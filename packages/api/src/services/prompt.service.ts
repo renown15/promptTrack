@@ -36,13 +36,11 @@ async function ensureUniqueSlug(base: string): Promise<string> {
 
 export const promptService = {
   async list(filters?: {
-    environment?: string;
-    collectionId?: string;
-    isArchived?: boolean;
+    environment?: "draft" | "review" | "staging" | "production" | undefined;
+    collectionId?: string | undefined;
+    isArchived?: boolean | undefined;
   }) {
-    return promptRepository.findAll(
-      filters as Parameters<typeof promptRepository.findAll>[0]
-    );
+    return promptRepository.findAll(filters);
   },
 
   async getById(id: string) {
@@ -60,7 +58,9 @@ export const promptService = {
     const prompt = await promptRepository.create({
       name: input.name,
       slug,
-      description: input.description,
+      ...(input.description !== undefined && {
+        description: input.description,
+      }),
       tags: input.tags,
       parentId: input.parentId ?? null,
       collectionId: input.collectionId ?? null,
@@ -86,7 +86,17 @@ export const promptService = {
     if (prompt.isArchived)
       throw new PromptError("Cannot update archived prompt");
 
-    return promptRepository.update(id, input);
+    return promptRepository.update(id, {
+      ...(input.name !== undefined && { name: input.name }),
+      ...(input.description !== undefined && {
+        description: input.description,
+      }),
+      ...(input.tags !== undefined && { tags: input.tags }),
+      ...(input.collectionId !== undefined && {
+        collectionId: input.collectionId,
+      }),
+      ...(input.parentId !== undefined && { parentId: input.parentId }),
+    });
   },
 
   async createVersion(
@@ -106,7 +116,7 @@ export const promptService = {
       versionNumber: nextVersion,
       content: input.content,
       role: input.role as "system" | "user" | "assistant",
-      changelog: input.changelog,
+      ...(input.changelog !== undefined && { changelog: input.changelog }),
       modelParameters: input.modelParameters,
       variables: input.variables,
       createdBy: userId,

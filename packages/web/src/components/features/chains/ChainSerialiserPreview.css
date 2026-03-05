@@ -1,0 +1,47 @@
+.chain-serialiser-preview__loading {
+  @apply text-sm text-muted-foreground;
+}
+
+.chain-serialiser-preview {
+  @apply border border-border rounded-lg overflow-hidden bg-background;
+}
+
+.chain-serialiser-preview__meta {
+  @apply flex gap-4 px-4 py-2 border-b border-border bg-muted text-xs;
+}
+
+.chain-serialiser-preview__token {
+  @apply text-muted-foreground;
+}
+
+.chain-serialiser-preview__warn {
+  @apply text-amber-600 font-medium;
+}
+
+.chain-serialiser-preview__messages {
+  @apply divide-y divide-border;
+}
+
+.chain-serialiser-preview__message {
+  @apply p-4;
+}
+
+.chain-serialiser-preview__message--system {
+  @apply bg-blue-50/50;
+}
+
+.chain-serialiser-preview__message--user {
+  @apply bg-background;
+}
+
+.chain-serialiser-preview__message--assistant {
+  @apply bg-muted/40;
+}
+
+.chain-serialiser-preview__role {
+  @apply text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2;
+}
+
+.chain-serialiser-preview__content {
+  @apply text-sm whitespace-pre-wrap font-mono;
+}

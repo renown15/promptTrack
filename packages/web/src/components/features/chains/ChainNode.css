@@ -1,0 +1,31 @@
+.chain-node {
+  @apply bg-background border border-border rounded-lg p-3 min-w-[160px] shadow-sm;
+}
+
+.chain-node--selected {
+  @apply border-primary ring-1 ring-primary;
+}
+
+.chain-node__header {
+  @apply flex justify-end mb-1;
+}
+
+.chain-node__badge {
+  @apply text-xs px-1.5 py-0.5 rounded font-medium;
+}
+
+.chain-node__badge--link {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.chain-node__badge--copy {
+  @apply bg-amber-100 text-amber-700;
+}
+
+.chain-node__label {
+  @apply text-sm font-semibold text-foreground truncate;
+}
+
+.chain-node__prompt {
+  @apply text-xs text-muted-foreground truncate mt-0.5;
+}

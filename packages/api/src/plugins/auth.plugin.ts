@@ -19,7 +19,10 @@ async function authPlugin(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         await request.jwtVerify();
-        const payload = request.user as { sub: string; type?: string };
+        const payload = request.user as unknown as {
+          sub: string;
+          type?: string;
+        };
         if (payload.type === "refresh") {
           return reply.code(401).send({ error: "Use access token" });
         }

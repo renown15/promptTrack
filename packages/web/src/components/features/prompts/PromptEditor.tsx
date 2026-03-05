@@ -1,7 +1,9 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CreatePromptSchema } from "@prompttrack/shared";
 import type { CreatePromptInput } from "@prompttrack/shared";
+import { RichTextEditor } from "@/components/features/prompts/RichTextEditor";
 import "@/components/features/prompts/PromptEditor.css";
 
 type Props = {
@@ -19,11 +21,14 @@ export function PromptEditor({
 }: Props) {
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<CreatePromptInput>({
-    resolver: zodResolver(CreatePromptSchema),
+    resolver: zodResolver(
+      CreatePromptSchema
+    ) as unknown as Resolver<CreatePromptInput>,
     defaultValues: {
       tags: [],
       variables: [],
@@ -75,14 +80,16 @@ export function PromptEditor({
         </select>
       </div>
       <div className="prompt-editor__field">
-        <label className="prompt-editor__label" htmlFor="content">
-          Content
-        </label>
-        <textarea
-          {...register("content")}
-          id="content"
-          className="prompt-editor__textarea"
-          placeholder="Write your prompt here. Use {{variable}} for placeholders."
+        <label className="prompt-editor__label">Content</label>
+        <Controller
+          name="content"
+          control={control}
+          render={({ field }) => (
+            <RichTextEditor
+              value={field.value ?? ""}
+              onChange={field.onChange}
+            />
+          )}
         />
         {errors.content && (
           <span className="prompt-editor__error">{errors.content.message}</span>

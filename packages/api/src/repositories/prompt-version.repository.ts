@@ -50,13 +50,15 @@ export const promptVersionRepository = {
     return prisma.promptVersion.create({
       data: {
         ...rest,
-        modelParameters: rest.modelParameters ?? {},
+        modelParameters: (rest.modelParameters ?? {}) as Record<string, string>,
         variables: {
           create: variables.map((v) => ({
             name: v.name,
-            description: v.description,
             required: v.required,
-            defaultValue: v.defaultValue,
+            ...(v.description !== undefined && { description: v.description }),
+            ...(v.defaultValue !== undefined && {
+              defaultValue: v.defaultValue,
+            }),
           })),
         },
       },

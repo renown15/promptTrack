@@ -3,10 +3,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthGuard } from "@/components/features/auth/AuthGuard";
 import { AppShell } from "@/components/layout/AppShell";
 import { LoginPage } from "@/pages/LoginPage";
+import { RegisterPage } from "@/pages/RegisterPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { PromptsPage } from "@/pages/PromptsPage";
 import { PromptDetailPage } from "@/pages/PromptDetailPage";
 import { PromptNewPage } from "@/pages/PromptNewPage";
+import { ChainsPage } from "@/pages/ChainsPage";
+import { ChainDetailPage } from "@/pages/ChainDetailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +26,7 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             element={
               <AuthGuard>
@@ -35,6 +39,8 @@ export function App() {
             <Route path="/prompts" element={<PromptsPage />} />
             <Route path="/prompts/new" element={<PromptNewPage />} />
             <Route path="/prompts/:id" element={<PromptDetailPage />} />
+            <Route path="/chains" element={<ChainsPage />} />
+            <Route path="/chains/:id" element={<ChainDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

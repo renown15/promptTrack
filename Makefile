@@ -89,6 +89,10 @@ test-coverage: ## Run tests with coverage
 
 ##@ Quality
 
+check: ## Smoke test — typecheck + build (run before declaring work complete)
+	pnpm typecheck
+	pnpm build
+
 lint: ## Run ESLint
 	pnpm lint
 

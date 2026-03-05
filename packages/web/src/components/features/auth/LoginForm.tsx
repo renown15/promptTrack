@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@prompttrack/shared";
 import { authApi } from "@/api/endpoints/auth";
 import { useAuthStore } from "@/stores/authStore";

@@ -37,15 +37,19 @@ type UpdatePromptData = {
 
 export const promptRepository = {
   async findAll(filters?: {
-    environment?: Environment;
-    isArchived?: boolean;
-    collectionId?: string;
+    environment?: Environment | undefined;
+    isArchived?: boolean | undefined;
+    collectionId?: string | undefined;
   }): Promise<PromptRecord[]> {
     return prisma.prompt.findMany({
       where: {
         isArchived: filters?.isArchived ?? false,
-        environment: filters?.environment,
-        collectionId: filters?.collectionId,
+        ...(filters?.environment !== undefined && {
+          environment: filters.environment,
+        }),
+        ...(filters?.collectionId !== undefined && {
+          collectionId: filters.collectionId,
+        }),
       },
       orderBy: { updatedAt: "desc" },
     });

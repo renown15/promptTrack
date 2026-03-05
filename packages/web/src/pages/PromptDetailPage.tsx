@@ -60,11 +60,12 @@ export function PromptDetailPage() {
         <PromptEditor
           onSubmit={handleNewVersion}
           onCancel={() => setShowVersionEditor(false)}
-          defaultValues={
-            latestVersion
-              ? { content: latestVersion.content, role: latestVersion.role }
-              : undefined
-          }
+          {...(latestVersion !== undefined && {
+            defaultValues: {
+              content: latestVersion.content,
+              role: latestVersion.role,
+            },
+          })}
           submitLabel="Save version"
         />
       )}

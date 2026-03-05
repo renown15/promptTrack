@@ -8,6 +8,7 @@ import authPlugin from "@/plugins/auth.plugin.js";
 import { registerErrorHandler } from "@/middleware/errorHandler.js";
 import { authRoutes } from "@/routes/auth/auth.routes.js";
 import { promptRoutes } from "@/routes/prompts/prompts.routes.js";
+import { chainRoutes } from "@/routes/chains/chains.routes.js";
 
 const loggerConfig =
   env.NODE_ENV === "development"
@@ -53,6 +54,7 @@ async function buildApp() {
 
   await fastify.register(authRoutes, { prefix: "/api/auth" });
   await fastify.register(promptRoutes, { prefix: "/api/prompts" });
+  await fastify.register(chainRoutes, { prefix: "/api/chains" });
 
   fastify.get("/health", async () => ({
     status: "ok",

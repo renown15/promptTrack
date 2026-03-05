@@ -1,6 +1,6 @@
 # PromptTrack — LLM Prompt Management System
 
-## Technical Design Document v1.1
+## Technical Design Document v1.2
 
 > **Purpose**: This document is the authoritative specification for PromptTrack. It is intended to be consumed directly by a coding agent. Implement exactly as specified. If a conflict or ambiguity is detected, halt and raise it before proceeding. Do not make architectural decisions not covered here without flagging them first.
 
@@ -8,22 +8,37 @@
 
 ## 1. Product Overview
 
-**PromptTrack** is a full-stack web application for creating, organising, versioning, chaining, and semantically searching LLM prompts across software development workflows. It treats prompts as first-class software artifacts — with structured hierarchy, DAG-based prompt chains, variable injection, vector search, and a full CI/CD-backed delivery pipeline.
+**PromptTrack** is a personal, locally-run prompt library and context reconstruction tool for agent-assisted software development. The primary user is a developer working with AI coding agents (e.g. Claude Code) who needs a proper authoring environment for prompts, a versioned history of what has been tried, and a fast way to reconstruct context mid-session when an agent's context window runs out.
+
+It is **not** a team SaaS product. It runs locally via Docker Compose and is accessed through a browser on the same machine.
+
+### The Problem It Solves
+
+Writing prompts in a terminal is painful. Storing them in Word documents loses history. When an agent's context resets mid-session, reconstructing what was decided and why is slow and error-prone. PromptTrack provides:
+
+- A decent **authoring environment** for writing and organising prompts — WYSIWYG, versioned, searchable
+- **Prompt chains** that assemble reusable context blocks into a single serialised output, ready to paste back into an agent session
+- A full **version history** so you can always recover what worked
 
 ### Core Capabilities
 
-- Create and manage individual prompts with rich metadata, tags, and labels
+- Write prompts in a **WYSIWYG Markdown editor** (headings, subheadings, bullets, bold, italic, code — stored as Markdown text)
 - Organise prompts in a hierarchy tree (prompts with labelled child prompts)
 - Build **prompt chains** as Directed Acyclic Graphs (DAGs) on a drag-and-drop canvas
-- Serialise chains to an ordered messages array for LLM execution; each node preserves its own role
-- Inject `{{variable_name}}` placeholders per-node; a unified chain-level form collects all at runtime
+- Serialise chains to an ordered messages array; copy the output and paste it into an agent session
 - Prompt nodes are **linked** (live reference) or **copied** (forked snapshot) into chains
-- **Vector search** over individual prompts, whole chains, and suggestions for a chain being built
+- **Vector search** over individual prompts and chains
 - Pluggable embedding provider (OpenAI in cloud, Ollama locally)
 - **Postgres + pgvector** as the single database — relational data and vectors in one store
-- Authentication: username/password (v1)
-- Docker Compose for local development; cloud deployment via container images (AWS/GCP/Azure)
-- Full audit trail, version history with diff, environment promotion workflow
+- Authentication: username/password (single local user in practice)
+- Full version history per prompt
+
+### Deliberately Out of Scope (for now)
+
+- `{{variable}}` template injection — deferred
+- CI/CD pipeline integration
+- Cloud hosting or multi-user team features
+- Environment promotion workflow
 
 ---
 
@@ -42,7 +57,7 @@
 | Styling       | **Tailwind CSS v3** — in dedicated `.css` files, never inline or in `.tsx` |
 | DAG Canvas    | **React Flow v11**                                                         |
 | Forms         | **React Hook Form** + **Zod**                                              |
-| Prompt Editor | **CodeMirror 6**                                                           |
+| Prompt Editor | **TipTap v2** (ProseMirror-based WYSIWYG, outputs Markdown)                |
 | HTTP Client   | **Axios**                                                                  |
 | Unit Testing  | **Vitest** + **React Testing Library**                                     |
 | E2E Testing   | **Playwright**                                                             |
@@ -1506,7 +1521,51 @@ All Tailwind utility classes go in `.css` files via `@apply` only — never in `
 
 ---
 
-## 18. Out of Scope for v1
+## 18. WYSIWYG Prompt Editor
+
+### 18.1 Library
+
+Use **TipTap v2** (`@tiptap/react`, `@tiptap/starter-kit`). TipTap is a headless ProseMirror wrapper with a Markdown serialiser extension (`@tiptap/extension-markdown`). The stored value in the database is always **plain Markdown text** — TipTap serialises on save and parses on load.
+
+Do not use CodeMirror 6 for prompt editing.
+
+### 18.2 Permitted Formatting
+
+Restrict the editor to the following extensions only:
+
+| Format       | TipTap extension    |
+| ------------ | ------------------- |
+| Heading H1   | `Heading` (level 1) |
+| Heading H2   | `Heading` (level 2) |
+| Heading H3   | `Heading` (level 3) |
+| Bold         | `Bold`              |
+| Italic       | `Italic`            |
+| Bullet list  | `BulletList`        |
+| Ordered list | `OrderedList`       |
+| Code inline  | `Code`              |
+| Code block   | `CodeBlock`         |
+| Hard break   | `HardBreak`         |
+
+Do **not** enable: tables, images, links, strikethrough, task lists, or any other extension not listed above.
+
+### 18.3 Toolbar
+
+A minimal floating or fixed toolbar above the editor with buttons for each permitted format. BEM class: `prompt-editor-toolbar`. No third-party toolbar component — build it from TipTap's `editor.chain()` API.
+
+### 18.4 Storage
+
+- Prompt content is stored as Markdown text (same `content` column, no schema change)
+- On save: `editor.storage.markdown.getMarkdown()` → send to API
+- On load: `editor.commands.setContent(markdownContent)` — TipTap parses Markdown to ProseMirror nodes
+
+### 18.5 Deferred
+
+- `{{variable}}` inline chip decoration — do not implement yet
+- Markdown preview toggle (WYSIWYG is the only mode)
+
+---
+
+## 19. Out of Scope for v1
 
 Explicitly deferred — do not implement:
 
@@ -1519,3 +1578,5 @@ Explicitly deferred — do not implement:
 - Multi-tenancy / workspace isolation
 - Webhook triggers on environment promotion
 - Prompt export (PDF/HTML)
+- `{{variable}}` template injection
+- Cloud hosting

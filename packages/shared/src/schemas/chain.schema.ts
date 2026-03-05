@@ -57,6 +57,54 @@ export const ChainSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
+export const ChainNodeDTOSchema = z.object({
+  id: z.string(),
+  nodeId: z.string(),
+  label: z.string().nullable(),
+  refType: ChainNodeRefTypeSchema,
+  snapshotContent: z.string().nullable(),
+  promptVersionNumber: z.number(),
+  positionX: z.number(),
+  positionY: z.number(),
+  promptId: z.string(),
+  chainVersionId: z.string(),
+});
+
+export const ChainEdgeDTOSchema = z.object({
+  id: z.string(),
+  edgeId: z.string(),
+  label: z.string().nullable(),
+  sourceNodeId: z.string(),
+  targetNodeId: z.string(),
+  chainVersionId: z.string(),
+});
+
+export const ChainVersionDTOSchema = z.object({
+  id: z.string(),
+  versionNumber: z.number(),
+  changelog: z.string().nullable(),
+  chainId: z.string(),
+  createdBy: z.string(),
+  createdAt: z.string().datetime(),
+  nodes: z.array(ChainNodeDTOSchema),
+  edges: z.array(ChainEdgeDTOSchema),
+});
+
+export const ChainWithVersionSchema = ChainSchema.extend({
+  currentVersionData: ChainVersionDTOSchema.nullable(),
+});
+
+export const SerialiserOutputSchema = z.object({
+  messages: z.array(z.object({ role: z.string(), content: z.string() })),
+  contextString: z.string(),
+  tokenEstimate: z.number(),
+  unresolvedVariables: z.array(z.string()),
+});
+
+export const ChainVariablesSchema = z.object({
+  variables: z.array(z.string()),
+});
+
 export type ChainNodeInput = z.infer<typeof ChainNodeInputSchema>;
 export type ChainEdgeInput = z.infer<typeof ChainEdgeInputSchema>;
 export type CreateChainInput = z.infer<typeof CreateChainSchema>;
@@ -64,3 +112,9 @@ export type UpdateChainInput = z.infer<typeof UpdateChainSchema>;
 export type CreateChainVersionInput = z.infer<typeof CreateChainVersionSchema>;
 export type SerialiseChainInput = z.infer<typeof SerialiseChainSchema>;
 export type ChainDTO = z.infer<typeof ChainSchema>;
+export type ChainNodeDTO = z.infer<typeof ChainNodeDTOSchema>;
+export type ChainEdgeDTO = z.infer<typeof ChainEdgeDTOSchema>;
+export type ChainVersionDTO = z.infer<typeof ChainVersionDTOSchema>;
+export type ChainWithVersionDTO = z.infer<typeof ChainWithVersionSchema>;
+export type SerialiserOutput = z.infer<typeof SerialiserOutputSchema>;
+export type ChainVariables = z.infer<typeof ChainVariablesSchema>;

@@ -1,8 +1,8 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyError } from "fastify";
 import { AuthError } from "@/services/auth.service.js";
 
 export function registerErrorHandler(fastify: FastifyInstance) {
-  fastify.setErrorHandler((error, _request, reply) => {
+  fastify.setErrorHandler((error: FastifyError, _request, reply) => {
     fastify.log.error(error);
 
     if (error instanceof AuthError) {
