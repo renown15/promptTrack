@@ -1,0 +1,15 @@
+.login-page {
+  @apply min-h-screen flex items-center justify-center bg-background px-4;
+}
+
+.login-page__card {
+  @apply w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm;
+}
+
+.login-page__title {
+  @apply text-2xl font-semibold text-card-foreground mb-2;
+}
+
+.login-page__subtitle {
+  @apply text-sm text-muted-foreground mb-6;
+}

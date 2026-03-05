@@ -1,0 +1,48 @@
+.prompt-editor {
+  @apply flex flex-col gap-5;
+}
+
+.prompt-editor__field {
+  @apply flex flex-col gap-1.5;
+}
+
+.prompt-editor__label {
+  @apply text-sm font-medium text-foreground;
+}
+
+.prompt-editor__input {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm
+    placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
+}
+
+.prompt-editor__textarea {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono
+    placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring
+    resize-none min-h-[200px];
+}
+
+.prompt-editor__select {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm
+    focus:outline-none focus:ring-2 focus:ring-ring;
+}
+
+.prompt-editor__error {
+  @apply text-xs text-destructive;
+}
+
+.prompt-editor__actions {
+  @apply flex gap-3 justify-end;
+}
+
+.prompt-editor__cancel {
+  @apply rounded-md border border-border px-4 py-2 text-sm hover:bg-accent transition-colors;
+}
+
+.prompt-editor__submit {
+  @apply rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium
+    hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity;
+}
+
+.prompt-editor__global-error {
+  @apply rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive;
+}

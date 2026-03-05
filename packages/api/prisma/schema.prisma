@@ -1,0 +1,263 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+enum Role {
+  viewer
+  editor
+  admin
+}
+
+enum Environment {
+  draft
+  review
+  staging
+  production
+}
+
+enum PromptRole {
+  system
+  user
+  assistant
+}
+
+enum AuditAction {
+  create
+  update
+  delete
+  promote
+  execute
+}
+
+enum ChainNodeRefType {
+  link
+  copy
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         Role     @default(editor)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  prompts        Prompt[]
+  chains         Chain[]
+  promptVersions PromptVersion[]
+  chainVersions  ChainVersion[]
+  auditLogs      AuditLog[]
+  refreshTokens  RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  prompts Prompt[]
+  chains  Chain[]
+
+  @@map("collections")
+}
+
+model Prompt {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String      @unique
+  description    String?
+  tags           String[]
+  environment    Environment @default(draft)
+  currentVersion Int         @default(1) @map("current_version")
+  isArchived     Boolean     @default(false) @map("is_archived")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  parentId     String?  @map("parent_id")
+  parent       Prompt?  @relation("PromptHierarchy", fields: [parentId], references: [id])
+  children     Prompt[] @relation("PromptHierarchy")
+
+  collectionId String?     @map("collection_id")
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+
+  createdBy String @map("created_by")
+  creator   User   @relation(fields: [createdBy], references: [id])
+
+  versions   PromptVersion[]
+  chainNodes ChainNode[]
+  auditLogs  AuditLog[]
+
+  @@index([createdBy])
+  @@index([environment])
+  @@index([collectionId])
+  @@map("prompts")
+}
+
+model PromptVersion {
+  id            String     @id @default(cuid())
+  versionNumber Int        @map("version_number")
+  content       String
+  role          PromptRole @default(user)
+  changelog     String?
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  embedding Unsupported("vector(1536)")?
+
+  modelParameters Json @default("{}") @map("model_parameters")
+
+  promptId  String @map("prompt_id")
+  prompt    Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  createdBy String @map("created_by")
+  creator   User   @relation(fields: [createdBy], references: [id])
+
+  variables TemplateVariable[]
+
+  @@unique([promptId, versionNumber])
+  @@map("prompt_versions")
+}
+
+model TemplateVariable {
+  id           String  @id @default(cuid())
+  name         String
+  description  String?
+  required     Boolean @default(true)
+  defaultValue String? @map("default_value")
+
+  promptVersionId String        @map("prompt_version_id")
+  promptVersion   PromptVersion @relation(fields: [promptVersionId], references: [id], onDelete: Cascade)
+
+  @@map("template_variables")
+}
+
+model Chain {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String      @unique
+  description    String?
+  tags           String[]
+  currentVersion Int         @default(1) @map("current_version")
+  isArchived     Boolean     @default(false) @map("is_archived")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  collectionId String?     @map("collection_id")
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+
+  createdBy String @map("created_by")
+  creator   User   @relation(fields: [createdBy], references: [id])
+
+  versions  ChainVersion[]
+  auditLogs AuditLog[]
+
+  @@index([createdBy])
+  @@index([collectionId])
+  @@map("chains")
+}
+
+model ChainVersion {
+  id            String   @id @default(cuid())
+  versionNumber Int      @map("version_number")
+  changelog     String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  embedding Unsupported("vector(1536)")?
+
+  chainId   String @map("chain_id")
+  chain     Chain  @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  createdBy String @map("created_by")
+  creator   User   @relation(fields: [createdBy], references: [id])
+
+  nodes ChainNode[]
+  edges ChainEdge[]
+
+  @@unique([chainId, versionNumber])
+  @@map("chain_versions")
+}
+
+model ChainNode {
+  id                  String           @id @default(cuid())
+  nodeId              String           @map("node_id")
+  label               String?
+  refType             ChainNodeRefType @map("ref_type")
+  snapshotContent     String?          @map("snapshot_content")
+  promptVersionNumber Int              @map("prompt_version_number")
+  positionX           Float            @map("position_x")
+  positionY           Float            @map("position_y")
+
+  chainVersionId String       @map("chain_version_id")
+  chainVersion   ChainVersion @relation(fields: [chainVersionId], references: [id], onDelete: Cascade)
+
+  promptId String @map("prompt_id")
+  prompt   Prompt @relation(fields: [promptId], references: [id])
+
+  sourceEdges ChainEdge[] @relation("EdgeSource")
+  targetEdges ChainEdge[] @relation("EdgeTarget")
+
+  @@index([chainVersionId])
+  @@map("chain_nodes")
+}
+
+model ChainEdge {
+  id     String  @id @default(cuid())
+  edgeId String  @map("edge_id")
+  label  String?
+
+  chainVersionId String       @map("chain_version_id")
+  chainVersion   ChainVersion @relation(fields: [chainVersionId], references: [id], onDelete: Cascade)
+
+  sourceNodeId String    @map("source_node_id")
+  sourceNode   ChainNode @relation("EdgeSource", fields: [sourceNodeId], references: [id])
+
+  targetNodeId String    @map("target_node_id")
+  targetNode   ChainNode @relation("EdgeTarget", fields: [targetNodeId], references: [id])
+
+  @@index([chainVersionId])
+  @@map("chain_edges")
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  entityType String      @map("entity_type")
+  action     AuditAction
+  diff       Json?
+  ipAddress  String?     @map("ip_address")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  userId   String  @map("user_id")
+  user     User    @relation(fields: [userId], references: [id])
+  promptId String? @map("prompt_id")
+  prompt   Prompt? @relation(fields: [promptId], references: [id])
+  chainId  String? @map("chain_id")
+  chain    Chain?  @relation(fields: [chainId], references: [id])
+
+  @@index([userId])
+  @@index([promptId])
+  @@index([chainId])
+  @@map("audit_logs")
+}

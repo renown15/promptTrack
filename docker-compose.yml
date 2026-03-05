@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: prompttrack-postgres
+    environment:
+      POSTGRES_USER: prompttrack
+      POSTGRES_PASSWORD: prompttrack_dev
+      POSTGRES_DB: prompttrack
+    ports:
+      - "5451:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prompttrack -d prompttrack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./packages/api
+      dockerfile: Dockerfile
+      target: development
+    container_name: prompttrack-api
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://prompttrack:prompttrack_dev@postgres:5432/prompttrack
+      PORT: 3051
+      JWT_SECRET: dev-secret-change-in-production
+    ports:
+      - "3051:3051"
+    volumes:
+      - ./packages/api/src:/app/src
+      - ./packages/api/prisma:/app/prisma
+      - ./packages/shared:/app/packages/shared
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./packages/web
+      dockerfile: Dockerfile
+      target: development
+    container_name: prompttrack-web
+    environment:
+      VITE_API_URL: http://localhost:3051
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./packages/web/src:/app/src
+      - ./packages/web/index.html:/app/index.html
+      - ./packages/shared:/app/packages/shared
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

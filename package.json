@@ -1,0 +1,57 @@
+{
+  "name": "prompttrack",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm run --parallel --filter @prompttrack/* dev",
+    "dev:api": "pnpm --filter @prompttrack/api dev",
+    "dev:web": "pnpm --filter @prompttrack/web dev",
+    "build": "pnpm run --filter @prompttrack/* build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm run --filter @prompttrack/* typecheck",
+    "test": "pnpm run --filter @prompttrack/* test",
+    "test:unit": "pnpm run --filter @prompttrack/* test:unit",
+    "test:integration": "pnpm run --filter @prompttrack/api test:integration",
+    "test:e2e": "pnpm run --filter @prompttrack/web test:e2e",
+    "test:coverage": "pnpm run --filter @prompttrack/* test:coverage",
+    "db:generate": "pnpm --filter @prompttrack/api db:generate",
+    "db:migrate": "pnpm --filter @prompttrack/api db:migrate",
+    "db:push": "pnpm --filter @prompttrack/api db:push",
+    "db:studio": "pnpm --filter @prompttrack/api db:studio",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^15.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.56.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yaml,yml}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

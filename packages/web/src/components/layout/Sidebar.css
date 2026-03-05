@@ -1,0 +1,29 @@
+.sidebar {
+  @apply flex flex-col w-56 min-h-screen border-r border-border bg-card px-3 py-4 shrink-0;
+}
+
+.sidebar__brand {
+  @apply text-base font-semibold text-foreground px-2 mb-6;
+}
+
+.sidebar__nav {
+  @apply flex flex-col gap-1 flex-1;
+}
+
+.sidebar__link {
+  @apply flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground
+    hover:bg-accent hover:text-accent-foreground transition-colors;
+}
+
+.sidebar__link--active {
+  @apply bg-accent text-accent-foreground font-medium;
+}
+
+.sidebar__footer {
+  @apply pt-4 border-t border-border;
+}
+
+.sidebar__logout {
+  @apply flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground
+    hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left cursor-pointer;
+}

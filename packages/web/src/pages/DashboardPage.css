@@ -1,0 +1,19 @@
+.dashboard {
+  @apply max-w-2xl;
+}
+
+.dashboard__title {
+  @apply text-2xl font-semibold mb-2;
+}
+
+.dashboard__subtitle {
+  @apply text-muted-foreground mb-6;
+}
+
+.dashboard__actions {
+  @apply flex gap-3;
+}
+
+.dashboard__btn {
+  @apply px-4 py-2 rounded border border-border bg-background hover:bg-accent transition-colors;
+}

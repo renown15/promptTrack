@@ -1,0 +1,12 @@
+.top-nav {
+  @apply flex items-center justify-end h-14 px-6 border-b border-border bg-background;
+  @apply sticky top-0 z-[var(--z-sticky)];
+}
+
+.top-nav__right {
+  @apply flex items-center gap-3;
+}
+
+.top-nav__user {
+  @apply text-sm text-muted-foreground;
+}

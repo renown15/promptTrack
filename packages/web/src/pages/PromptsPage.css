@@ -1,0 +1,12 @@
+.prompts-page__header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.prompts-page__title {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.prompts-page__new-btn {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium
+    hover:opacity-90 transition-opacity;
+}

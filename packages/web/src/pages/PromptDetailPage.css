@@ -1,0 +1,68 @@
+.prompt-detail__header {
+  @apply flex items-start justify-between gap-4 mb-6;
+}
+
+.prompt-detail__title {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.prompt-detail__meta {
+  @apply flex items-center gap-2 mt-1;
+}
+
+.prompt-detail__env {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground;
+}
+
+.prompt-detail__version {
+  @apply text-xs text-muted-foreground;
+}
+
+.prompt-detail__actions {
+  @apply flex gap-2 shrink-0;
+}
+
+.prompt-detail__btn {
+  @apply rounded-md border border-border px-3 py-1.5 text-sm hover:bg-accent transition-colors;
+}
+
+.prompt-detail__btn--primary {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium
+    hover:opacity-90 transition-opacity;
+}
+
+.prompt-detail__versions {
+  @apply mt-8;
+}
+
+.prompt-detail__versions-title {
+  @apply text-sm font-medium text-foreground mb-3;
+}
+
+.prompt-detail__version-item {
+  @apply rounded-md border border-border p-4 mb-3;
+}
+
+.prompt-detail__version-header {
+  @apply flex items-center justify-between mb-2;
+}
+
+.prompt-detail__version-num {
+  @apply text-sm font-medium text-foreground;
+}
+
+.prompt-detail__version-date {
+  @apply text-xs text-muted-foreground;
+}
+
+.prompt-detail__version-content {
+  @apply text-sm font-mono text-muted-foreground whitespace-pre-wrap bg-muted rounded p-3;
+}
+
+.prompt-detail__loading {
+  @apply text-sm text-muted-foreground;
+}
+
+.prompt-detail__not-found {
+  @apply text-sm text-muted-foreground;
+}
