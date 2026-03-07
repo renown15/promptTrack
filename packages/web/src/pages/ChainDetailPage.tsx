@@ -5,6 +5,7 @@ import { useChainVariables } from "@/hooks/useChainVariables";
 import { ChainCanvas } from "@/components/features/chains/ChainCanvas";
 import { ChainVariableForm } from "@/components/features/chains/ChainVariableForm";
 import { ChainSerialiserPreview } from "@/components/features/chains/ChainSerialiserPreview";
+import { ProjectPicker } from "@/components/features/collections/ProjectPicker";
 import type { SerialiserOutput } from "@prompttrack/shared";
 import "@/pages/ChainDetailPage.css";
 
@@ -45,6 +46,9 @@ export function ChainDetailPage() {
         {chain.description && (
           <p className="chain-detail-page__description">{chain.description}</p>
         )}
+        <div className="chain-detail-page__projects">
+          <ProjectPicker resourceId={chainId} resourceType="chain" />
+        </div>
       </div>
 
       <div className="chain-detail-page__canvas">

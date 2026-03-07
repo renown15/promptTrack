@@ -59,6 +59,10 @@
   @apply text-sm font-mono text-muted-foreground whitespace-pre-wrap bg-muted rounded p-3;
 }
 
+.prompt-detail__projects {
+  @apply mt-2;
+}
+
 .prompt-detail__loading {
   @apply text-sm text-muted-foreground;
 }

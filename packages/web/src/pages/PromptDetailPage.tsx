@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePrompt, useCreatePromptVersion } from "@/hooks/usePrompts";
 import { PromptEditor } from "@/components/features/prompts/PromptEditor";
+import { ProjectPicker } from "@/components/features/collections/ProjectPicker";
 import type { CreatePromptInput } from "@prompttrack/shared";
 import "@/pages/PromptDetailPage.css";
 
@@ -38,6 +39,9 @@ export function PromptDetailPage() {
             <span className="prompt-detail__version">
               v{prompt.currentVersion}
             </span>
+          </div>
+          <div className="prompt-detail__projects">
+            <ProjectPicker resourceId={prompt.id} resourceType="prompt" />
           </div>
         </div>
         <div className="prompt-detail__actions">
