@@ -1,6 +1,6 @@
 # PromptTrack — LLM Prompt Management System
 
-## Technical Design Document v1.2
+## Technical Design Document v1.3
 
 > **Purpose**: This document is the authoritative specification for PromptTrack. It is intended to be consumed directly by a coding agent. Implement exactly as specified. If a conflict or ambiguity is detected, halt and raise it before proceeding. Do not make architectural decisions not covered here without flagging them first.
 
@@ -493,8 +493,31 @@ model Collection {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  prompts Prompt[]
-  chains  Chain[]
+  @@map("collections")
+
+  prompts PromptCollection[]
+  chains  ChainCollection[]
+}
+
+// Many-to-many join tables — a prompt or chain can belong to multiple projects
+model PromptCollection {
+  promptId     String
+  collectionId String
+  prompt       Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, collectionId])
+  @@map("prompt_collections")
+}
+
+model ChainCollection {
+  chainId      String
+  collectionId String
+  chain        Chain      @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([chainId, collectionId])
+  @@map("chain_collections")
 }
 
 model Prompt {
@@ -513,15 +536,13 @@ model Prompt {
   parent       Prompt?  @relation("PromptHierarchy", fields: [parentId], references: [id])
   children     Prompt[] @relation("PromptHierarchy")
 
-  collectionId String?
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-
   createdBy String
   creator   User   @relation(fields: [createdBy], references: [id])
 
-  versions   PromptVersion[]
-  chainNodes ChainNode[]
-  auditLogs  AuditLog[]
+  versions     PromptVersion[]
+  chainNodes   ChainNode[]
+  auditLogs    AuditLog[]
+  collections  PromptCollection[]
 }
 
 model PromptVersion {
@@ -570,14 +591,12 @@ model Chain {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
-  collectionId String?
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-
   createdBy String
   creator   User   @relation(fields: [createdBy], references: [id])
 
-  versions  ChainVersion[]
-  auditLogs AuditLog[]
+  versions    ChainVersion[]
+  auditLogs   AuditLog[]
+  collections ChainCollection[]
 }
 
 model ChainVersion {
@@ -1565,7 +1584,63 @@ A minimal floating or fixed toolbar above the editor with buttons for each permi
 
 ---
 
-## 19. Out of Scope for v1
+## 19. Projects (Collections)
+
+### 19.1 Concept
+
+**Projects** are the UI name for the `Collection` database model. They group prompts and chains into named folders displayed in a VS Code-style sidebar tree. A prompt or chain can belong to **multiple** projects simultaneously (many-to-many).
+
+### 19.2 Schema
+
+Remove `collectionId` from `Prompt` and `Chain`. Replace with many-to-many join tables `PromptCollection` and `ChainCollection` (see §10 schema). This requires a Prisma migration that drops the old columns and creates the join tables.
+
+### 19.3 Sidebar Tree Structure
+
+```
+📁 Project A
+   📝 Prompt 1
+   🔗 Chain 1          ← expandable
+      └ 📝 Prompt 2
+      └ 📝 Prompt 3
+📁 Project B
+   🔗 Chain 2
+      └ 📝 Prompt 1    ← same prompt, appears in both projects
+── Ungrouped
+   📝 Prompt 4
+   🔗 Chain 3
+      └ 📝 Prompt 5
+```
+
+- Projects are flat (no nesting)
+- Chains are expandable nodes showing their linked prompts (from `currentVersionData.nodes`)
+- Clicking a prompt navigates to `/prompts/:id`
+- Clicking a chain navigates to `/chains/:id`
+- Ungrouped section shows prompts and chains not in any project
+- Sidebar is persistent, collapsible per-project
+
+### 19.4 API Endpoints
+
+| Method | Path                              | Description                         |
+| ------ | --------------------------------- | ----------------------------------- |
+| GET    | `/projects`                       | List all projects                   |
+| POST   | `/projects`                       | Create project                      |
+| PATCH  | `/projects/:id`                   | Rename / update project             |
+| DELETE | `/projects/:id`                   | Delete project (not items inside)   |
+| POST   | `/projects/:id/prompts/:promptId` | Add prompt to project               |
+| DELETE | `/projects/:id/prompts/:promptId` | Remove prompt from project          |
+| POST   | `/projects/:id/chains/:chainId`   | Add chain to project                |
+| DELETE | `/projects/:id/chains/:chainId`   | Remove chain from project           |
+| GET    | `/projects/:id/tree`              | Full tree: prompts + chains + nodes |
+
+### 19.5 Sidebar Component
+
+BEM block: `app-sidebar`. Built as a fixed left panel inside `AppShell`. State (collapsed projects) stored in Zustand `sidebarStore`.
+
+The sidebar replaces or augments the existing `Sidebar` component. It calls `GET /projects` and `GET /prompts?ungrouped=true` and `GET /chains?ungrouped=true` on load.
+
+---
+
+## 20. Out of Scope for v1
 
 Explicitly deferred — do not implement:
 

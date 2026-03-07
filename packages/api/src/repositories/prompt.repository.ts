@@ -11,7 +11,6 @@ export type PromptRecord = {
   currentVersion: number;
   isArchived: boolean;
   parentId: string | null;
-  collectionId: string | null;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -23,7 +22,6 @@ type CreatePromptData = {
   description?: string;
   tags?: string[];
   parentId?: string | null;
-  collectionId?: string | null;
   createdBy: string;
 };
 
@@ -31,7 +29,6 @@ type UpdatePromptData = {
   name?: string;
   description?: string | null;
   tags?: string[];
-  collectionId?: string | null;
   parentId?: string | null;
 };
 
@@ -39,16 +36,12 @@ export const promptRepository = {
   async findAll(filters?: {
     environment?: Environment | undefined;
     isArchived?: boolean | undefined;
-    collectionId?: string | undefined;
   }): Promise<PromptRecord[]> {
     return prisma.prompt.findMany({
       where: {
         isArchived: filters?.isArchived ?? false,
         ...(filters?.environment !== undefined && {
           environment: filters.environment,
-        }),
-        ...(filters?.collectionId !== undefined && {
-          collectionId: filters.collectionId,
         }),
       },
       orderBy: { updatedAt: "desc" },

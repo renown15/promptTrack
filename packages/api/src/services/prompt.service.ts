@@ -37,7 +37,6 @@ async function ensureUniqueSlug(base: string): Promise<string> {
 export const promptService = {
   async list(filters?: {
     environment?: "draft" | "review" | "staging" | "production" | undefined;
-    collectionId?: string | undefined;
     isArchived?: boolean | undefined;
   }) {
     return promptRepository.findAll(filters);
@@ -63,7 +62,6 @@ export const promptService = {
       }),
       tags: input.tags,
       parentId: input.parentId ?? null,
-      collectionId: input.collectionId ?? null,
       createdBy: userId,
     });
 
@@ -92,9 +90,6 @@ export const promptService = {
         description: input.description,
       }),
       ...(input.tags !== undefined && { tags: input.tags }),
-      ...(input.collectionId !== undefined && {
-        collectionId: input.collectionId,
-      }),
       ...(input.parentId !== undefined && { parentId: input.parentId }),
     });
   },

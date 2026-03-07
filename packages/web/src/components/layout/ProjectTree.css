@@ -1,0 +1,72 @@
+.project-tree {
+  @apply flex flex-col gap-0.5 py-1;
+}
+
+.project-tree__loading {
+  @apply text-xs text-muted-foreground px-2 py-1;
+}
+
+/* Project (folder) */
+.project-tree__project {
+  @apply flex flex-col;
+}
+
+.project-tree__project-header {
+  @apply flex items-center gap-1.5 w-full rounded-md px-2 py-1 text-xs font-semibold
+    text-muted-foreground hover:bg-accent hover:text-accent-foreground
+    transition-colors cursor-pointer text-left;
+}
+
+.project-tree__project-toggle {
+  @apply text-[9px] text-muted-foreground/60 w-2.5 shrink-0;
+}
+
+.project-tree__project-children {
+  @apply flex flex-col gap-0.5 pl-3;
+}
+
+/* Generic tree item */
+.project-tree__item {
+  @apply flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground
+    hover:bg-accent hover:text-accent-foreground transition-colors truncate;
+}
+
+.project-tree__item--active {
+  @apply bg-accent text-accent-foreground font-medium;
+}
+
+.project-tree__icon {
+  @apply shrink-0 text-[11px];
+}
+
+/* Chain row with toggle */
+.project-tree__chain-group {
+  @apply flex flex-col;
+}
+
+.project-tree__chain-row {
+  @apply flex items-center gap-0.5;
+}
+
+.project-tree__toggle {
+  @apply text-[8px] text-muted-foreground/50 shrink-0 w-3 hover:text-muted-foreground
+    transition-colors cursor-pointer;
+}
+
+.project-tree__chain-prompts {
+  @apply flex flex-col gap-0.5 pl-4;
+}
+
+.project-tree__item--child-prompt {
+  @apply flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs text-muted-foreground
+    hover:bg-accent hover:text-accent-foreground transition-colors truncate;
+}
+
+/* Ungrouped section */
+.project-tree__ungrouped {
+  @apply flex flex-col gap-0.5 mt-2 pt-2 border-t border-border;
+}
+
+.project-tree__ungrouped-label {
+  @apply px-2 py-0.5 text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider;
+}

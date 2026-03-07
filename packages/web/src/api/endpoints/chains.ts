@@ -12,10 +12,7 @@ import type {
 } from "@prompttrack/shared";
 
 export const chainsApi = {
-  list: async (params?: {
-    isArchived?: boolean;
-    collectionId?: string;
-  }): Promise<ChainDTO[]> => {
+  list: async (params?: { isArchived?: boolean }): Promise<ChainDTO[]> => {
     const response = await apiClient.get<ChainDTO[]>("/chains", { params });
     return response.data;
   },

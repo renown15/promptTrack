@@ -37,10 +37,7 @@ async function ensureUniqueSlug(base: string): Promise<string> {
 }
 
 export const chainService = {
-  async list(filters?: {
-    isArchived?: boolean | undefined;
-    collectionId?: string | undefined;
-  }) {
+  async list(filters?: { isArchived?: boolean | undefined }) {
     return chainRepository.findAll(filters);
   },
 
@@ -61,7 +58,6 @@ export const chainService = {
         description: input.description,
       }),
       tags: input.tags,
-      collectionId: input.collectionId ?? null,
       createdBy: userId,
     });
     return chainService.getById(chain.id);
@@ -77,9 +73,6 @@ export const chainService = {
         description: input.description,
       }),
       ...(input.tags !== undefined && { tags: input.tags }),
-      ...(input.collectionId !== undefined && {
-        collectionId: input.collectionId,
-      }),
     });
   },
 

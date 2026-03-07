@@ -8,7 +8,6 @@ export type ChainRecord = {
   tags: string[];
   currentVersion: number;
   isArchived: boolean;
-  collectionId: string | null;
   createdBy: string;
   createdAt: Date;
   updatedAt: Date;
@@ -19,7 +18,6 @@ type CreateChainData = {
   slug: string;
   description?: string;
   tags?: string[];
-  collectionId?: string | null;
   createdBy: string;
 };
 
@@ -27,21 +25,14 @@ type UpdateChainData = {
   name?: string;
   description?: string | null;
   tags?: string[];
-  collectionId?: string | null;
 };
 
 export const chainRepository = {
   async findAll(filters?: {
     isArchived?: boolean | undefined;
-    collectionId?: string | undefined;
   }): Promise<ChainRecord[]> {
     return prisma.chain.findMany({
-      where: {
-        isArchived: filters?.isArchived ?? false,
-        ...(filters?.collectionId !== undefined && {
-          collectionId: filters.collectionId,
-        }),
-      },
+      where: { isArchived: filters?.isArchived ?? false },
       orderBy: { updatedAt: "desc" },
     });
   },

@@ -6,10 +6,7 @@ import type {
   CreatePromptVersionInput,
 } from "@prompttrack/shared";
 
-export function usePrompts(params?: {
-  environment?: string;
-  collectionId?: string;
-}) {
+export function usePrompts(params?: { environment?: string }) {
   return useQuery({
     queryKey: ["prompts", params],
     queryFn: () => promptsApi.list(params),

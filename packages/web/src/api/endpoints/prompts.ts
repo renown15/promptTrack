@@ -10,7 +10,6 @@ import type {
 export const promptsApi = {
   list: async (params?: {
     environment?: string;
-    collectionId?: string;
     isArchived?: boolean;
   }): Promise<PromptDTO[]> => {
     const response = await apiClient.get<PromptDTO[]>("/prompts", { params });

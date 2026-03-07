@@ -17,5 +17,4 @@ export const ChainIdParamSchema = z.object({ id: z.string() });
 
 export const ChainListQuerySchema = z.object({
   isArchived: z.coerce.boolean().optional(),
-  collectionId: z.string().optional(),
 });

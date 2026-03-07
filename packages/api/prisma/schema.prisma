@@ -81,10 +81,32 @@ model Collection {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  prompts Prompt[]
-  chains  Chain[]
+  prompts PromptCollection[]
+  chains  ChainCollection[]
 
   @@map("collections")
+}
+
+model PromptCollection {
+  promptId     String @map("prompt_id")
+  collectionId String @map("collection_id")
+
+  prompt     Prompt     @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, collectionId])
+  @@map("prompt_collections")
+}
+
+model ChainCollection {
+  chainId      String @map("chain_id")
+  collectionId String @map("collection_id")
+
+  chain      Chain      @relation(fields: [chainId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([chainId, collectionId])
+  @@map("chain_collections")
 }
 
 model Prompt {
@@ -103,19 +125,16 @@ model Prompt {
   parent       Prompt?  @relation("PromptHierarchy", fields: [parentId], references: [id])
   children     Prompt[] @relation("PromptHierarchy")
 
-  collectionId String?     @map("collection_id")
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-
   createdBy String @map("created_by")
   creator   User   @relation(fields: [createdBy], references: [id])
 
-  versions   PromptVersion[]
-  chainNodes ChainNode[]
-  auditLogs  AuditLog[]
+  versions     PromptVersion[]
+  chainNodes   ChainNode[]
+  auditLogs    AuditLog[]
+  collections  PromptCollection[]
 
   @@index([createdBy])
   @@index([environment])
-  @@index([collectionId])
   @@map("prompts")
 }
 
@@ -166,17 +185,14 @@ model Chain {
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  collectionId String?     @map("collection_id")
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-
   createdBy String @map("created_by")
   creator   User   @relation(fields: [createdBy], references: [id])
 
-  versions  ChainVersion[]
-  auditLogs AuditLog[]
+  versions    ChainVersion[]
+  auditLogs   AuditLog[]
+  collections ChainCollection[]
 
   @@index([createdBy])
-  @@index([collectionId])
   @@map("chains")
 }
 

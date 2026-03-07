@@ -1,13 +1,47 @@
 .sidebar {
-  @apply flex flex-col w-56 min-h-screen border-r border-border bg-card px-3 py-4 shrink-0;
+  @apply flex flex-col w-56 min-h-screen border-r border-border bg-card px-3 py-4 shrink-0 overflow-y-auto;
 }
 
 .sidebar__brand {
-  @apply text-base font-semibold text-foreground px-2 mb-6;
+  @apply text-base font-semibold text-foreground px-2 mb-4;
+}
+
+.sidebar__section-header {
+  @apply flex items-center justify-between px-2 mb-1;
+}
+
+.sidebar__section-label {
+  @apply text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70;
+}
+
+.sidebar__add-btn {
+  @apply text-base leading-none text-muted-foreground hover:text-foreground transition-colors cursor-pointer;
+}
+
+.sidebar__new-project {
+  @apply flex gap-1 px-1 mb-2;
+}
+
+.sidebar__new-project-input {
+  @apply flex-1 text-xs rounded border border-border bg-background px-2 py-1
+    focus:outline-none focus:ring-1 focus:ring-ring;
+}
+
+.sidebar__new-project-submit {
+  @apply text-xs rounded border border-border px-2 py-1 hover:bg-accent
+    transition-colors cursor-pointer;
 }
 
 .sidebar__nav {
-  @apply flex flex-col gap-1 flex-1;
+  @apply flex flex-col flex-1 overflow-y-auto;
+}
+
+.sidebar__divider {
+  @apply my-3 border-t border-border;
+}
+
+.sidebar__bottom-nav {
+  @apply flex flex-col gap-1 mb-2;
 }
 
 .sidebar__link {
@@ -20,7 +54,7 @@
 }
 
 .sidebar__footer {
-  @apply pt-4 border-t border-border;
+  @apply pt-3 border-t border-border;
 }
 
 .sidebar__logout {

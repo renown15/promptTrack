@@ -23,14 +23,12 @@ export const CreateChainSchema = z.object({
   name: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   tags: z.array(z.string()).default([]),
-  collectionId: z.string().nullable().optional(),
 });
 
 export const UpdateChainSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(1000).optional().nullable(),
   tags: z.array(z.string()).optional(),
-  collectionId: z.string().nullable().optional(),
 });
 
 export const CreateChainVersionSchema = z.object({
@@ -51,7 +49,6 @@ export const ChainSchema = z.object({
   tags: z.array(z.string()),
   currentVersion: z.number(),
   isArchived: z.boolean(),
-  collectionId: z.string().nullable(),
   createdBy: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
