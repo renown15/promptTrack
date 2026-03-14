@@ -78,13 +78,33 @@ model Collection {
   id          String   @id @default(cuid())
   name        String
   description String?
+  directory   String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  prompts PromptCollection[]
-  chains  ChainCollection[]
+  prompts        PromptCollection[]
+  chains         ChainCollection[]
+  fileSnapshots  FileSnapshotRecord[]
 
   @@map("collections")
+}
+
+model FileSnapshotRecord {
+  id           String     @id @default(cuid())
+  collectionId String     @map("collection_id")
+  relativePath String     @map("relative_path")
+  name         String
+  fileType     String     @map("file_type")
+  lineCount    Int        @map("line_count")
+  coverage     Float?
+  metrics      Json       @default("{}")
+  scannedAt    DateTime   @default(now()) @map("scanned_at")
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId, relativePath])
+  @@index([collectionId, scannedAt])
+  @@map("file_snapshot_records")
 }
 
 model PromptCollection {
@@ -255,6 +275,16 @@ model ChainEdge {
 
   @@index([chainVersionId])
   @@map("chain_edges")
+}
+
+model OllamaConfig {
+  id        String   @id @default(cuid())
+  endpoint  String   @default("http://localhost:11434")
+  model     String   @default("llama3")
+  metrics   Json     @default("{}")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ollama_config")
 }
 
 model AuditLog {

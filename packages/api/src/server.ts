@@ -10,6 +10,12 @@ import { authRoutes } from "@/routes/auth/auth.routes.js";
 import { promptRoutes } from "@/routes/prompts/prompts.routes.js";
 import { chainRoutes } from "@/routes/chains/chains.routes.js";
 import { collectionRoutes } from "@/routes/collections/collections.routes.js";
+import { fsRoutes } from "@/routes/fs/fs.routes.js";
+import { insightRoutes } from "@/routes/insights/insights.routes.js";
+import { settingsRoutes } from "@/routes/settings/settings.routes.js";
+import { collectionRepository } from "@/repositories/collection.repository.js";
+import { watcherService } from "@/services/watcher.service.js";
+import { seedCache } from "@/services/insight.service.js";
 
 const loggerConfig =
   env.NODE_ENV === "development"
@@ -57,6 +63,9 @@ async function buildApp() {
   await fastify.register(promptRoutes, { prefix: "/api/prompts" });
   await fastify.register(chainRoutes, { prefix: "/api/chains" });
   await fastify.register(collectionRoutes, { prefix: "/api/collections" });
+  await fastify.register(fsRoutes, { prefix: "/api/fs" });
+  await fastify.register(insightRoutes, { prefix: "/api/collections" });
+  await fastify.register(settingsRoutes, { prefix: "/api/settings" });
 
   fastify.get("/health", async () => ({
     status: "ok",
@@ -66,10 +75,21 @@ async function buildApp() {
   return fastify;
 }
 
+async function startWatchers() {
+  const collections = await collectionRepository.findAll();
+  for (const c of collections) {
+    if (c.directory) {
+      await seedCache(c.id).catch(() => {});
+      watcherService.start(c.id, c.directory);
+    }
+  }
+}
+
 async function start() {
   try {
     const app = await buildApp();
     await app.listen({ port: env.PORT, host: env.HOST });
+    await startWatchers();
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
