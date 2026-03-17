@@ -26,6 +26,18 @@ export const DEFAULT_METRICS: MetricDefinition[] = [
     description:
       "Are identifiers (variables, functions, types) named clearly and consistently with the codebase conventions?",
   },
+  {
+    name: "security",
+    label: "Sec",
+    description:
+      "Does this file contain security vulnerabilities or risky patterns? Look for injection risks, hardcoded secrets, insecure defaults, improper input validation, unsafe deserialization, or exposure of sensitive data.",
+  },
+  {
+    name: "eng_quality",
+    label: "EngQ",
+    description:
+      "Does this file adhere to industry-standard engineering practices that support DevSecOps? Consider: error handling, observability (logging/tracing), testability, immutability, principle of least privilege, secrets management, and absence of technical debt that would impede secure delivery.",
+  },
 ];
 
 const MAX_CONTENT_CHARS = 6000;
