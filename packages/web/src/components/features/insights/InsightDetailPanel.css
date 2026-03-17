@@ -1,0 +1,155 @@
+.insight-detail-panel {
+  @apply flex flex-col flex-1 min-h-0 overflow-hidden border-t border-border bg-card text-xs;
+}
+
+.insight-detail-panel__header {
+  @apply flex items-center gap-2 px-3 py-2 border-b border-border shrink-0 bg-muted/20;
+}
+
+.insight-detail-panel__filename {
+  @apply font-semibold text-foreground shrink-0;
+}
+
+.insight-detail-panel__path {
+  @apply font-mono text-[10px] text-muted-foreground/60 truncate flex-1;
+}
+
+.insight-detail-panel__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors shrink-0 w-5 h-5
+    flex items-center justify-center rounded hover:bg-muted/50 text-[11px];
+}
+
+.insight-detail-panel__loading,
+.insight-detail-panel__empty {
+  @apply flex items-center justify-center p-4 text-muted-foreground;
+}
+
+.insight-detail-panel__body {
+  @apply flex-1 overflow-y-auto flex gap-0;
+}
+
+/* Sections laid out horizontally */
+.insight-detail-panel__section {
+  @apply flex flex-col border-r border-border min-w-0;
+  flex: 1 1 0;
+}
+
+.insight-detail-panel__section:last-child {
+  @apply border-r-0;
+}
+
+.insight-detail-panel__section-header {
+  @apply flex items-center justify-between gap-2 px-3 py-1.5
+    border-b border-border bg-muted/10 text-[11px] font-medium text-muted-foreground
+    shrink-0;
+}
+
+.insight-detail-panel__section-age {
+  @apply text-[10px] text-muted-foreground/60 font-normal;
+}
+
+.insight-detail-panel__unavailable {
+  @apply text-[10px] text-muted-foreground/40 font-normal;
+}
+
+/* ── Metrics ── */
+.insight-detail-panel__metrics {
+  @apply flex flex-col divide-y divide-border/50 overflow-y-auto;
+}
+
+.insight-detail-panel__metric {
+  @apply px-3 py-2;
+}
+
+.insight-detail-panel__metric-header {
+  @apply flex items-center gap-2;
+}
+
+.insight-detail-panel__metric-dot {
+  @apply w-2 h-2 rounded-full shrink-0;
+}
+
+.insight-detail-panel__metric--green .insight-detail-panel__metric-dot { @apply bg-green-500; }
+.insight-detail-panel__metric--amber .insight-detail-panel__metric-dot { @apply bg-yellow-400; }
+.insight-detail-panel__metric--red .insight-detail-panel__metric-dot { @apply bg-red-500; }
+.insight-detail-panel__metric--error .insight-detail-panel__metric-dot { @apply bg-foreground/60; }
+.insight-detail-panel__metric--pending .insight-detail-panel__metric-dot { @apply bg-muted-foreground/40 animate-pulse; }
+.insight-detail-panel__metric--unrun .insight-detail-panel__metric-dot { @apply bg-muted-foreground/20; }
+
+.insight-detail-panel__metric-label {
+  @apply font-medium text-foreground flex-1;
+}
+
+.insight-detail-panel__metric-status {
+  @apply text-[10px] text-muted-foreground capitalize;
+}
+
+.insight-detail-panel__metric-summary {
+  @apply mt-1 text-[11px] text-muted-foreground leading-relaxed pl-4;
+}
+
+/* ── Coverage ── */
+.insight-detail-panel__cov-grid {
+  @apply flex flex-col gap-1.5 px-3 py-2 overflow-y-auto;
+}
+
+.insight-detail-panel__cov-row {
+  @apply flex items-center gap-2;
+}
+
+.insight-detail-panel__cov-label {
+  @apply w-20 shrink-0 text-muted-foreground;
+}
+
+.insight-detail-panel__cov-bar {
+  @apply flex-1 h-1.5 rounded-full bg-muted overflow-hidden;
+}
+
+.insight-detail-panel__cov-fill {
+  @apply h-full rounded-full transition-all duration-300 block;
+}
+
+.insight-detail-panel__cov-fill--green { @apply bg-green-500; }
+.insight-detail-panel__cov-fill--amber { @apply bg-yellow-400; }
+.insight-detail-panel__cov-fill--red { @apply bg-red-500; }
+
+.insight-detail-panel__cov-pct {
+  @apply w-10 text-right text-muted-foreground tabular-nums shrink-0;
+}
+
+/* ── Lint ── */
+.insight-detail-panel__lint-badge {
+  @apply ml-2 text-[10px] px-1 py-0.5 rounded font-normal;
+}
+
+.insight-detail-panel__lint-badge--error { @apply text-red-600 bg-red-500/10; }
+.insight-detail-panel__lint-badge--warn { @apply text-yellow-600 bg-yellow-400/10; }
+.insight-detail-panel__lint-badge--ok { @apply text-green-600 bg-green-500/10; }
+
+.insight-detail-panel__lint-messages {
+  @apply flex flex-col overflow-y-auto;
+}
+
+.insight-detail-panel__lint-msg {
+  @apply flex items-start gap-2 px-3 py-1.5 border-b border-border/40;
+}
+
+.insight-detail-panel__lint-msg--error {
+  @apply border-l-2 border-l-red-500/60;
+}
+
+.insight-detail-panel__lint-msg--warn {
+  @apply border-l-2 border-l-yellow-400/60;
+}
+
+.insight-detail-panel__lint-loc {
+  @apply font-mono text-[10px] text-muted-foreground/60 shrink-0 w-14;
+}
+
+.insight-detail-panel__lint-text {
+  @apply flex-1 text-foreground/80 leading-snug;
+}
+
+.insight-detail-panel__lint-rule {
+  @apply font-mono text-[10px] text-muted-foreground/50 shrink-0;
+}

@@ -5,12 +5,14 @@ import type {
   CreatePromptVersionInput,
   PromptWithVersionsDTO,
   PromptDTO,
+  ChainDTO,
 } from "@prompttrack/shared";
 
 export const promptsApi = {
   list: async (params?: {
     environment?: string;
     isArchived?: boolean;
+    collectionId?: string;
   }): Promise<PromptDTO[]> => {
     const response = await apiClient.get<PromptDTO[]>("/prompts", { params });
     return response.data;
@@ -49,5 +51,10 @@ export const promptsApi = {
 
   archive: async (id: string): Promise<void> => {
     await apiClient.delete(`/prompts/${id}`);
+  },
+
+  getChains: async (id: string): Promise<ChainDTO[]> => {
+    const response = await apiClient.get<ChainDTO[]>(`/prompts/${id}/chains`);
+    return response.data;
   },
 };

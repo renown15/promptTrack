@@ -2,8 +2,9 @@ import { usePrompts } from "@/hooks/usePrompts";
 import { PromptCard } from "@/components/features/prompts/PromptCard";
 import "@/components/features/prompts/PromptList.css";
 
-export function PromptList() {
-  const { data: prompts, isLoading, isError } = usePrompts();
+export function PromptList({ collectionId }: { collectionId?: string }) {
+  const params = collectionId !== undefined ? { collectionId } : undefined;
+  const { data: prompts, isLoading, isError } = usePrompts(params);
 
   if (isLoading) {
     return (

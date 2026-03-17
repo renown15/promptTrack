@@ -1,0 +1,83 @@
+.docs-panel {
+  @apply flex flex-col rounded-xl border border-border bg-card overflow-hidden;
+  grid-column: 1 / -1;
+}
+
+.docs-panel__header {
+  @apply flex items-center px-4 py-3 border-b border-border bg-muted/30 shrink-0;
+}
+
+.docs-panel__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.docs-panel__file-list {
+  @apply flex flex-wrap gap-2 p-4;
+}
+
+.docs-panel__loading,
+.docs-panel__empty {
+  @apply text-xs text-muted-foreground;
+}
+
+.docs-panel__file {
+  @apply flex flex-col items-start gap-1 px-3 py-2.5 rounded-lg border border-border
+    hover:bg-muted/50 hover:border-border/80 transition-colors text-left;
+  width: 180px;
+  height: 80px;
+}
+
+.docs-panel__file-name {
+  @apply text-xs font-medium text-foreground leading-snug;
+  word-break: break-word;
+}
+
+.docs-panel__file-path {
+  @apply text-xs font-mono text-muted-foreground leading-snug;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.docs-panel__file-meta {
+  @apply flex items-center gap-2 text-xs text-muted-foreground mt-auto;
+}
+
+.docs-panel__file-meta span {
+  @apply shrink-0;
+}
+
+/* Modal */
+
+.docs-modal__overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6;
+}
+
+.docs-modal {
+  @apply bg-card border border-border rounded-xl shadow-xl flex flex-col;
+  width: min(860px, 100%);
+  max-height: 80vh;
+}
+
+.docs-modal__header {
+  @apply flex items-center justify-between px-5 py-3 border-b border-border shrink-0;
+}
+
+.docs-modal__path {
+  @apply text-xs font-mono text-muted-foreground;
+}
+
+.docs-modal__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors text-sm;
+}
+
+.docs-modal__body {
+  @apply flex-1 overflow-y-auto px-6 py-5;
+}
+
+.docs-modal__loading {
+  @apply text-sm text-muted-foreground;
+}

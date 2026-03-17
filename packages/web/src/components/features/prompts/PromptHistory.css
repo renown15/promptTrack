@@ -1,0 +1,93 @@
+.prompt-history {
+  @apply flex flex-col flex-1;
+}
+
+.prompt-history__header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30 shrink-0;
+}
+
+.prompt-history__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.prompt-history__body {
+  @apply p-4 overflow-y-auto;
+}
+
+.prompt-history__actions {
+  @apply flex items-center gap-2;
+}
+
+.prompt-history__select-all {
+  @apply text-xs text-muted-foreground hover:text-foreground underline transition-colors cursor-pointer;
+}
+
+.prompt-history__build-btn {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium
+    hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.prompt-history__empty {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Timeline */
+.prompt-history__timeline {
+  @apply flex flex-col border-l-2 border-border ml-2;
+}
+
+.prompt-history__item {
+  @apply relative flex items-start gap-3 pl-5 pb-5 cursor-pointer;
+}
+
+.prompt-history__item:last-child {
+  @apply pb-0;
+}
+
+.prompt-history__checkbox {
+  @apply mt-0.5 shrink-0 cursor-pointer;
+}
+
+.prompt-history__dot {
+  @apply absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-border shrink-0;
+}
+
+.prompt-history__item:has(.prompt-history__checkbox:checked) .prompt-history__dot {
+  @apply bg-primary;
+}
+
+.prompt-history__item-body {
+  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+}
+
+.prompt-history__date {
+  @apply text-[10px] text-muted-foreground/70 font-mono;
+}
+
+.prompt-history__name {
+  @apply text-sm font-medium text-foreground truncate;
+}
+
+.prompt-history__desc {
+  @apply text-xs text-muted-foreground truncate;
+}
+
+.prompt-history__env {
+  @apply shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium mt-0.5;
+}
+
+.prompt-history__env--draft {
+  @apply bg-muted text-muted-foreground;
+}
+
+.prompt-history__env--review {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.prompt-history__env--staging {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.prompt-history__env--production {
+  @apply bg-green-100 text-green-800;
+}

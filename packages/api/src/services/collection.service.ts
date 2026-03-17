@@ -35,6 +35,7 @@ export const collectionService = {
       ...(input.description !== undefined && {
         description: input.description,
       }),
+      ...(input.directory !== undefined && { directory: input.directory }),
     });
   },
 
@@ -46,6 +47,7 @@ export const collectionService = {
       ...(input.description !== undefined && {
         description: input.description,
       }),
+      ...(input.directory !== undefined && { directory: input.directory }),
     });
   },
 
@@ -81,6 +83,7 @@ export const collectionService = {
     const collections: CollectionTreeItemDTO[] = raw.collections.map((c) => ({
       id: c.id,
       name: c.name,
+      directory: c.directory,
       prompts: c.prompts.map(
         (p): PromptSummaryDTO => ({
           id: p.prompt.id,

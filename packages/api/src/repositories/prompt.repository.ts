@@ -36,12 +36,16 @@ export const promptRepository = {
   async findAll(filters?: {
     environment?: Environment | undefined;
     isArchived?: boolean | undefined;
+    collectionId?: string | undefined;
   }): Promise<PromptRecord[]> {
     return prisma.prompt.findMany({
       where: {
         isArchived: filters?.isArchived ?? false,
         ...(filters?.environment !== undefined && {
           environment: filters.environment,
+        }),
+        ...(filters?.collectionId !== undefined && {
+          collections: { some: { collectionId: filters.collectionId } },
         }),
       },
       orderBy: { updatedAt: "desc" },

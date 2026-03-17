@@ -9,93 +9,103 @@ function PromptLink({ prompt }: { prompt: PromptSummaryDTO }) {
     <NavLink
       to={`/prompts/${prompt.id}`}
       className={({ isActive }) =>
-        `project-tree__item project-tree__item--prompt${isActive ? " project-tree__item--active" : ""}`
+        `project-tree__item${isActive ? " project-tree__item--active" : ""}`
       }
     >
-      <span className="project-tree__icon">&#128196;</span>
+      <span className="project-tree__icon">◻</span>
       {prompt.name}
     </NavLink>
   );
 }
 
 function ChainNode({ chain }: { chain: ChainSummaryDTO }) {
-  const { isChainCollapsed, toggleChain } = useSidebarStore();
-  const collapsed = isChainCollapsed(chain.id);
-
   return (
-    <div className="project-tree__chain-group">
-      <div className="project-tree__chain-row">
-        <button
-          className="project-tree__toggle"
-          onClick={() => toggleChain(chain.id)}
-          aria-label={collapsed ? "Expand" : "Collapse"}
-        >
-          {collapsed ? "▶" : "▼"}
-        </button>
-        <NavLink
-          to={`/chains/${chain.id}`}
-          className={({ isActive }) =>
-            `project-tree__item project-tree__item--chain${isActive ? " project-tree__item--active" : ""}`
-          }
-        >
-          <span className="project-tree__icon">&#128279;</span>
-          {chain.name}
-        </NavLink>
-      </div>
-      {!collapsed && chain.prompts.length > 0 && (
-        <div className="project-tree__chain-prompts">
-          {chain.prompts.map((p) => (
-            <NavLink
-              key={p.id}
-              to={`/prompts/${p.id}`}
-              className={({ isActive }) =>
-                `project-tree__item project-tree__item--child-prompt${isActive ? " project-tree__item--active" : ""}`
-              }
-            >
-              <span className="project-tree__icon">&#128196;</span>
-              {p.name}
-            </NavLink>
-          ))}
-        </div>
-      )}
-    </div>
+    <NavLink
+      to={`/chains/${chain.id}`}
+      className={({ isActive }) =>
+        `project-tree__item project-tree__item--chain${isActive ? " project-tree__item--active" : ""}`
+      }
+    >
+      <span className="project-tree__icon">⬡</span>
+      {chain.name}
+    </NavLink>
   );
 }
 
 function ProjectSection({
   id,
   name,
+  directory,
   prompts,
   chains,
 }: {
   id: string;
   name: string;
+  directory: string | null;
   prompts: PromptSummaryDTO[];
   chains: ChainSummaryDTO[];
 }) {
   const { isProjectCollapsed, toggleProject } = useSidebarStore();
   const collapsed = isProjectCollapsed(id);
 
+  const isEmpty = prompts.length === 0 && chains.length === 0;
+
   return (
     <div className="project-tree__project">
-      <button
-        className="project-tree__project-header"
-        onClick={() => toggleProject(id)}
-      >
-        <span className="project-tree__project-toggle">
+      <div className="project-tree__project-header">
+        <button
+          className="project-tree__toggle"
+          onClick={() => toggleProject(id)}
+          aria-label={collapsed ? "Expand" : "Collapse"}
+        >
           {collapsed ? "▶" : "▼"}
-        </span>
-        <span className="project-tree__icon">&#128193;</span>
-        {name}
-      </button>
+        </button>
+        <NavLink
+          to={`/collections/${id}`}
+          className={({ isActive }) =>
+            `project-tree__project-link${isActive ? " project-tree__item--active" : ""}`
+          }
+        >
+          <span className="project-tree__icon project-tree__icon--folder">
+            {collapsed ? "▷" : "▽"}
+          </span>
+          {name}
+        </NavLink>
+      </div>
       {!collapsed && (
         <div className="project-tree__project-children">
-          {prompts.map((p) => (
-            <PromptLink key={p.id} prompt={p} />
-          ))}
-          {chains.map((c) => (
-            <ChainNode key={c.id} chain={c} />
-          ))}
+          {isEmpty && !directory && (
+            <span className="project-tree__empty">Empty</span>
+          )}
+          {directory && (
+            <NavLink
+              to={`/collections/${id}/insights`}
+              className={({ isActive }) =>
+                `project-tree__item project-tree__item--insight${isActive ? " project-tree__item--active" : ""}`
+              }
+            >
+              <span className="project-tree__icon">◈</span>
+              Agent Insight
+            </NavLink>
+          )}
+          {prompts.length > 0 && (
+            <div className="project-tree__group">
+              <span className="project-tree__group-label">Input Prompts</span>
+              {prompts.map((p) => (
+                <PromptLink key={p.id} prompt={p} />
+              ))}
+            </div>
+          )}
+          {chains.length > 0 && (
+            <div className="project-tree__group">
+              <span className="project-tree__group-label">
+                Agent Instructions
+              </span>
+              {chains.map((c) => (
+                <ChainNode key={c.id} chain={c} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -111,9 +121,6 @@ export function ProjectTree() {
 
   if (!data) return null;
 
-  const hasUngrouped =
-    data.ungrouped.prompts.length > 0 || data.ungrouped.chains.length > 0;
-
   return (
     <div className="project-tree">
       {data.collections.map((c) => (
@@ -121,21 +128,22 @@ export function ProjectTree() {
           key={c.id}
           id={c.id}
           name={c.name}
+          directory={c.directory}
           prompts={c.prompts}
           chains={c.chains}
         />
       ))}
-      {hasUngrouped && (
-        <div className="project-tree__ungrouped">
-          <span className="project-tree__ungrouped-label">Ungrouped</span>
-          {data.ungrouped.prompts.map((p) => (
-            <PromptLink key={p.id} prompt={p} />
-          ))}
-          {data.ungrouped.chains.map((c) => (
-            <ChainNode key={c.id} chain={c} />
-          ))}
-        </div>
-      )}
+      <div className="project-tree__all-prompts">
+        <NavLink
+          to="/prompts"
+          className={({ isActive }) =>
+            `project-tree__item project-tree__item--all${isActive ? " project-tree__item--active" : ""}`
+          }
+        >
+          <span className="project-tree__icon">≡</span>
+          All Prompts
+        </NavLink>
+      </div>
     </div>
   );
 }

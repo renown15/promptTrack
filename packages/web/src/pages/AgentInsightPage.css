@@ -1,0 +1,69 @@
+.agent-insight-page {
+  @apply flex flex-col h-full overflow-hidden;
+}
+
+.agent-insight-page__title-bar {
+  @apply flex items-center gap-3 px-4 py-2 border-b border-border shrink-0;
+}
+
+.agent-insight-page__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.agent-insight-page__project {
+  @apply text-sm text-muted-foreground;
+}
+
+.agent-insight-page__dir {
+  @apply text-[11px] font-mono text-muted-foreground/60 truncate;
+}
+
+/* body fills remaining height; children are absolutely positioned */
+.agent-insight-page__body {
+  @apply relative flex-1 overflow-hidden;
+}
+
+/* main-row: absolutely fills from top down to the handle */
+.agent-insight-page__main-row {
+  @apply absolute inset-x-0 top-0 flex overflow-hidden;
+  /* bottom is set via inline style */
+}
+
+/* left column: tree table */
+.agent-insight-page__table-col {
+  @apply flex flex-col flex-1 min-w-0 overflow-hidden;
+}
+
+/* vertical drag handle between columns */
+.agent-insight-page__col-handle {
+  @apply w-1.5 shrink-0 cursor-col-resize bg-border hover:bg-primary/40 active:bg-primary/60
+    transition-colors;
+}
+
+/* right column: activity stack */
+.agent-insight-page__stack-col {
+  @apply flex flex-col shrink-0 overflow-hidden;
+}
+
+/* horizontal drag handle — absolutely positioned, sits between main-row and detail panel */
+.agent-insight-page__row-handle {
+  @apply absolute inset-x-0 cursor-row-resize bg-border hover:bg-primary/40 active:bg-primary/60
+    transition-colors flex items-center justify-center z-10;
+  /* bottom and height set via inline style */
+}
+
+.agent-insight-page__row-handle::after {
+  content: "";
+  @apply w-8 h-0.5 rounded-full bg-muted-foreground/40;
+}
+
+/* detail panel: absolutely pinned to bottom */
+.agent-insight-page__detail-panel {
+  @apply absolute inset-x-0 bottom-0 flex flex-col overflow-hidden border-t border-border;
+  /* height set via inline style */
+}
+
+.agent-insight-page__loading,
+.agent-insight-page__empty {
+  @apply flex items-center justify-center w-full text-sm text-muted-foreground p-8;
+}

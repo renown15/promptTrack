@@ -38,6 +38,7 @@ export const promptService = {
   async list(filters?: {
     environment?: "draft" | "review" | "staging" | "production" | undefined;
     isArchived?: boolean | undefined;
+    collectionId?: string | undefined;
   }) {
     return promptRepository.findAll(filters);
   },

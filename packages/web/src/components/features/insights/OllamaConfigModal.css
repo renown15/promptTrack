@@ -1,0 +1,96 @@
+.ollama-modal__overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6;
+}
+
+.ollama-modal {
+  @apply bg-card border border-border rounded-xl shadow-xl flex flex-col;
+  width: min(520px, 100%);
+  max-height: 80vh;
+}
+
+.ollama-modal__header {
+  @apply flex items-center justify-between px-5 py-3 border-b border-border shrink-0;
+}
+
+.ollama-modal__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.ollama-modal__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors text-sm;
+}
+
+.ollama-modal__loading {
+  @apply p-6 text-sm text-muted-foreground;
+}
+
+.ollama-modal__body {
+  @apply flex flex-col gap-5 px-5 py-4 overflow-y-auto flex-1;
+}
+
+.ollama-modal__field {
+  @apply flex flex-col gap-1.5;
+}
+
+.ollama-modal__label {
+  @apply text-xs font-semibold text-foreground;
+}
+
+.ollama-modal__input-row {
+  @apply flex items-center gap-2;
+}
+
+.ollama-modal__input {
+  @apply flex-1 text-xs font-mono bg-background border border-border rounded px-2 py-1.5
+    text-foreground outline-none focus:ring-1 focus:ring-ring;
+}
+
+.ollama-modal__select {
+  @apply cursor-pointer;
+}
+
+.ollama-modal__test-btn {
+  @apply text-xs px-2.5 py-1.5 rounded border border-border text-muted-foreground
+    hover:text-foreground hover:border-foreground/30 transition-colors shrink-0;
+}
+
+.ollama-modal__test-ok {
+  @apply text-xs text-green-500;
+}
+
+.ollama-modal__test-fail {
+  @apply text-xs text-red-500;
+}
+
+.ollama-modal__metrics {
+  @apply flex flex-col gap-2;
+}
+
+.ollama-modal__metric {
+  @apply flex items-start gap-2 cursor-pointer;
+}
+
+.ollama-modal__metric input[type="checkbox"] {
+  @apply mt-0.5 shrink-0 accent-primary;
+}
+
+.ollama-modal__metric-label {
+  @apply text-xs font-medium text-foreground shrink-0 w-12;
+}
+
+.ollama-modal__metric-desc {
+  @apply text-xs text-muted-foreground leading-snug;
+}
+
+.ollama-modal__footer {
+  @apply flex items-center justify-end gap-2 px-5 py-3 border-t border-border shrink-0;
+}
+
+.ollama-modal__cancel {
+  @apply text-xs px-3 py-1.5 rounded text-muted-foreground hover:text-foreground transition-colors;
+}
+
+.ollama-modal__save {
+  @apply text-xs px-3 py-1.5 rounded bg-primary text-primary-foreground
+    hover:opacity-90 transition-opacity disabled:opacity-50;
+}

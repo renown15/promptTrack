@@ -1,0 +1,81 @@
+.insight-activity-stack {
+  @apply flex flex-col flex-1 min-h-0 overflow-hidden border-l border-border;
+}
+
+.insight-activity-stack__header {
+  @apply px-3 py-2 text-[11px] font-medium text-muted-foreground border-b border-border
+    shrink-0 bg-muted/20;
+}
+
+.insight-activity-stack__cards {
+  @apply flex-1 overflow-y-auto flex flex-col;
+}
+
+.insight-activity-stack__card {
+  @apply w-full text-left px-3 py-2.5 border-b border-border/50
+    hover:bg-muted/30 transition-colors flex flex-col gap-1 cursor-pointer;
+}
+
+.insight-activity-stack__card-top {
+  @apply flex items-baseline justify-between gap-2;
+}
+
+.insight-activity-stack__card-name {
+  @apply text-xs font-semibold text-foreground truncate flex-1;
+}
+
+.insight-activity-stack__card-name--modified {
+  @apply text-yellow-600;
+}
+
+.insight-activity-stack__card-name--untracked {
+  @apply text-red-600;
+}
+
+.insight-activity-stack__git-badge {
+  @apply text-[10px] font-bold shrink-0;
+}
+
+.insight-activity-stack__git-badge--modified {
+  @apply text-yellow-500;
+}
+
+.insight-activity-stack__git-badge--untracked {
+  @apply text-red-500;
+}
+
+.insight-activity-stack__card-right {
+  @apply flex items-baseline gap-1.5 shrink-0;
+}
+
+.insight-activity-stack__line-delta {
+  @apply text-[10px] font-mono font-medium tabular-nums;
+}
+
+.insight-activity-stack__line-delta--add {
+  @apply text-green-600;
+}
+
+.insight-activity-stack__line-delta--remove {
+  @apply text-red-500;
+}
+
+.insight-activity-stack__card-time {
+  @apply text-[10px] text-muted-foreground shrink-0;
+}
+
+.insight-activity-stack__card-path {
+  @apply text-[10px] font-mono text-muted-foreground/60 truncate;
+}
+
+.insight-activity-stack__card--analyzing {
+  @apply border-l-2 border-l-primary/50 bg-primary/5;
+}
+
+.insight-activity-stack__card-metrics {
+  @apply flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5;
+}
+
+.insight-activity-stack__empty {
+  @apply text-xs text-muted-foreground/50 p-3;
+}

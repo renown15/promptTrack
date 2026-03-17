@@ -63,4 +63,14 @@ export const chainRepository = {
   async archive(id: string): Promise<ChainRecord> {
     return prisma.chain.update({ where: { id }, data: { isArchived: true } });
   },
+
+  async findByPromptId(promptId: string): Promise<ChainRecord[]> {
+    return prisma.chain.findMany({
+      where: {
+        isArchived: false,
+        versions: { some: { nodes: { some: { promptId } } } },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+  },
 };

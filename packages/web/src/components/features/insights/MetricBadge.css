@@ -1,0 +1,35 @@
+.metric-badge {
+  @apply inline-flex items-center gap-0.5 text-[10px] text-muted-foreground;
+}
+
+.metric-badge__dot {
+  @apply w-1.5 h-1.5 rounded-full shrink-0;
+}
+
+.metric-badge__dot--green {
+  @apply bg-green-500;
+}
+
+.metric-badge__dot--amber {
+  @apply bg-yellow-400;
+}
+
+.metric-badge__dot--red {
+  @apply bg-red-500;
+}
+
+.metric-badge__dot--pending {
+  @apply bg-muted-foreground/40 animate-pulse;
+}
+
+.metric-badge__dot--unrun {
+  @apply bg-muted-foreground/25;
+}
+
+.metric-badge__dot--error {
+  @apply bg-foreground/80;
+}
+
+.metric-badge__label {
+  @apply leading-none;
+}

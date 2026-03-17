@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { promptService } from "@/services/prompt.service.js";
+import { chainRepository } from "@/repositories/chain.repository.js";
 import {
   CreatePromptSchema,
   UpdatePromptSchema,
@@ -14,6 +15,11 @@ export async function promptRoutes(fastify: FastifyInstance) {
   fastify.get("/", async (request) => {
     const query = PromptListQuerySchema.parse(request.query);
     return promptService.list(query);
+  });
+
+  fastify.get("/:id/chains", async (request) => {
+    const { id } = PromptIdParamSchema.parse(request.params);
+    return chainRepository.findByPromptId(id);
   });
 
   fastify.get("/:id", async (request, reply) => {

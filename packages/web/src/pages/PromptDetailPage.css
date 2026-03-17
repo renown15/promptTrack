@@ -31,6 +31,12 @@
     hover:opacity-90 transition-opacity;
 }
 
+.prompt-detail__btn--danger {
+  @apply rounded-md border border-destructive/40 text-destructive px-3 py-1.5 text-sm
+    hover:bg-destructive hover:text-destructive-foreground transition-colors
+    disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
 .prompt-detail__versions {
   @apply mt-8;
 }
@@ -47,6 +53,16 @@
   @apply flex items-center justify-between mb-2;
 }
 
+.prompt-detail__version-header-right {
+  @apply flex items-center gap-3;
+}
+
+.prompt-detail__copy-btn {
+  @apply text-xs text-muted-foreground hover:text-foreground transition-colors
+    border border-border rounded px-2 py-0.5 hover:bg-accent;
+  min-width: 3.5rem;
+}
+
 .prompt-detail__version-num {
   @apply text-sm font-medium text-foreground;
 }
@@ -59,8 +75,30 @@
   @apply text-sm font-mono text-muted-foreground whitespace-pre-wrap bg-muted rounded p-3;
 }
 
-.prompt-detail__projects {
-  @apply mt-2;
+.prompt-detail__meta-row {
+  @apply flex flex-wrap gap-x-6 gap-y-2 mt-3 pt-3 border-t border-border;
+}
+
+.prompt-detail__meta-section {
+  @apply flex items-center gap-2;
+}
+
+.prompt-detail__meta-label {
+  @apply text-xs font-medium text-muted-foreground shrink-0;
+}
+
+.prompt-detail__meta-empty {
+  @apply text-xs text-muted-foreground/50;
+}
+
+.prompt-detail__chain-list {
+  @apply flex items-center gap-1.5 flex-wrap;
+}
+
+.prompt-detail__chain-link {
+  @apply inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full
+    bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground
+    transition-colors;
 }
 
 .prompt-detail__loading {

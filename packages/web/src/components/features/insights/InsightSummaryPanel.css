@@ -1,0 +1,128 @@
+.insight-summary-panel {
+  @apply flex items-center justify-between gap-4 px-4 py-2
+    border-b border-border bg-card shrink-0;
+}
+
+.insight-summary-panel__stats {
+  @apply flex items-center gap-3 flex-wrap;
+}
+
+.insight-summary-panel__stat {
+  @apply flex items-baseline gap-1;
+}
+
+.insight-summary-panel__stat-value {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.insight-summary-panel__stat-label {
+  @apply text-xs text-muted-foreground;
+}
+
+.insight-summary-panel__progress {
+  @apply flex items-center gap-1.5;
+}
+
+.insight-summary-panel__progress-bar {
+  @apply w-20 h-1.5 rounded-full bg-muted overflow-hidden shrink-0;
+}
+
+.insight-summary-panel__progress-fill {
+  @apply h-full bg-primary/60 rounded-full transition-all duration-300;
+}
+
+.insight-summary-panel__progress-label {
+  @apply text-xs text-muted-foreground tabular-nums;
+}
+
+.insight-summary-panel__divider {
+  @apply w-px h-4 bg-border shrink-0;
+}
+
+.insight-summary-panel__metric {
+  @apply flex items-center gap-1;
+}
+
+.insight-summary-panel__metric-label {
+  @apply text-xs text-muted-foreground;
+}
+
+.insight-summary-panel__count {
+  @apply text-[11px] font-medium px-1 py-0.5 rounded;
+}
+
+.insight-summary-panel__count {
+  @apply cursor-pointer hover:opacity-80 transition-opacity;
+}
+
+.insight-summary-panel__count--active {
+  @apply ring-1 ring-current;
+}
+
+.insight-summary-panel__count--red {
+  @apply text-red-600 bg-red-500/10;
+}
+
+.insight-summary-panel__count--amber {
+  @apply text-yellow-600 bg-yellow-400/10;
+}
+
+.insight-summary-panel__count--green {
+  @apply text-green-600 bg-green-500/10;
+}
+
+.insight-summary-panel__count--error {
+  @apply text-foreground/70 bg-muted;
+}
+
+.insight-summary-panel__count--pending {
+  @apply text-muted-foreground bg-muted;
+}
+
+.insight-summary-panel__aggregate {
+  @apply flex items-center gap-1;
+}
+
+.insight-summary-panel__rag {
+  @apply text-[11px] font-medium px-1 py-0.5 rounded;
+}
+
+.insight-summary-panel__rag--green {
+  @apply text-green-600 bg-green-500/10;
+}
+
+.insight-summary-panel__rag--amber {
+  @apply text-yellow-600 bg-yellow-400/10;
+}
+
+.insight-summary-panel__rag--red {
+  @apply text-red-600 bg-red-500/10;
+}
+
+.insight-summary-panel__age {
+  @apply text-[10px] text-muted-foreground;
+}
+
+.insight-summary-panel__actions {
+  @apply flex items-center gap-2 shrink-0;
+}
+
+.insight-summary-panel__last-scan {
+  @apply text-xs text-muted-foreground;
+}
+
+.insight-summary-panel__scanning {
+  @apply text-xs text-muted-foreground animate-pulse;
+}
+
+.insight-summary-panel__scan-btn {
+  @apply text-xs px-2.5 py-1 rounded border border-border
+    text-muted-foreground hover:text-foreground hover:bg-muted/50
+    transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.insight-summary-panel__config-btn {
+  @apply text-xs px-2.5 py-1 rounded border border-border
+    text-muted-foreground hover:text-foreground hover:bg-muted/50
+    transition-colors truncate max-w-[200px];
+}

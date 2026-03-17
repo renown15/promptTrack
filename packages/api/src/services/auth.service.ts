@@ -1,4 +1,5 @@
 import argon2 from "argon2";
+import { randomUUID } from "crypto";
 import type { FastifyInstance } from "fastify";
 import { userRepository } from "@/repositories/user.repository.js";
 import { refreshTokenRepository } from "@/repositories/refresh-token.repository.js";
@@ -91,7 +92,7 @@ async function issueTokens(
   );
 
   const refreshToken = fastify.jwt.sign(
-    { sub: userId, type: "refresh" },
+    { sub: userId, type: "refresh", jti: randomUUID() },
     { expiresIn: env.JWT_REFRESH_EXPIRES_IN }
   );
 

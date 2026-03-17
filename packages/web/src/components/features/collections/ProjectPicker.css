@@ -1,9 +1,13 @@
 .project-picker {
-  @apply flex items-start gap-2 flex-wrap;
+  @apply flex items-center gap-1.5 flex-wrap;
 }
 
-.project-picker__label {
-  @apply text-xs font-medium text-muted-foreground shrink-0 mt-1;
+.project-picker__loading {
+  @apply text-xs text-muted-foreground/60;
+}
+
+.project-picker__empty {
+  @apply text-xs text-muted-foreground/50;
 }
 
 .project-picker__tags {

@@ -10,30 +10,94 @@
   @apply p-6 text-sm text-destructive;
 }
 
+/* ── Header ── */
 .chain-detail-page__header {
-  @apply px-6 py-4 border-b border-border shrink-0;
+  @apply px-6 py-4 border-b border-border shrink-0 flex flex-col gap-2;
+}
+
+.chain-detail-page__header-top {
+  @apply flex items-start justify-between gap-4;
+}
+
+.chain-detail-page__title-group {
+  @apply flex flex-col gap-0.5;
 }
 
 .chain-detail-page__title {
-  @apply text-xl font-bold;
+  @apply text-xl font-semibold text-foreground;
 }
 
 .chain-detail-page__description {
-  @apply text-sm text-muted-foreground mt-1;
+  @apply text-sm text-muted-foreground;
 }
 
-.chain-detail-page__projects {
-  @apply mt-2;
+.chain-detail-page__actions {
+  @apply flex gap-2 shrink-0;
 }
 
-.chain-detail-page__canvas {
-  @apply flex-1 min-h-0;
+.chain-detail-page__btn {
+  @apply rounded-md border border-border px-3 py-1.5 text-sm hover:bg-accent transition-colors;
 }
 
+.chain-detail-page__btn--primary {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium
+    hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.chain-detail-page__meta {
+  @apply flex items-center gap-2;
+}
+
+/* ── Body ── */
+.chain-detail-page__body {
+  @apply flex flex-1 min-h-0 overflow-hidden;
+}
+
+.chain-detail-page__body--with-sidebar {
+  @apply divide-x divide-border;
+}
+
+/* ── Prompt list ── */
+.chain-detail-page__prompts {
+  @apply flex-1 overflow-y-auto p-6 flex flex-col gap-4;
+}
+
+.chain-detail-page__empty {
+  @apply text-sm text-muted-foreground;
+}
+
+.chain-detail-page__prompt-block {
+  @apply border border-border rounded-lg overflow-hidden;
+}
+
+.chain-detail-page__prompt-header {
+  @apply flex items-center gap-2 px-4 py-2.5 bg-muted/50 border-b border-border;
+}
+
+.chain-detail-page__prompt-index {
+  @apply flex items-center justify-center w-5 h-5 rounded-full bg-muted-foreground/20
+    text-[10px] font-semibold text-muted-foreground shrink-0;
+}
+
+.chain-detail-page__prompt-name {
+  @apply text-sm font-medium text-foreground flex-1;
+}
+
+.chain-detail-page__prompt-version {
+  @apply text-xs text-muted-foreground;
+}
+
+.chain-detail-page__prompt-link {
+  @apply text-xs text-muted-foreground hover:text-foreground transition-colors;
+}
+
+.chain-detail-page__prompt-content {
+  @apply px-4 py-3 text-sm text-muted-foreground font-mono whitespace-pre-wrap
+    leading-relaxed bg-background;
+}
+
+/* ── Serialise sidebar ── */
 .chain-detail-page__sidebar {
-  @apply flex flex-col gap-4 p-4 border-t border-border shrink-0 max-h-72 overflow-y-auto;
-}
-
-.chain-detail-page__serialise-btn {
-  @apply self-start px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply flex flex-col gap-4 p-6 overflow-y-auto shrink-0;
+  width: 360px;
 }

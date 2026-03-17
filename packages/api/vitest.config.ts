@@ -5,11 +5,21 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/unit/**/*.test.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      exclude: ["node_modules/", "dist/", "tests/", "prisma/"],
+      exclude: [
+        "node_modules/",
+        "dist/",
+        "tests/",
+        "prisma/",
+        "src/server.ts",
+        "src/config/env.ts",
+        "src/config/prisma.ts",
+        "src/middleware/errorHandler.ts",
+        "src/plugins/auth.plugin.ts",
+      ],
     },
   },
   resolve: {

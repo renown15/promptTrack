@@ -7,7 +7,7 @@ const UI_COMPONENTS_DIR = path.join(SRC_DIR, "components/ui");
 
 // Regex to match className with Tailwind classes (not just empty or cn())
 const TAILWIND_CLASS_REGEX =
-  /className\s*=\s*["'`](?!["'`])([^"'`]*(?:bg-|text-|flex|grid|(?<![a-z])p-|(?<![a-z])m-|(?<![a-z])w-|(?<![a-z])h-|border|rounded|shadow)[^"'`]*)["'`]/;
+  /className\s*=\s*["'`](?!["'`])([^"'`]*(?:bg-|(?<![a-z])text-|flex|grid|(?<![a-z])p-|(?<![a-z])m-|(?<![a-z])w-|(?<![a-z])h-|border|rounded|shadow)[^"'`]*)["'`]/;
 
 // Regex to match inline styles
 const INLINE_STYLE_REGEX = /style\s*=\s*\{\s*\{/;

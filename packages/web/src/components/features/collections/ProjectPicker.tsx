@@ -22,7 +22,9 @@ export function ProjectPicker({ resourceId, resourceType }: Props) {
   const addChain = useAddChainToCollection();
   const removeChain = useRemoveChainFromCollection();
 
-  if (!tree) return null;
+  if (!tree) {
+    return <span className="project-picker__loading">Loading…</span>;
+  }
 
   const memberIds = new Set(
     tree.collections
@@ -68,24 +70,27 @@ export function ProjectPicker({ resourceId, resourceType }: Props) {
     }
   };
 
+  const memberCollections = tree.collections.filter((c) => memberIds.has(c.id));
+
+  if (memberCollections.length === 0 && nonMembers.length === 0) {
+    return <span className="project-picker__empty">No collections yet</span>;
+  }
+
   return (
     <div className="project-picker">
-      <span className="project-picker__label">Projects</span>
       <div className="project-picker__tags">
-        {tree.collections
-          .filter((c) => memberIds.has(c.id))
-          .map((c) => (
-            <span key={c.id} className="project-picker__tag">
-              {c.name}
-              <button
-                className="project-picker__remove"
-                onClick={() => handleRemove(c.id)}
-                title="Remove from project"
-              >
-                ×
-              </button>
-            </span>
-          ))}
+        {memberCollections.map((c) => (
+          <span key={c.id} className="project-picker__tag">
+            {c.name}
+            <button
+              className="project-picker__remove"
+              onClick={() => handleRemove(c.id)}
+              title="Remove from collection"
+            >
+              ×
+            </button>
+          </span>
+        ))}
         {nonMembers.length > 0 && (
           <select
             className="project-picker__select"
@@ -94,7 +99,7 @@ export function ProjectPicker({ resourceId, resourceType }: Props) {
               if (e.target.value) handleAdd(e.target.value);
             }}
           >
-            <option value="">+ Add to project</option>
+            <option value="">+ Add to collection</option>
             {nonMembers.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}

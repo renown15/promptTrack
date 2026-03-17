@@ -6,7 +6,7 @@ import { userRepository } from "@/repositories/user.repository.js";
 
 declare module "@fastify/jwt" {
   interface FastifyJWT {
-    payload: { sub: string; type?: string };
+    payload: { sub: string; type?: string; jti?: string };
     user: { id: string; role: string; email: string };
   }
 }

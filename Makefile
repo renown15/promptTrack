@@ -1,4 +1,4 @@
-.PHONY: dev dev-api dev-web db db-stop db-logs db-studio db-dump db-restore db-reset migrate migrate-dev push test test-unit test-integration test-e2e lint typecheck build clean stop help
+.PHONY: dev dev-api dev-web dev-log logs db db-stop db-logs db-studio db-dump db-restore db-reset migrate migrate-dev push test test-unit test-integration test-e2e lint lint-report typecheck build clean stop help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -13,18 +13,39 @@ DUMP_FILE := $(BACKUP_DIR)/prompttrack-$(shell date +%Y%m%d-%H%M%S).sql
 
 ##@ Development
 
+API_PORT := $(shell grep -m1 '^PORT=' packages/api/.env | cut -d= -f2)
+WEB_PORT := $(shell grep -m1 'port:' packages/web/vite.config.ts | grep -o '[0-9]\+')
+
 dev: db ## Start all services (db + api + web)
 	@echo "Waiting for Postgres to be ready..."
 	@until docker-compose exec -T postgres pg_isready -U prompttrack > /dev/null 2>&1; do sleep 1; done
+	@echo "Freeing ports $(API_PORT) and $(WEB_PORT)..."
+	@lsof -ti :$(API_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti :$(WEB_PORT) | xargs kill -9 2>/dev/null || true
 	@echo "Starting development servers..."
 	pnpm dev
 
 dev-api: db ## Start API only (with db)
 	@until docker-compose exec -T postgres pg_isready -U prompttrack > /dev/null 2>&1; do sleep 1; done
+	@lsof -ti :$(API_PORT) | xargs kill -9 2>/dev/null || true
 	pnpm dev:api
 
 dev-web: ## Start Web only (no db needed)
 	pnpm dev:web
+
+dev-log: db ## Start all services with output logged to /tmp/prompttrack-{api,web}.log
+	@echo "Waiting for Postgres to be ready..."
+	@until docker-compose exec -T postgres pg_isready -U prompttrack > /dev/null 2>&1; do sleep 1; done
+	@lsof -ti :$(API_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti :$(WEB_PORT) | xargs kill -9 2>/dev/null || true
+	@echo "Logging API  → /tmp/prompttrack-api.log"
+	@echo "Logging Web  → /tmp/prompttrack-web.log"
+	@pnpm dev:api > /tmp/prompttrack-api.log 2>&1 &
+	@pnpm dev:web > /tmp/prompttrack-web.log 2>&1 &
+	@echo "Both servers started in background. Use 'make logs' to tail them."
+
+logs: ## Tail API and web logs (from dev-log)
+	@tail -f /tmp/prompttrack-api.log /tmp/prompttrack-web.log
 
 ##@ Database
 
@@ -72,20 +93,39 @@ db-reset: ## Wipe database (keeps node_modules)
 
 ##@ Testing
 
-test: ## Run all tests
+## Test DB URL — only needed by prisma CLI (vitest reads .env.test directly)
+TEST_DB_URL := postgresql://prompttrack:prompttrack_test@localhost:5453/prompttrack_test
+
+test: ## Run all tests (unit + integration)
 	pnpm test
+	docker-compose up -d postgres-test
+	@echo "Waiting for test Postgres to be ready..."
+	@until docker-compose exec -T postgres-test pg_isready -U prompttrack -d prompttrack_test > /dev/null 2>&1; do sleep 1; done
+	DATABASE_URL="$(TEST_DB_URL)" pnpm --filter @prompttrack/api exec prisma migrate deploy
+	pnpm --filter @prompttrack/api test:integration; \
+	  EXIT=$$?; docker-compose stop postgres-test; exit $$EXIT
 
 test-unit: ## Run unit tests only
 	pnpm test:unit
 
-test-integration: db ## Run integration tests
-	pnpm test:integration
+test-integration: ## Run integration tests against a dedicated ephemeral test DB
+	docker-compose up -d postgres-test
+	@echo "Waiting for test Postgres to be ready..."
+	@until docker-compose exec -T postgres-test pg_isready -U prompttrack -d prompttrack_test > /dev/null 2>&1; do sleep 1; done
+	DATABASE_URL="$(TEST_DB_URL)" pnpm --filter @prompttrack/api exec prisma migrate deploy
+	pnpm --filter @prompttrack/api test:integration; \
+	  EXIT=$$?; docker-compose stop postgres-test; exit $$EXIT
 
 test-e2e: ## Run e2e tests
 	pnpm test:e2e
 
-test-coverage: ## Run tests with coverage
-	pnpm test:coverage
+test-coverage: ## Run all tests (unit + integration) with combined coverage report
+	docker-compose up -d postgres-test
+	@echo "Waiting for test Postgres to be ready..."
+	@until docker-compose exec -T postgres-test pg_isready -U prompttrack -d prompttrack_test > /dev/null 2>&1; do sleep 1; done
+	DATABASE_URL="$(TEST_DB_URL)" pnpm --filter @prompttrack/api exec prisma migrate deploy
+	pnpm --filter @prompttrack/api test:coverage-all; \
+	  EXIT=$$?; docker-compose stop postgres-test; exit $$EXIT
 
 ##@ Quality
 
@@ -95,6 +135,10 @@ check: ## Smoke test — typecheck + build (run before declaring work complete)
 
 lint: ## Run ESLint
 	pnpm lint
+
+lint-report: ## Generate ESLint JSON reports for Agent Insight (packages/api and packages/web)
+	pnpm --filter @prompttrack/api exec eslint src --format json --output-file .eslint-report.json; true
+	pnpm --filter @prompttrack/web exec eslint src --format json --output-file .eslint-report.json; true
 
 lint-fix: ## Run ESLint with auto-fix
 	pnpm lint:fix

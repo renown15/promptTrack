@@ -4,6 +4,7 @@ export type CollectionRecord = {
   id: string;
   name: string;
   description: string | null;
+  directory: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -11,11 +12,13 @@ export type CollectionRecord = {
 type CreateCollectionData = {
   name: string;
   description?: string;
+  directory?: string;
 };
 
 type UpdateCollectionData = {
   name?: string;
   description?: string | null;
+  directory?: string | null;
 };
 
 export const collectionRepository = {
@@ -75,11 +78,13 @@ export const collectionRepository = {
       orderBy: { name: "asc" },
       include: {
         prompts: {
+          where: { prompt: { isArchived: false } },
           include: {
             prompt: { select: { id: true, name: true, slug: true } },
           },
         },
         chains: {
+          where: { chain: { isArchived: false } },
           include: {
             chain: {
               select: {

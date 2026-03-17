@@ -1,0 +1,51 @@
+.project-page__header {
+  @apply flex flex-col gap-1 mb-5;
+}
+
+.project-page__title {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.project-page__dir {
+  @apply flex items-center;
+}
+
+.project-page__dir-display {
+  @apply flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground
+    transition-colors cursor-pointer;
+}
+
+.project-page__dir-icon {
+  @apply text-sm;
+}
+
+.project-page__dir-path {
+  @apply font-mono;
+}
+
+
+.project-page__body {
+  @apply grid gap-5;
+  grid-template-columns: 1fr 1fr;
+}
+
+.project-page__panel {
+  @apply flex flex-col rounded-xl border border-border bg-card overflow-hidden;
+}
+
+.project-page__panel-header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30 shrink-0;
+}
+
+.project-page__panel-title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.project-page__new-btn {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium
+    hover:opacity-90 transition-opacity;
+}
+
+.project-page__panel-body {
+  @apply p-4 overflow-y-auto;
+}

@@ -3,17 +3,20 @@ import { z } from "zod";
 export const CreateCollectionSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
+  directory: z.string().max(1000).optional(),
 });
 
 export const UpdateCollectionSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
+  directory: z.string().max(1000).nullable().optional(),
 });
 
 export const CollectionDTO = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().nullable(),
+  directory: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -35,6 +38,7 @@ export const ChainSummaryDTO = z.object({
 export const CollectionTreeItemDTO = z.object({
   id: z.string(),
   name: z.string(),
+  directory: z.string().nullable(),
   prompts: z.array(PromptSummaryDTO),
   chains: z.array(ChainSummaryDTO),
 });

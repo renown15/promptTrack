@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
 import { authApi } from "@/api/endpoints/auth";
 import { useCreateCollection } from "@/hooks/useCollections";
@@ -37,11 +37,11 @@ export function Sidebar() {
       <span className="sidebar__brand">PromptTrack</span>
 
       <div className="sidebar__section-header">
-        <span className="sidebar__section-label">Projects</span>
+        <span className="sidebar__section-label">Collections</span>
         <button
           className="sidebar__add-btn"
           onClick={() => setShowNewProject((v) => !v)}
-          title="New project"
+          title="New collection"
         >
           +
         </button>
@@ -53,38 +53,34 @@ export function Sidebar() {
             className="sidebar__new-project-input"
             value={newProjectName}
             onChange={(e) => setNewProjectName(e.target.value)}
-            placeholder="Project name"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setNewProjectName("");
+                setShowNewProject(false);
+              }
+            }}
+            placeholder="Collection name"
             autoFocus
           />
           <button type="submit" className="sidebar__new-project-submit">
             Add
+          </button>
+          <button
+            type="button"
+            className="sidebar__new-project-cancel"
+            onClick={() => {
+              setNewProjectName("");
+              setShowNewProject(false);
+            }}
+            aria-label="Cancel"
+          >
+            ✕
           </button>
         </form>
       )}
 
       <nav className="sidebar__nav">
         <ProjectTree />
-      </nav>
-
-      <div className="sidebar__divider" />
-
-      <nav className="sidebar__bottom-nav">
-        <NavLink
-          to="/prompts"
-          className={({ isActive }) =>
-            `sidebar__link${isActive ? " sidebar__link--active" : ""}`
-          }
-        >
-          All Prompts
-        </NavLink>
-        <NavLink
-          to="/chains"
-          className={({ isActive }) =>
-            `sidebar__link${isActive ? " sidebar__link--active" : ""}`
-          }
-        >
-          All Chains
-        </NavLink>
       </nav>
 
       <div className="sidebar__footer">

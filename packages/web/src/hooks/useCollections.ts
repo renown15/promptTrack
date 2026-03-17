@@ -4,6 +4,7 @@ import type {
   CreateCollectionInput,
   UpdateCollectionInput,
 } from "@prompttrack/shared";
+export type { DocFile } from "@/api/endpoints/collections";
 
 export function useProjectTree() {
   return useQuery({
@@ -95,6 +96,22 @@ export function useAddChainToCollection() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
+  });
+}
+
+export function useCollectionDocs(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["collections", id, "docs"],
+    queryFn: () => collectionsApi.listDocs(id),
+    enabled,
+  });
+}
+
+export function useDocContent(id: string, file: string | null) {
+  return useQuery({
+    queryKey: ["collections", id, "docs", file],
+    queryFn: () => collectionsApi.getDocContent(id, file!),
+    enabled: file !== null,
   });
 }
 

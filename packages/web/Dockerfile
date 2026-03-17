@@ -23,6 +23,9 @@ CMD ["pnpm", "dev"]
 # Production build stage
 FROM node:20-alpine AS builder
 
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate

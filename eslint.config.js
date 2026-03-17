@@ -69,5 +69,13 @@ export default tseslint.config(
     rules: {
       "no-restricted-imports": "off",
     },
+  },
+  {
+    // Test files: allow relative imports (can't use @/ which points to src/) and longer files
+    files: ["**/tests/**/*.ts", "**/tests/**/*.tsx", "**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "no-restricted-imports": "off",
+      "max-lines": "off",
+    },
   }
 );

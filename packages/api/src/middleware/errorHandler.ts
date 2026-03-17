@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyError } from "fastify";
+import { ZodError } from "zod";
 import { AuthError } from "@/services/auth.service.js";
 
 export function registerErrorHandler(fastify: FastifyInstance) {
@@ -7,6 +8,12 @@ export function registerErrorHandler(fastify: FastifyInstance) {
 
     if (error instanceof AuthError) {
       return reply.code(error.statusCode).send({ error: error.message });
+    }
+
+    if (error instanceof ZodError) {
+      return reply
+        .code(400)
+        .send({ error: "Validation error", details: error.errors });
     }
 
     if (error.validation) {

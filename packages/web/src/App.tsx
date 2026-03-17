@@ -10,6 +10,8 @@ import { PromptDetailPage } from "@/pages/PromptDetailPage";
 import { PromptNewPage } from "@/pages/PromptNewPage";
 import { ChainsPage } from "@/pages/ChainsPage";
 import { ChainDetailPage } from "@/pages/ChainDetailPage";
+import { ProjectPage } from "@/pages/ProjectPage";
+import { AgentInsightPage } from "@/pages/AgentInsightPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +41,11 @@ export function App() {
             <Route path="/prompts" element={<PromptsPage />} />
             <Route path="/prompts/new" element={<PromptNewPage />} />
             <Route path="/prompts/:id" element={<PromptDetailPage />} />
+            <Route path="/collections/:id" element={<ProjectPage />} />
+            <Route
+              path="/collections/:id/insights"
+              element={<AgentInsightPage />}
+            />
             <Route path="/chains" element={<ChainsPage />} />
             <Route path="/chains/:id" element={<ChainDetailPage />} />
           </Route>
