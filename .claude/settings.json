@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "allow": ["Bash(GIT_DIR=.git bash .husky/pre-commit)"]
+  }
+}
