@@ -51,6 +51,16 @@ export function ragLint(errors: number): "green" | "amber" | "red" {
   return errors === 0 ? "green" : errors <= 5 ? "amber" : "red";
 }
 
+export function ciRag(
+  conclusion: string | null,
+  status: string
+): "green" | "amber" | "red" {
+  if (status === "in_progress" || status === "queued") return "amber";
+  if (conclusion === "success") return "green";
+  if (conclusion === "failure") return "red";
+  return "amber";
+}
+
 export function filterMatches(a: InsightFilter, b: InsightFilter): boolean {
   if (a.type !== b.type) return false;
   if (a.type === "git" && b.type === "git") return a.status === b.status;

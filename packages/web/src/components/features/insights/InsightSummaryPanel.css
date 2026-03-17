@@ -1,9 +1,9 @@
 .insight-summary-panel {
-  @apply flex items-center justify-between gap-4 px-4 py-2
+  @apply flex flex-col px-4 py-1.5 gap-1
     border-b border-border bg-card shrink-0;
 }
 
-.insight-summary-panel__stats {
+.insight-summary-panel__row {
   @apply flex items-center gap-3 flex-wrap;
 }
 

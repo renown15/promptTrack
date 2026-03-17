@@ -9,6 +9,7 @@ import {
   timeAgo,
   ragCoverage,
   ragLint,
+  ciRag,
   filterMatches,
 } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightMetricPills } from "@/components/features/insights/InsightMetricPills";
@@ -24,16 +25,6 @@ type Props = {
   onCIClick: () => void;
 };
 
-function ciRag(
-  conclusion: string | null,
-  status: string
-): "green" | "amber" | "red" {
-  if (status === "in_progress" || status === "queued") return "amber";
-  if (conclusion === "success") return "green";
-  if (conclusion === "failure") return "red";
-  return "amber";
-}
-
 export function InsightSummaryPanel({
   files,
   metricLabels,
@@ -44,6 +35,7 @@ export function InsightSummaryPanel({
   onCIClick,
 }: Props) {
   const totalLines = files.reduce((s, f) => s + f.lineCount, 0);
+  const avgLines = files.length > 0 ? Math.round(totalLines / files.length) : 0;
   const metricEntries = Object.entries(metricLabels);
   const metricNames = metricEntries.map(([n]) => n);
   const health = computeHealth(files, metricNames);
@@ -63,15 +55,8 @@ export function InsightSummaryPanel({
 
   function pill(filter: InsightFilter, colorClass: string, label: string) {
     const active = activeFilter !== null && filterMatches(activeFilter, filter);
-    const key =
-      filter.type === "git"
-        ? `git-${filter.status}`
-        : filter.type === "metric"
-          ? `metric-${filter.name}-${filter.status}`
-          : filter.type;
     return (
       <button
-        key={key}
         className={`insight-summary-panel__count insight-summary-panel__count--${colorClass}${active ? " insight-summary-panel__count--active" : ""}`}
         onClick={() => onFilterToggle(filter)}
         title={active ? "Clear filter" : `Filter: ${label}`}
@@ -83,7 +68,7 @@ export function InsightSummaryPanel({
 
   return (
     <div className="insight-summary-panel">
-      <div className="insight-summary-panel__stats">
+      <div className="insight-summary-panel__row">
         <span className="insight-summary-panel__stat">
           <span className="insight-summary-panel__stat-value">
             {files.length}
@@ -96,6 +81,18 @@ export function InsightSummaryPanel({
           </span>
           <span className="insight-summary-panel__stat-label">lines</span>
         </span>
+        {avgLines > 0 && (
+          <span className="insight-summary-panel__stat">
+            <span className="insight-summary-panel__stat-value">
+              {avgLines}
+            </span>
+            <span className="insight-summary-panel__stat-label">
+              avg lines/file
+            </span>
+          </span>
+        )}
+      </div>
+      <div className="insight-summary-panel__row">
         {(modifiedCount > 0 || untrackedCount > 0) && (
           <>
             <span className="insight-summary-panel__divider" />
