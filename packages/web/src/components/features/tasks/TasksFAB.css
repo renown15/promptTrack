@@ -3,14 +3,14 @@
 }
 
 .tasks-fab__btn {
-  @apply w-12 h-12 rounded-full bg-primary text-primary-foreground
+  @apply w-12 h-12 rounded-full bg-sky-400 text-white
     shadow-lg flex items-center justify-center
     cursor-pointer border-0
-    hover:opacity-90 transition-opacity;
+    hover:bg-sky-500 transition-colors;
 }
 
 .tasks-fab__btn--active {
-  @apply ring-2 ring-primary ring-offset-2;
+  @apply ring-2 ring-sky-400 ring-offset-2;
 }
 
 .tasks-fab__panel {
