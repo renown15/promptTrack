@@ -8,8 +8,8 @@ function buildPrompt(data: {
   lineCount: number;
   modifiedCount: number;
   untrackedCount: number;
-  coverage: { linesPct: number } | null;
-  lint: { errors: number; warnings: number } | null;
+  coverage: { linesPct: number; reportedAt: string } | null;
+  lint: { errors: number; warnings: number; reportedAt: string } | null;
   analyzed: number;
   metricHealth: Record<
     string,
@@ -22,11 +22,13 @@ function buildPrompt(data: {
     `Files: ${data.fileCount} (${data.lineCount.toLocaleString()} lines)`
   );
   lines.push(
-    data.coverage ? `Coverage: ${data.coverage.linesPct}%` : "Coverage: no data"
+    data.coverage
+      ? `Coverage: ${data.coverage.linesPct}% (last run: ${new Date(data.coverage.reportedAt).toLocaleString()})`
+      : "Coverage: no data"
   );
   lines.push(
     data.lint
-      ? `Lint: ${data.lint.errors} errors, ${data.lint.warnings} warnings`
+      ? `Lint: ${data.lint.errors} errors, ${data.lint.warnings} warnings (last run: ${new Date(data.lint.reportedAt).toLocaleString()})`
       : "Lint: no data"
   );
   if (data.modifiedCount || data.untrackedCount)
