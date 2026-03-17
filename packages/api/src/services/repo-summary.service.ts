@@ -16,6 +16,7 @@ function buildPrompt(data: {
     { green: number; amber: number; red: number; error: number }
   >;
   badFiles: { path: string; issues: string[] }[];
+  largestFiles: { path: string; lines: number; vsAvg: string }[];
 }): string {
   const lines: string[] = [];
   lines.push(
@@ -47,6 +48,12 @@ function buildPrompt(data: {
     lines.push("Files needing attention:");
     for (const f of data.badFiles)
       lines.push(`  ${f.path}: ${f.issues.join(", ")}`);
+  }
+
+  if (data.largestFiles.length) {
+    lines.push("Top 10 largest files (vs avg):");
+    for (const f of data.largestFiles)
+      lines.push(`  ${f.path}: ${f.lines} lines (${f.vsAvg})`);
   }
 
   return `You are a code quality assistant. Summarise the repo health in 2-4 concise sentences. Be direct and specific. Highlight the biggest issues first. If things look healthy, say so briefly.
@@ -105,6 +112,19 @@ export const repoSummaryService = {
         badFiles.push({ path: f.relativePath, issues: fileIssues });
     }
 
+    const avgLines = files.length ? Math.round(lineCount / files.length) : 0;
+    const largestFiles = [...files]
+      .sort((a, b) => b.lineCount - a.lineCount)
+      .slice(0, 10)
+      .map((f) => {
+        const ratio = avgLines ? f.lineCount / avgLines : 1;
+        const vsAvg =
+          ratio >= 2
+            ? `${ratio.toFixed(1)}× avg`
+            : `+${Math.round((ratio - 1) * 100)}% vs avg`;
+        return { path: f.relativePath, lines: f.lineCount, vsAvg };
+      });
+
     const prompt = buildPrompt({
       fileCount: files.length,
       lineCount,
@@ -115,6 +135,7 @@ export const repoSummaryService = {
       analyzed,
       metricHealth,
       badFiles,
+      largestFiles,
     });
 
     const res = await fetch(`${cfg.endpoint}/api/generate`, {
