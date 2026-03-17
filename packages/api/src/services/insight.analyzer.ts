@@ -42,7 +42,12 @@ export async function runAnalysis(
   let content: string;
   try {
     content = await readFile(join(directory, snap.relativePath), "utf-8");
-  } catch {
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const current = state.files.get(snap.relativePath);
+    if (current)
+      for (const m of enabledMetrics)
+        current.metrics[m.name] = { error: `unreadable: ${msg}` };
     return;
   }
 
