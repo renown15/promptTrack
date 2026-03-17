@@ -79,7 +79,7 @@ async function startWatchers() {
   const collections = await collectionRepository.findAll();
   for (const c of collections) {
     if (c.directory) {
-      await seedCache(c.id).catch(() => {});
+      await seedCache(c.id, c.directory).catch(() => {});
       watcherService.start(c.id, c.directory);
     }
   }

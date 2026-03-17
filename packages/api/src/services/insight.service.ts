@@ -128,11 +128,16 @@ export const insightService = {
   },
 };
 
-export async function seedCache(collectionId: string): Promise<void> {
+export async function seedCache(
+  collectionId: string,
+  directory: string
+): Promise<void> {
   const records = await fileSnapshotRepository.getLatestPerFile(collectionId);
   if (records.length === 0) return;
-  const baselines =
-    await fileSnapshotRepository.getBaselineLineCounts(collectionId);
+  const [baselines, gitStatusMap] = await Promise.all([
+    fileSnapshotRepository.getBaselineLineCounts(collectionId),
+    getGitStatus(directory),
+  ]);
   const state = getOrCreateState(collectionId);
   for (const r of records) {
     const baseline = baselines.get(r.relativePath);
@@ -144,7 +149,7 @@ export async function seedCache(collectionId: string): Promise<void> {
       lineDelta: baseline !== undefined ? r.lineCount - baseline : null,
       updatedAt: r.scannedAt,
       coverage: r.coverage ?? null,
-      gitStatus: null,
+      gitStatus: gitStatusMap.get(r.relativePath) ?? "clean",
       metrics: r.metrics as Record<string, MetricResult | "pending" | null>,
     });
   }
