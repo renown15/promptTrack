@@ -30,14 +30,20 @@ export async function runAnalysis(
     return;
   }
   const enabledMetrics = ollamaService.enabledMetrics(cfg.metrics);
-  console.log(
-    `[insight] runAnalysis ${snap.relativePath} — ${enabledMetrics.length} metrics, model=${cfg.model}`
-  );
   if (enabledMetrics.length === 0) return;
 
+  // Only run metrics that are pending or errored — skip valid cached results
+  const metricsToRun = enabledMetrics.filter((m) => {
+    const v = snap.metrics[m.name];
+    return !v || v === "pending" || (typeof v === "object" && "error" in v);
+  });
+  if (metricsToRun.length === 0) return;
+
+  console.log(
+    `[insight] runAnalysis ${snap.relativePath} — ${metricsToRun.length}/${enabledMetrics.length} metrics, model=${cfg.model}`
+  );
+
   const state = getOrCreateState(collectionId);
-  for (const m of enabledMetrics) snap.metrics[m.name] = "pending";
-  emitFileUpdated(collectionId, snap);
 
   let content: string;
   try {
@@ -46,12 +52,12 @@ export async function runAnalysis(
     const msg = err instanceof Error ? err.message : String(err);
     const current = state.files.get(snap.relativePath);
     if (current)
-      for (const m of enabledMetrics)
+      for (const m of metricsToRun)
         current.metrics[m.name] = { error: `unreadable: ${msg}` };
     return;
   }
 
-  for (const metric of enabledMetrics) {
+  for (const metric of metricsToRun) {
     const result = await ollamaService.analyzeMetric({
       endpoint: cfg.endpoint,
       model: cfg.model,

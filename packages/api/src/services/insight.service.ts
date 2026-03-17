@@ -66,12 +66,22 @@ export const insightService = {
             v === null || (typeof v === "object" && v !== null && "error" in v)
         );
         const hasMissing = enabledMetricNames.some((n) => !(n in metrics));
-        if (hasErrors || hasMissing) {
+        if (hasErrors) {
+          // full re-analysis — mark everything pending now so UI shows them all
+          for (const name of enabledMetricNames) snap.metrics[name] = "pending";
+          toAnalyze.push(snap);
+        } else if (hasMissing) {
+          // keep valid results, mark only missing metrics pending
+          snap.metrics = { ...metrics };
+          for (const name of enabledMetricNames)
+            if (!(name in snap.metrics)) snap.metrics[name] = "pending";
           toAnalyze.push(snap);
         } else {
           snap.metrics = metrics;
         }
       } else {
+        // new or changed file — mark everything pending now
+        for (const name of enabledMetricNames) snap.metrics[name] = "pending";
         toAnalyze.push(snap);
       }
       state.files.set(snap.relativePath, snap);
