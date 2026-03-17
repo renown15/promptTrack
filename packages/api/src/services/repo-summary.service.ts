@@ -64,9 +64,9 @@ export const repoSummaryService = {
 
     const files = state.files;
     const lineCount = files.reduce((s, f) => s + f.lineCount, 0);
-    const metricNames = Object.keys(cfg.metrics ?? {}).filter(
-      (k) => cfg.metrics[k] !== false
-    );
+    const metricNames = ollamaService
+      .enabledMetrics(cfg.metrics ?? {})
+      .map((m) => m.name);
 
     const metricHealth: Record<
       string,
