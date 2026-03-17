@@ -17,6 +17,7 @@ export interface FileSnapshotDTO {
   lineDelta: number | null;
   updatedAt: string;
   coverage: number | null;
+  lintErrors: number | null;
   gitStatus: "untracked" | "modified" | "clean" | null;
   metrics: Record<string, FileMetric | FileMetricError | "pending" | null>;
 }
@@ -69,7 +70,9 @@ export type InsightFilter =
       type: "metric";
       name: string;
       status: "red" | "amber" | "green" | "error";
-    };
+    }
+  | { type: "coverage" }
+  | { type: "lint" };
 
 export interface CIStepDTO {
   number: number;

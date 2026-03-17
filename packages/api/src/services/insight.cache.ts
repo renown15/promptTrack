@@ -21,6 +21,7 @@ export interface FileSnapshot {
   lineDelta: number | null;
   updatedAt: Date;
   coverage: number | null;
+  lintErrors: number | null;
   gitStatus: GitFileStatus | null;
   metrics: Record<string, MetricValue>;
 }

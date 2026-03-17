@@ -56,5 +56,6 @@ export function filterMatches(a: InsightFilter, b: InsightFilter): boolean {
   if (a.type === "git" && b.type === "git") return a.status === b.status;
   if (a.type === "metric" && b.type === "metric")
     return a.name === b.name && a.status === b.status;
-  return false;
+  // coverage and lint filters have no additional discriminators
+  return a.type === b.type;
 }

@@ -25,6 +25,8 @@ type Props = {
 function filterLabel(filter: InsightFilter): string {
   if (filter.type === "git")
     return filter.status === "modified" ? "Modified files" : "Untracked files";
+  if (filter.type === "coverage") return "Files with coverage";
+  if (filter.type === "lint") return "Files with lint errors";
   const statusLabels: Record<string, string> = {
     red: "critical",
     amber: "warn",

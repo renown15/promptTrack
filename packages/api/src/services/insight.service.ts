@@ -19,6 +19,7 @@ import {
   runAnalysis,
   runAnalysisQueue,
 } from "@/services/insight.analyzer.js";
+import { getPerFileMaps } from "@/services/discovery.per-file.js";
 
 export const insightService = {
   async scan(collectionId: string, directory: string): Promise<void> {
@@ -38,12 +39,16 @@ export const insightService = {
 
     const snapshots: FileSnapshot[] = [];
     const toAnalyze: FileSnapshot[] = [];
+    const { coveragePct, lintErrors: lintMap } =
+      await getPerFileMaps(directory);
 
     for await (const snap of walkCode(directory, directory, 0)) {
       const baseline = baselines.get(snap.relativePath);
       snap.lineDelta =
         baseline !== undefined ? snap.lineCount - baseline : null;
       snap.gitStatus = gitStatusMap.get(snap.relativePath) ?? "clean";
+      snap.coverage = coveragePct.get(snap.relativePath) ?? null;
+      snap.lintErrors = lintMap.get(snap.relativePath) ?? 0;
 
       const existing = existingMap.get(snap.relativePath);
       if (existing && snap.updatedAt <= existing.scannedAt) {
@@ -149,6 +154,7 @@ export async function seedCache(
       lineDelta: baseline !== undefined ? r.lineCount - baseline : null,
       updatedAt: r.scannedAt,
       coverage: r.coverage ?? null,
+      lintErrors: null,
       gitStatus: gitStatusMap.get(r.relativePath) ?? "clean",
       metrics: r.metrics as Record<string, MetricResult | "pending" | null>,
     });

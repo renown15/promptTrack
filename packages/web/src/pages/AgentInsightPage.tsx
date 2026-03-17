@@ -12,6 +12,7 @@ import type { InsightFilter } from "@/hooks/useInsights";
 import { useOllamaConfig } from "@/hooks/useOllamaConfig";
 import { useResizeHandle } from "@/hooks/useResizeHandle";
 import { applyFilter } from "@/pages/AgentInsightPage.utils";
+import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightTitleBar } from "@/components/features/insights/InsightTitleBar";
 import { InsightSummaryPanel } from "@/components/features/insights/InsightSummaryPanel";
 import { InsightTreeTable } from "@/components/features/insights/InsightTreeTable";
@@ -82,24 +83,9 @@ export function AgentInsightPage() {
   );
 
   function handleFilterToggle(filter: InsightFilter) {
-    setActiveFilter((prev) => {
-      if (!prev) return filter;
-      if (prev.type !== filter.type) return filter;
-      if (
-        prev.type === "git" &&
-        filter.type === "git" &&
-        prev.status === filter.status
-      )
-        return null;
-      if (
-        prev.type === "metric" &&
-        filter.type === "metric" &&
-        prev.name === filter.name &&
-        prev.status === filter.status
-      )
-        return null;
-      return filter;
-    });
+    setActiveFilter((prev) =>
+      prev && filterMatches(prev, filter) ? null : filter
+    );
   }
 
   function handleCIClick() {

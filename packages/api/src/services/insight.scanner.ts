@@ -88,6 +88,7 @@ export async function readSnapshot(
       lineDelta: null,
       updatedAt: info.mtime,
       coverage: null,
+      lintErrors: null,
       gitStatus: null,
       metrics: {},
     };

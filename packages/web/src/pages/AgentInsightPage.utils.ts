@@ -7,6 +7,10 @@ export function applyFilter(
   if (!filter) return files;
   if (filter.type === "git")
     return files.filter((f) => f.gitStatus === filter.status);
+  if (filter.type === "coverage")
+    return files.filter((f) => f.coverage !== null);
+  if (filter.type === "lint")
+    return files.filter((f) => (f.lintErrors ?? 0) > 0);
   return files.filter((f) => {
     const v = f.metrics[filter.name];
     if (filter.status === "error")

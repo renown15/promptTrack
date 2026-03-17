@@ -63,7 +63,12 @@ export function InsightSummaryPanel({
 
   function pill(filter: InsightFilter, colorClass: string, label: string) {
     const active = activeFilter !== null && filterMatches(activeFilter, filter);
-    const key = `${filter.type}-${filter.type === "git" ? filter.status : `${filter.name}-${filter.status}`}`;
+    const key =
+      filter.type === "git"
+        ? `git-${filter.status}`
+        : filter.type === "metric"
+          ? `metric-${filter.name}-${filter.status}`
+          : filter.type;
     return (
       <button
         key={key}
@@ -119,11 +124,17 @@ export function InsightSummaryPanel({
               <span className="insight-summary-panel__metric-label">
                 coverage
               </span>
-              <span
-                className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}`}
+              <button
+                className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__rag--active" : ""}`}
+                onClick={() => onFilterToggle({ type: "coverage" })}
+                title={
+                  activeFilter?.type === "coverage"
+                    ? "Clear filter"
+                    : "Filter: files with coverage data"
+                }
               >
                 {aggregate.coverage.linesPct}%
-              </span>
+              </button>
               <span className="insight-summary-panel__age">
                 {timeAgo(aggregate.coverage.reportedAt)}
               </span>
@@ -133,13 +144,19 @@ export function InsightSummaryPanel({
         {aggregate?.lint && (
           <span className="insight-summary-panel__aggregate">
             <span className="insight-summary-panel__metric-label">lint</span>
-            <span
-              className={`insight-summary-panel__rag insight-summary-panel__rag--${ragLint(aggregate.lint.errors)}`}
+            <button
+              className={`insight-summary-panel__rag insight-summary-panel__rag--${ragLint(aggregate.lint.errors)}${activeFilter?.type === "lint" ? " insight-summary-panel__rag--active" : ""}`}
+              onClick={() => onFilterToggle({ type: "lint" })}
+              title={
+                activeFilter?.type === "lint"
+                  ? "Clear filter"
+                  : "Filter: files with lint errors"
+              }
             >
               {aggregate.lint.errors === 0
                 ? "clean"
                 : `${aggregate.lint.errors} err`}
-            </span>
+            </button>
             {aggregate.lint.warnings > 0 && (
               <span className="insight-summary-panel__rag insight-summary-panel__rag--amber">
                 {aggregate.lint.warnings} warn
