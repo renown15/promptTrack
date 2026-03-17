@@ -1,0 +1,128 @@
+.ci-detail-panel {
+  @apply flex flex-col h-full text-xs overflow-hidden;
+}
+
+.ci-detail-panel--empty {
+  @apply flex items-center justify-between px-4;
+}
+
+.ci-detail-panel__header {
+  @apply flex items-center gap-2 px-4 py-2 border-b border-border shrink-0;
+}
+
+.ci-detail-panel__run-name {
+  @apply font-medium text-foreground truncate;
+}
+
+.ci-detail-panel__run-at {
+  @apply text-[11px] text-muted-foreground ml-auto mr-2;
+}
+
+.ci-detail-panel__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors shrink-0;
+}
+
+.ci-detail-panel__empty-msg {
+  @apply text-muted-foreground;
+}
+
+.ci-detail-panel__body {
+  @apply flex-1 min-h-0 overflow-y-auto px-4 py-2 flex flex-col gap-1;
+}
+
+/* Conclusion badge */
+.ci-detail-panel__badge {
+  @apply w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0;
+}
+
+.ci-detail-panel__badge--lg {
+  @apply w-5 h-5 text-xs;
+}
+
+.ci-detail-panel__badge--success {
+  @apply bg-green-500/20 text-green-600;
+}
+
+.ci-detail-panel__badge--failure {
+  @apply bg-red-500/20 text-red-600;
+}
+
+.ci-detail-panel__badge--running {
+  @apply bg-yellow-400/20 text-yellow-600 animate-spin;
+}
+
+.ci-detail-panel__badge--skipped {
+  @apply bg-muted text-muted-foreground;
+}
+
+.ci-detail-panel__badge--neutral {
+  @apply bg-muted text-muted-foreground;
+}
+
+/* Conclusion inline label */
+.ci-detail-panel__conclusion {
+  @apply text-[11px] font-medium px-1.5 py-0.5 rounded;
+}
+
+.ci-detail-panel__conclusion--success {
+  @apply text-green-600 bg-green-500/10;
+}
+
+.ci-detail-panel__conclusion--failure {
+  @apply text-red-600 bg-red-500/10;
+}
+
+.ci-detail-panel__conclusion--running {
+  @apply text-yellow-600 bg-yellow-400/10;
+}
+
+.ci-detail-panel__conclusion--skipped,
+.ci-detail-panel__conclusion--neutral {
+  @apply text-muted-foreground bg-muted;
+}
+
+/* Job rows */
+.ci-detail-panel__job {
+  @apply rounded border border-border/50;
+}
+
+.ci-detail-panel__job--failure {
+  @apply border-red-500/30 bg-red-500/5;
+}
+
+.ci-detail-panel__job--success {
+  @apply border-green-500/20;
+}
+
+.ci-detail-panel__job-header {
+  @apply flex items-center gap-2 px-3 py-1.5;
+}
+
+.ci-detail-panel__job-name {
+  @apply font-medium text-foreground/90 truncate flex-1;
+}
+
+.ci-detail-panel__duration {
+  @apply text-[10px] text-muted-foreground shrink-0 font-mono;
+}
+
+.ci-detail-panel__fail-count {
+  @apply text-[10px] text-red-600 shrink-0;
+}
+
+/* Step rows */
+.ci-detail-panel__steps {
+  @apply border-t border-border/30 px-3 py-1 flex flex-col gap-0.5;
+}
+
+.ci-detail-panel__step {
+  @apply flex items-center gap-2 py-0.5;
+}
+
+.ci-detail-panel__step-name {
+  @apply flex-1 text-foreground/70;
+}
+
+.ci-detail-panel__step--failure .ci-detail-panel__step-name {
+  @apply text-red-600 font-medium;
+}

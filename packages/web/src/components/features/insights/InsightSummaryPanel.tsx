@@ -1,6 +1,7 @@
 import type {
   FileSnapshotDTO,
   AggregateStatsDTO,
+  CIStatusDTO,
   InsightFilter,
 } from "@/api/endpoints/insights";
 import {
@@ -16,27 +17,31 @@ import "@/components/features/insights/InsightSummaryPanel.css";
 type Props = {
   files: FileSnapshotDTO[];
   metricLabels: Record<string, string>;
-  lastScan: string | null;
-  scanning: boolean;
-  onScan: () => void;
-  onConfig: () => void;
-  modelLabel: string | null;
   aggregate: AggregateStatsDTO | null;
+  ciStatus: CIStatusDTO | null;
   activeFilter: InsightFilter | null;
   onFilterToggle: (filter: InsightFilter) => void;
+  onCIClick: () => void;
 };
+
+function ciRag(
+  conclusion: string | null,
+  status: string
+): "green" | "amber" | "red" {
+  if (status === "in_progress" || status === "queued") return "amber";
+  if (conclusion === "success") return "green";
+  if (conclusion === "failure") return "red";
+  return "amber";
+}
 
 export function InsightSummaryPanel({
   files,
   metricLabels,
-  lastScan,
-  scanning,
-  onScan,
-  onConfig,
-  modelLabel,
   aggregate,
+  ciStatus,
   activeFilter,
   onFilterToggle,
+  onCIClick,
 }: Props) {
   const totalLines = files.reduce((s, f) => s + f.lineCount, 0);
   const metricEntries = Object.entries(metricLabels);
@@ -86,20 +91,6 @@ export function InsightSummaryPanel({
           </span>
           <span className="insight-summary-panel__stat-label">lines</span>
         </span>
-        {files.length > 0 && metricNames.length > 0 && (
-          <span className="insight-summary-panel__progress">
-            <span className="insight-summary-panel__progress-bar">
-              <span
-                className="insight-summary-panel__progress-fill"
-                style={{ width: `${(analyzed / files.length) * 100}%` }}
-              />
-            </span>
-            <span className="insight-summary-panel__progress-label">
-              {analyzed} / {files.length}
-            </span>
-          </span>
-        )}
-
         {(modifiedCount > 0 || untrackedCount > 0) && (
           <>
             <span className="insight-summary-panel__divider" />
@@ -160,36 +151,43 @@ export function InsightSummaryPanel({
           </span>
         )}
 
+        {ciStatus?.run && (
+          <span className="insight-summary-panel__aggregate">
+            <span className="insight-summary-panel__metric-label">CI</span>
+            <button
+              className={`insight-summary-panel__rag insight-summary-panel__rag--${ciRag(ciStatus.run.conclusion, ciStatus.run.status)}`}
+              onClick={onCIClick}
+              title="View CI details"
+            >
+              {ciStatus.run.status !== "completed"
+                ? "running"
+                : (ciStatus.run.conclusion ?? "—")}
+            </button>
+            <span className="insight-summary-panel__age">
+              {timeAgo(ciStatus.run.createdAt)}
+            </span>
+          </span>
+        )}
+
+        {files.length > 0 && metricNames.length > 0 && (
+          <span className="insight-summary-panel__aggregate">
+            <span className="insight-summary-panel__metric-label">
+              analyzed
+            </span>
+            <span
+              className={`insight-summary-panel__rag insight-summary-panel__rag--${analyzed === files.length ? "green" : analyzed > 0 ? "amber" : "red"}`}
+            >
+              {analyzed} / {files.length}
+            </span>
+          </span>
+        )}
+
         <InsightMetricPills
           metricEntries={metricEntries}
           health={health}
           activeFilter={activeFilter}
           onFilterToggle={onFilterToggle}
         />
-      </div>
-      <div className="insight-summary-panel__actions">
-        {lastScan && (
-          <span className="insight-summary-panel__last-scan">
-            {timeAgo(lastScan)}
-          </span>
-        )}
-        {scanning && (
-          <span className="insight-summary-panel__scanning">Scanning…</span>
-        )}
-        <button
-          className="insight-summary-panel__scan-btn"
-          onClick={onScan}
-          disabled={scanning}
-        >
-          ↻ Scan
-        </button>
-        <button
-          className="insight-summary-panel__config-btn"
-          onClick={onConfig}
-          title={modelLabel ?? "Configure Ollama"}
-        >
-          ⚙ {modelLabel ?? "Ollama"}
-        </button>
       </div>
     </div>
   );

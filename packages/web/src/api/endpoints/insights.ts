@@ -71,6 +71,40 @@ export type InsightFilter =
       status: "red" | "amber" | "green" | "error";
     };
 
+export interface CIStepDTO {
+  number: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+}
+
+export interface CIJobDTO {
+  id: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  steps: CIStepDTO[];
+}
+
+export interface CIRunDTO {
+  id: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  createdAt: string;
+  htmlUrl: string;
+}
+
+export interface CIStatusDTO {
+  run: CIRunDTO | null;
+  jobs: CIJobDTO[];
+  error: "no_remote" | "not_github" | "api_error" | null;
+}
+
 export interface AggregateStatsDTO {
   coverage: { linesPct: number; reportedAt: string } | null;
   lint: { errors: number; warnings: number; reportedAt: string } | null;
@@ -126,6 +160,13 @@ export const insightsApi = {
   ): Promise<AggregateStatsDTO> => {
     const r = await apiClient.get<AggregateStatsDTO>(
       `/collections/${collectionId}/insights/aggregate`
+    );
+    return r.data;
+  },
+
+  getCIStatus: async (collectionId: string): Promise<CIStatusDTO> => {
+    const r = await apiClient.get<CIStatusDTO>(
+      `/collections/${collectionId}/insights/ci`
     );
     return r.data;
   },

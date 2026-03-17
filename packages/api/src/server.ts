@@ -12,6 +12,7 @@ import { chainRoutes } from "@/routes/chains/chains.routes.js";
 import { collectionRoutes } from "@/routes/collections/collections.routes.js";
 import { fsRoutes } from "@/routes/fs/fs.routes.js";
 import { insightRoutes } from "@/routes/insights/insights.routes.js";
+import { ciRoutes } from "@/routes/insights/ci.routes.js";
 import { settingsRoutes } from "@/routes/settings/settings.routes.js";
 import { collectionRepository } from "@/repositories/collection.repository.js";
 import { watcherService } from "@/services/watcher.service.js";
@@ -65,6 +66,7 @@ async function buildApp() {
   await fastify.register(collectionRoutes, { prefix: "/api/collections" });
   await fastify.register(fsRoutes, { prefix: "/api/fs" });
   await fastify.register(insightRoutes, { prefix: "/api/collections" });
+  await fastify.register(ciRoutes, { prefix: "/api/collections" });
   await fastify.register(settingsRoutes, { prefix: "/api/settings" });
 
   fastify.get("/health", async () => ({

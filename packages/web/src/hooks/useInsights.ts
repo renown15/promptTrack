@@ -12,9 +12,10 @@ export type {
   CoverageDetailDTO,
   LintDetailDTO,
   LintMessageDTO,
-  OllamaConfigDTO,
-  MetricDefinition,
   AggregateStatsDTO,
+  CIStatusDTO,
+  CIJobDTO,
+  CIStepDTO,
   InsightFilter,
 } from "@/api/endpoints/insights";
 
@@ -182,37 +183,12 @@ export function useInsightAggregate(collectionId: string) {
   });
 }
 
-export function useOllamaConfig() {
+export function useCIStatus(collectionId: string) {
   return useQuery({
-    queryKey: ["ollama-config"],
-    queryFn: () => insightsApi.getOllamaConfig(),
-  });
-}
-
-export function useUpdateOllamaConfig() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: insightsApi.updateOllamaConfig,
-    onSuccess: (data) => {
-      queryClient.setQueryData(["ollama-config"], (prev: typeof data) =>
-        prev ? { ...prev, ...data } : data
-      );
-    },
-  });
-}
-
-export function useTestOllamaConnection() {
-  return useMutation({
-    mutationFn: (endpoint: string) =>
-      insightsApi.testOllamaConnection(endpoint),
-  });
-}
-
-export function useOllamaModels(endpoint: string) {
-  return useQuery({
-    queryKey: ["ollama-models", endpoint],
-    queryFn: () => insightsApi.getOllamaModels(endpoint),
-    enabled: !!endpoint,
-    staleTime: 30_000,
+    queryKey: ["ci-status", collectionId],
+    queryFn: () => insightsApi.getCIStatus(collectionId),
+    enabled: !!collectionId,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
   });
 }

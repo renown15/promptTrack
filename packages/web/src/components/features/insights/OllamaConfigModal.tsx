@@ -4,7 +4,7 @@ import {
   useUpdateOllamaConfig,
   useTestOllamaConnection,
   useOllamaModels,
-} from "@/hooks/useInsights";
+} from "@/hooks/useOllamaConfig";
 import "@/components/features/insights/OllamaConfigModal.css";
 
 type Props = {
