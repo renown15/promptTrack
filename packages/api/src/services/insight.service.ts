@@ -20,6 +20,7 @@ import {
   runAnalysisQueue,
 } from "@/services/insight.analyzer.js";
 import { getPerFileMaps } from "@/services/discovery.per-file.js";
+import { ollamaService } from "@/services/ollama.service.js";
 
 export const insightService = {
   async scan(collectionId: string, directory: string): Promise<void> {
@@ -39,8 +40,12 @@ export const insightService = {
 
     const snapshots: FileSnapshot[] = [];
     const toAnalyze: FileSnapshot[] = [];
-    const { coveragePct, lintErrors: lintMap } =
-      await getPerFileMaps(directory);
+    const [{ coveragePct, lintErrors: lintMap }, ollamaCfg] = await Promise.all(
+      [getPerFileMaps(directory), ollamaService.getConfig()]
+    );
+    const enabledMetricNames = ollamaService
+      .enabledMetrics(ollamaCfg.metrics)
+      .map((m) => m.name);
 
     for await (const snap of walkCode(directory, directory, 0)) {
       const baseline = baselines.get(snap.relativePath);
@@ -60,7 +65,8 @@ export const insightService = {
           (v) =>
             v === null || (typeof v === "object" && v !== null && "error" in v)
         );
-        if (hasErrors) {
+        const hasMissing = enabledMetricNames.some((n) => !(n in metrics));
+        if (hasErrors || hasMissing) {
           toAnalyze.push(snap);
         } else {
           snap.metrics = metrics;
