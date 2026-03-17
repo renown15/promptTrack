@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
+import { TasksFAB } from "@/components/features/tasks/TasksFAB";
 import "@/components/layout/AppShell.css";
 
 export function AppShell() {
@@ -13,6 +14,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <TasksFAB />
     </div>
   );
 }

@@ -1,0 +1,39 @@
+.tasks-fab {
+  @apply fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3;
+}
+
+.tasks-fab__btn {
+  @apply w-12 h-12 rounded-full bg-primary text-primary-foreground
+    shadow-lg flex items-center justify-center
+    cursor-pointer border-0
+    hover:opacity-90 transition-opacity;
+}
+
+.tasks-fab__btn--active {
+  @apply ring-2 ring-primary ring-offset-2;
+}
+
+.tasks-fab__panel {
+  @apply w-80 max-h-[70vh] flex flex-col
+    rounded-xl border border-border bg-card
+    shadow-xl overflow-hidden;
+}
+
+.tasks-fab__panel-header {
+  @apply flex items-center justify-between
+    px-4 py-2.5 border-b border-border shrink-0;
+}
+
+.tasks-fab__panel-title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.tasks-fab__panel-close {
+  @apply text-muted-foreground hover:text-foreground
+    cursor-pointer bg-transparent border-0 p-0.5
+    transition-colors leading-none;
+}
+
+.tasks-fab__panel-body {
+  @apply overflow-y-auto flex-1 px-4 py-3 text-sm;
+}

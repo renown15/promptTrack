@@ -15,6 +15,7 @@ import { insightRoutes } from "@/routes/insights/insights.routes.js";
 import { ciRoutes } from "@/routes/insights/ci.routes.js";
 import { repoSummaryRoutes } from "@/routes/insights/repo-summary.routes.js";
 import { settingsRoutes } from "@/routes/settings/settings.routes.js";
+import { tasksRoutes } from "@/routes/tasks/tasks.routes.js";
 import { collectionRepository } from "@/repositories/collection.repository.js";
 import { watcherService } from "@/services/watcher.service.js";
 import { seedCache } from "@/services/insight.service.js";
@@ -70,6 +71,7 @@ async function buildApp() {
   await fastify.register(ciRoutes, { prefix: "/api/collections" });
   await fastify.register(repoSummaryRoutes, { prefix: "/api/collections" });
   await fastify.register(settingsRoutes, { prefix: "/api/settings" });
+  await fastify.register(tasksRoutes, { prefix: "/api/tasks" });
 
   fastify.get("/health", async () => ({
     status: "ok",
