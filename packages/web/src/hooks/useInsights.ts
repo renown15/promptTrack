@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { insightsApi, type FileSnapshotDTO } from "@/api/endpoints/insights";
 import { useAuthStore } from "@/stores/authStore";
@@ -28,7 +28,11 @@ export function useInsightFilesCache(collectionId: string) {
   });
 }
 
-export function useInsights(collectionId: string) {
+export function useInsights(collectionId: string, onScanComplete?: () => void) {
+  const onScanCompleteRef = useRef(onScanComplete);
+  useEffect(() => {
+    onScanCompleteRef.current = onScanComplete;
+  });
   const queryClient = useQueryClient();
 
   const query = useQuery({
@@ -116,6 +120,7 @@ export function useInsights(collectionId: string) {
           return { ...prev, scanning: false, lastScan: data.timestamp };
         }
       );
+      onScanCompleteRef.current?.();
     });
 
     return () => es.close();
@@ -180,6 +185,12 @@ export function useInsightAggregate(collectionId: string) {
     queryFn: () => insightsApi.getAggregateStats(collectionId),
     enabled: !!collectionId,
     staleTime: 60_000,
+  });
+}
+
+export function useGenerateRepoSummary(collectionId: string) {
+  return useMutation({
+    mutationFn: () => insightsApi.generateRepoSummary(collectionId),
   });
 }
 

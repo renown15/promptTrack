@@ -167,6 +167,13 @@ export const insightsApi = {
     return r.data;
   },
 
+  generateRepoSummary: async (collectionId: string): Promise<string> => {
+    const r = await apiClient.post<{ summary: string }>(
+      `/collections/${collectionId}/insights/repo-summary`
+    );
+    return r.data.summary;
+  },
+
   getCIStatus: async (collectionId: string): Promise<CIStatusDTO> => {
     const r = await apiClient.get<CIStatusDTO>(
       `/collections/${collectionId}/insights/ci`

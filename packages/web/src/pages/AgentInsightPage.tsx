@@ -7,6 +7,7 @@ import {
   useFileDetail,
   useInsightAggregate,
   useCIStatus,
+  useGenerateRepoSummary,
 } from "@/hooks/useInsights";
 import type { InsightFilter } from "@/hooks/useInsights";
 import { useOllamaConfig } from "@/hooks/useOllamaConfig";
@@ -19,6 +20,7 @@ import { InsightTreeTable } from "@/components/features/insights/InsightTreeTabl
 import { InsightActivityStack } from "@/components/features/insights/InsightActivityStack";
 import { InsightDetailPanel } from "@/components/features/insights/InsightDetailPanel";
 import { CIDetailPanel } from "@/components/features/insights/CIDetailPanel";
+import { InsightRepoSummaryPanel } from "@/components/features/insights/InsightRepoSummaryPanel";
 import { OllamaConfigModal } from "@/components/features/insights/OllamaConfigModal";
 import "@/pages/AgentInsightPage.css";
 
@@ -29,7 +31,12 @@ export function AgentInsightPage() {
   const { data: collections } = useCollections();
   const collection = collections?.find((c) => c.id === id);
 
-  const { data: state, isLoading } = useInsights(id ?? "");
+  const [showSummary, setShowSummary] = useState(false);
+  const summary = useGenerateRepoSummary(id ?? "");
+  const { data: state, isLoading } = useInsights(id ?? "", () => {
+    setShowSummary(true);
+    summary.mutate();
+  });
   const scan = useScanInsights(id ?? "");
   const { data: ollamaCfg } = useOllamaConfig();
   const { data: aggregate } = useInsightAggregate(id ?? "");
@@ -89,16 +96,16 @@ export function AgentInsightPage() {
   }
 
   function handleCIClick() {
+    setShowSummary(false);
     setShowCIDetail((prev) => !prev);
     setSelectedFile(null);
   }
 
   function handleFileSelect(path: string) {
+    setShowSummary(false);
     setShowCIDetail(false);
     setSelectedFile((prev) => (prev === path ? null : path));
   }
-
-  const panelBottom = detail.size + HANDLE_H;
 
   return (
     <div className="agent-insight-page">
@@ -125,7 +132,7 @@ export function AgentInsightPage() {
       <div className="agent-insight-page__body">
         <div
           className="agent-insight-page__main-row"
-          style={{ bottom: panelBottom }}
+          style={{ bottom: detail.size + HANDLE_H }}
         >
           {isLoading && (
             <div className="agent-insight-page__loading">Loading</div>
@@ -185,6 +192,12 @@ export function AgentInsightPage() {
             <CIDetailPanel
               ciStatus={ciStatus}
               onClose={() => setShowCIDetail(false)}
+            />
+          ) : showSummary ? (
+            <InsightRepoSummaryPanel
+              summary={summary.data}
+              isLoading={summary.isPending}
+              onClose={() => setShowSummary(false)}
             />
           ) : (
             <InsightDetailPanel
