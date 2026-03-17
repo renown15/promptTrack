@@ -1,1 +1,1 @@
-pnpm commitlint --edit $1
+# commitlint removed — personal project, free-form messages allowed
