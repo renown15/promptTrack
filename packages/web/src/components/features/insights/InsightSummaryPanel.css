@@ -1,12 +1,13 @@
 .insight-summary-panel {
-  @apply flex flex-col px-4 py-1.5 gap-1
+  @apply flex flex-col px-4 py-2 gap-1.5
     border-b border-border bg-card shrink-0;
 }
 
 .insight-summary-panel__row {
-  @apply flex items-center gap-2 flex-wrap;
+  @apply flex items-center gap-3 flex-wrap;
 }
 
+/* Row 1 — file stats */
 .insight-summary-panel__stat {
   @apply flex items-center gap-1;
 }
@@ -19,6 +20,7 @@
   @apply text-xs text-muted-foreground;
 }
 
+/* Row 2 — git / coverage / lint / CI */
 .insight-summary-panel__divider {
   @apply w-px h-4 bg-border shrink-0;
 }
@@ -31,10 +33,27 @@
   @apply text-xs text-muted-foreground;
 }
 
+.insight-summary-panel__aggregate {
+  @apply flex items-center gap-1;
+}
+
+.insight-summary-panel__age {
+  @apply text-[10px] text-muted-foreground;
+}
+
+.insight-summary-panel__analyzed {
+  @apply text-[11px] text-muted-foreground/60 tabular-nums;
+}
+
+.insight-summary-panel__filter-badge {
+  @apply ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full
+    bg-sky-400/15 text-sky-600;
+}
+
 /* Git filter pills */
 .insight-summary-panel__count {
-  @apply text-[11px] font-medium px-1.5 py-0.5 rounded
-    cursor-pointer hover:opacity-80 transition-opacity border-0;
+  @apply text-[11px] font-medium px-1.5 py-0.5 rounded border-0
+    cursor-pointer hover:opacity-80 transition-opacity;
 }
 
 .insight-summary-panel__count--active {
@@ -53,11 +72,7 @@
   @apply text-green-600 bg-green-500/10;
 }
 
-/* Coverage / lint / CI badges */
-.insight-summary-panel__aggregate {
-  @apply flex items-center gap-1;
-}
-
+/* Coverage / lint / CI RAG badges */
 .insight-summary-panel__rag {
   @apply text-[11px] font-medium px-1.5 py-0.5 rounded border-0
     cursor-pointer hover:opacity-80 transition-opacity;
@@ -79,43 +94,55 @@
   @apply text-red-600 bg-red-500/10;
 }
 
-/* AI metric dot badges */
-.insight-summary-panel__dot {
-  @apply text-[11px] font-semibold min-w-[1.25rem] px-1 py-0.5
-    rounded text-white border-0 text-center leading-none;
+/* Row 3 — AI metric cards */
+.insight-summary-panel__cards {
+  @apply flex flex-wrap gap-2 pb-0.5;
 }
 
-.insight-summary-panel__dot--red {
-  @apply bg-red-500 cursor-pointer hover:bg-red-600 transition-colors;
+.insight-summary-panel__card {
+  @apply flex flex-col gap-0.5 px-2.5 py-2 rounded-lg
+    border border-border bg-muted/20 min-w-[100px];
 }
 
-.insight-summary-panel__dot--amber {
-  @apply bg-yellow-400 cursor-pointer hover:bg-yellow-500 transition-colors;
+.insight-summary-panel__card-name {
+  @apply text-[10px] font-semibold text-muted-foreground
+    uppercase tracking-wide mb-1;
 }
 
-.insight-summary-panel__dot--green {
-  @apply bg-green-500 cursor-pointer hover:bg-green-600 transition-colors;
+.insight-summary-panel__chip {
+  @apply flex items-center gap-2 text-[11px] px-1.5 py-0.5
+    rounded w-full text-left border-0
+    cursor-pointer hover:opacity-80 transition-opacity;
 }
 
-.insight-summary-panel__dot--error {
-  @apply bg-muted-foreground/50 cursor-pointer hover:opacity-80 transition-opacity;
+.insight-summary-panel__chip--active {
+  @apply ring-1 ring-inset ring-current;
 }
 
-.insight-summary-panel__dot--pending {
-  @apply bg-muted-foreground/25 text-muted-foreground cursor-default;
+.insight-summary-panel__chip--red {
+  @apply text-red-700 bg-red-500/15;
 }
 
-.insight-summary-panel__dot--active {
-  @apply ring-2 ring-offset-1 ring-current;
+.insight-summary-panel__chip--amber {
+  @apply text-yellow-700 bg-yellow-400/15;
 }
 
-/* Analyzed count */
-.insight-summary-panel__analyzed {
-  @apply text-[11px] text-muted-foreground/60 tabular-nums;
+.insight-summary-panel__chip--green {
+  @apply text-green-700 bg-green-500/15;
 }
 
-/* Active filter badge */
-.insight-summary-panel__filter-badge {
-  @apply ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full
-    bg-sky-400/15 text-sky-600;
+.insight-summary-panel__chip--error {
+  @apply text-foreground/50 bg-muted;
+}
+
+.insight-summary-panel__chip--pending {
+  @apply text-muted-foreground/50 bg-transparent cursor-default;
+}
+
+.insight-summary-panel__chip-count {
+  @apply font-bold tabular-nums;
+}
+
+.insight-summary-panel__chip-label {
+  @apply font-normal;
 }

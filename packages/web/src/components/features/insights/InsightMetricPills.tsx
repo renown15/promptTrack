@@ -3,37 +3,42 @@ import type { MetricHealth } from "@/components/features/insights/InsightSummary
 import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 import "@/components/features/insights/InsightSummaryPanel.css";
 
+type ChipProps = {
+  filter: InsightFilter;
+  count: number;
+  label: string;
+  colorClass: string;
+  activeFilter: InsightFilter | null;
+  onFilterToggle: (f: InsightFilter) => void;
+};
+
+function MetricChip({
+  filter,
+  count,
+  label,
+  colorClass,
+  activeFilter,
+  onFilterToggle,
+}: ChipProps) {
+  const isActive = activeFilter !== null && filterMatches(activeFilter, filter);
+  return (
+    <button
+      className={`insight-summary-panel__chip insight-summary-panel__chip--${colorClass}${isActive ? " insight-summary-panel__chip--active" : ""}`}
+      onClick={() => onFilterToggle(filter)}
+      title={isActive ? "Clear filter" : `Filter: ${count} ${label}`}
+    >
+      <span className="insight-summary-panel__chip-count">{count}</span>
+      <span className="insight-summary-panel__chip-label">{label}</span>
+    </button>
+  );
+}
+
 type Props = {
   metricEntries: [string, string][];
   health: Record<string, MetricHealth>;
   activeFilter: InsightFilter | null;
   onFilterToggle: (filter: InsightFilter) => void;
 };
-
-type DotStatus = "red" | "amber" | "green" | "error" | "pending";
-
-function worstStatus(h: MetricHealth): DotStatus | null {
-  if (h.red > 0) return "red";
-  if (h.error > 0) return "error";
-  if (h.amber > 0) return "amber";
-  if (h.pending > 0) return "pending";
-  if (h.green > 0) return "green";
-  return null;
-}
-
-function worstCount(h: MetricHealth, status: DotStatus): number {
-  return h[status === "error" ? "error" : status] ?? 0;
-}
-
-function breakdown(h: MetricHealth): string {
-  const parts: string[] = [];
-  if (h.red > 0) parts.push(`${h.red} critical`);
-  if (h.amber > 0) parts.push(`${h.amber} warn`);
-  if (h.green > 0) parts.push(`${h.green} ok`);
-  if (h.error > 0) parts.push(`${h.error} error`);
-  if (h.pending > 0) parts.push(`${h.pending} pending`);
-  return parts.join(" · ");
-}
 
 export function InsightMetricPills({
   metricEntries,
@@ -44,57 +49,68 @@ export function InsightMetricPills({
   if (metricEntries.length === 0) return null;
 
   return (
-    <>
-      <span className="insight-summary-panel__divider" />
+    <div className="insight-summary-panel__cards">
       {metricEntries.map(([name, label]) => {
         const h = health[name];
         if (!h) return null;
-        const worst = worstStatus(h);
-        if (worst === null) return null;
-
-        const count = worstCount(h, worst);
-        const isClickable = worst !== "pending";
-        const filter: InsightFilter | null = isClickable
-          ? {
-              type: "metric",
-              name,
-              status: worst === "error" ? "error" : worst,
-            }
-          : null;
-        const isActive =
-          filter !== null &&
-          activeFilter !== null &&
-          filterMatches(activeFilter, filter);
-
-        const dotClass = [
-          "insight-summary-panel__dot",
-          `insight-summary-panel__dot--${worst}`,
-          isActive ? "insight-summary-panel__dot--active" : "",
-        ]
-          .filter(Boolean)
-          .join(" ");
-
-        const tooltipText = `${breakdown(h)}${isClickable ? ` — ${isActive ? "clear filter" : "click to filter"}` : ""}`;
-
+        const total = h.green + h.amber + h.red + h.error + h.pending;
+        if (total === 0) return null;
         return (
-          <span key={name} className="insight-summary-panel__metric">
-            <span className="insight-summary-panel__metric-label">{label}</span>
-            {filter ? (
-              <button
-                className={dotClass}
-                onClick={() => onFilterToggle(filter)}
-                title={tooltipText}
-              >
-                {count}
-              </button>
-            ) : (
-              <span className={dotClass} title={tooltipText}>
-                {count}
+          <div key={name} className="insight-summary-panel__card">
+            <span className="insight-summary-panel__card-name">{label}</span>
+            {h.red > 0 && (
+              <MetricChip
+                filter={{ type: "metric", name, status: "red" }}
+                count={h.red}
+                label="critical"
+                colorClass="red"
+                activeFilter={activeFilter}
+                onFilterToggle={onFilterToggle}
+              />
+            )}
+            {h.amber > 0 && (
+              <MetricChip
+                filter={{ type: "metric", name, status: "amber" }}
+                count={h.amber}
+                label="warn"
+                colorClass="amber"
+                activeFilter={activeFilter}
+                onFilterToggle={onFilterToggle}
+              />
+            )}
+            {h.green > 0 && (
+              <MetricChip
+                filter={{ type: "metric", name, status: "green" }}
+                count={h.green}
+                label="ok"
+                colorClass="green"
+                activeFilter={activeFilter}
+                onFilterToggle={onFilterToggle}
+              />
+            )}
+            {h.error > 0 && (
+              <MetricChip
+                filter={{ type: "metric", name, status: "error" }}
+                count={h.error}
+                label="error"
+                colorClass="error"
+                activeFilter={activeFilter}
+                onFilterToggle={onFilterToggle}
+              />
+            )}
+            {h.pending > 0 && (
+              <span className="insight-summary-panel__chip insight-summary-panel__chip--pending">
+                <span className="insight-summary-panel__chip-count">
+                  {h.pending}
+                </span>
+                <span className="insight-summary-panel__chip-label">
+                  pending
+                </span>
               </span>
             )}
-          </span>
+          </div>
         );
       })}
-    </>
+    </div>
   );
 }

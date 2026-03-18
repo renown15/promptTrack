@@ -72,6 +72,7 @@ export function InsightSummaryPanel({
 
   return (
     <div className="insight-summary-panel">
+      {/* Row 1 — file stats */}
       <div className="insight-summary-panel__row">
         <span className="insight-summary-panel__stat">
           <span className="insight-summary-panel__stat-value">
@@ -97,6 +98,7 @@ export function InsightSummaryPanel({
         )}
       </div>
 
+      {/* Row 2 — git / coverage / lint / CI */}
       <div className="insight-summary-panel__row">
         {(modifiedCount > 0 || untrackedCount > 0) && (
           <>
@@ -125,10 +127,17 @@ export function InsightSummaryPanel({
             <button
               className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__rag--active" : ""}`}
               onClick={() => onFilterToggle({ type: "coverage" })}
-              title={`${aggregate.coverage.linesPct}% line coverage · ${timeAgo(aggregate.coverage.reportedAt)} — ${activeFilter?.type === "coverage" ? "clear filter" : "filter by coverage"}`}
+              title={
+                activeFilter?.type === "coverage"
+                  ? "Clear filter"
+                  : "Filter: files with coverage data"
+              }
             >
               {aggregate.coverage.linesPct}%
             </button>
+            <span className="insight-summary-panel__age">
+              {timeAgo(aggregate.coverage.reportedAt)}
+            </span>
           </span>
         )}
 
@@ -138,17 +147,25 @@ export function InsightSummaryPanel({
             <button
               className={`insight-summary-panel__rag insight-summary-panel__rag--${ragLint(aggregate.lint.errors)}${activeFilter?.type === "lint" ? " insight-summary-panel__rag--active" : ""}`}
               onClick={() => onFilterToggle({ type: "lint" })}
-              title={`${aggregate.lint.errors} errors · ${aggregate.lint.warnings} warnings · ${timeAgo(aggregate.lint.reportedAt)} — ${activeFilter?.type === "lint" ? "clear filter" : "filter files with errors"}`}
+              title={
+                activeFilter?.type === "lint"
+                  ? "Clear filter"
+                  : "Filter: files with lint errors"
+              }
             >
               {aggregate.lint.errors === 0
                 ? "clean"
                 : `${aggregate.lint.errors} err`}
             </button>
+            {aggregate.lint.warnings > 0 && (
+              <span className="insight-summary-panel__rag insight-summary-panel__rag--amber">
+                {aggregate.lint.warnings} warn
+              </span>
+            )}
+            <span className="insight-summary-panel__age">
+              {timeAgo(aggregate.lint.reportedAt)}
+            </span>
           </span>
-        )}
-
-        {(aggregate?.coverage || aggregate?.lint) && ciStatus?.run && (
-          <span className="insight-summary-panel__divider" />
         )}
 
         {ciStatus?.run && (
@@ -157,34 +174,39 @@ export function InsightSummaryPanel({
             <button
               className={`insight-summary-panel__rag insight-summary-panel__rag--${ciRag(ciStatus.run.conclusion, ciStatus.run.status)}`}
               onClick={onCIClick}
-              title={`CI ${ciStatus.run.conclusion ?? ciStatus.run.status} · ${timeAgo(ciStatus.run.createdAt)} — view details`}
+              title="View CI details"
             >
               {ciStatus.run.status !== "completed"
                 ? "running"
                 : (ciStatus.run.conclusion ?? "—")}
             </button>
+            <span className="insight-summary-panel__age">
+              {timeAgo(ciStatus.run.createdAt)}
+            </span>
           </span>
         )}
-
-        <InsightMetricPills
-          metricEntries={metricEntries}
-          health={health}
-          activeFilter={activeFilter}
-          onFilterToggle={onFilterToggle}
-        />
 
         {files.length > 0 && metricNames.length > 0 && (
           <span className="insight-summary-panel__analyzed">
-            {analyzed}/{files.length}
+            {analyzed}/{files.length} analyzed
           </span>
         )}
-
         {activeFilter && (
           <span className="insight-summary-panel__filter-badge">
             ● {filteredCount} filtered
           </span>
         )}
       </div>
+
+      {/* Row 3 — AI metric cards */}
+      {metricEntries.length > 0 && (
+        <InsightMetricPills
+          metricEntries={metricEntries}
+          health={health}
+          activeFilter={activeFilter}
+          onFilterToggle={onFilterToggle}
+        />
+      )}
     </div>
   );
 }

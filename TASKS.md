@@ -2,10 +2,9 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Active: InsightSummaryPanel UX redesign
+## Active: metric cards redesign for InsightSummaryPanel
 
-- [x] Read AgentInsightPage to understand data flow
-- [x] Rewrite InsightMetricPills — single dot per metric
-- [x] Update InsightSummaryPanel — dividers, active filter banner, ages as tooltips
-- [x] Update CSS
+- [x] Rewrite InsightMetricPills as card grid
+- [x] Restructure InsightSummaryPanel — 3 rows, ages back inline
+- [x] Update CSS with card + chip styles
 - [ ] make check + commit
