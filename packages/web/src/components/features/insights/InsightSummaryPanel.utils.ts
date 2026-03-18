@@ -61,6 +61,30 @@ export function ciRag(
   return "amber";
 }
 
+export function fileMatchesFilter(
+  file: {
+    gitStatus?: string | null;
+    coverage?: number | null;
+    lintErrors?: number | null;
+    metrics: Record<string, unknown>;
+  },
+  filter: InsightFilter
+): boolean {
+  if (filter.type === "git") return file.gitStatus === filter.status;
+  if (filter.type === "coverage")
+    return file.coverage !== null && file.coverage !== undefined;
+  if (filter.type === "lint") return (file.lintErrors ?? 0) > 0;
+  const v = file.metrics[filter.name];
+  if (filter.status === "error")
+    return v === null || (typeof v === "object" && v !== null && "error" in v);
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "status" in v &&
+    (v as { status: string }).status === filter.status
+  );
+}
+
 export function filterMatches(a: InsightFilter, b: InsightFilter): boolean {
   if (a.type !== b.type) return false;
   if (a.type === "git" && b.type === "git") return a.status === b.status;

@@ -2,13 +2,10 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Active: Tasks FAB overlay
+## Active: highlight filtered rows in InsightTreeTable
 
-- [x] Plan implementation
-- [ ] Mount TASKS.md into API container (docker-compose.yml)
-- [ ] Add GET /tasks API endpoint
-- [ ] Register route in app
-- [ ] Add tasksApi.get() frontend client
-- [ ] Create TasksFAB component + CSS
-- [ ] Add TasksFAB to App.tsx
-- [ ] make check
+- [x] Read InsightTreeTable + CSS
+- [x] Add fileMatchesFilter to shared utils
+- [x] Pass activeFilter to FileTableRow, compute isHighlighted
+- [x] Add --highlighted CSS class
+- [ ] make check + commit

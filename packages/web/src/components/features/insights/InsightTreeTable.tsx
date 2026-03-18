@@ -162,6 +162,7 @@ export function InsightTreeTable({
               row={row}
               flashPath={flashPath}
               selectedPath={selectedPath}
+              activeFilter={activeFilter}
               metricEntries={metricEntries}
               onSelect={onFileSelect}
             />

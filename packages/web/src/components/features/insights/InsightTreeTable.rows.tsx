@@ -1,6 +1,7 @@
 import type { InsightFilter } from "@/api/endpoints/insights";
 import { MetricBadge } from "@/components/features/insights/MetricBadge";
 import { MetricCountCell } from "@/components/features/insights/InsightTreeTable.utils";
+import { fileMatchesFilter } from "@/components/features/insights/InsightSummaryPanel.utils";
 import type {
   FolderRow,
   FileRow,
@@ -59,6 +60,7 @@ type FileRowProps = {
   row: FileRow;
   flashPath: string | null;
   selectedPath: string | null;
+  activeFilter: InsightFilter | null;
   metricEntries: [string, string][];
   onSelect: (path: string) => void;
 };
@@ -67,15 +69,19 @@ export function FileTableRow({
   row,
   flashPath,
   selectedPath,
+  activeFilter,
   metricEntries,
   onSelect,
 }: FileRowProps) {
   const isFlashing = row.file.relativePath === flashPath;
   const isSelected = row.file.relativePath === selectedPath;
+  const isHighlighted =
+    activeFilter !== null && fileMatchesFilter(row.file, activeFilter);
   const rowClass = [
     "insight-tree-table__file-row",
     isFlashing ? "insight-tree-table__file-row--flash" : "",
     isSelected ? "insight-tree-table__file-row--selected" : "",
+    isHighlighted ? "insight-tree-table__file-row--highlighted" : "",
   ]
     .filter(Boolean)
     .join(" ");
