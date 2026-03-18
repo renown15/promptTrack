@@ -1,5 +1,15 @@
 # PromptTrack — Claude Code Rules
 
+## Task list — CRITICAL
+
+Always maintain `/Users/marklewis/dev/promptTrack/TASKS.md` throughout every task:
+
+1. **Before starting** any multi-step work: write the full task list with `- [ ]` items
+2. **After completing each step**: immediately update the file, marking that item `- [x]`
+3. **When done**: reset the file to `## Status: idle`
+
+Never batch updates — update after every individual step, not at the end.
+
 ## Always run before declaring work complete
 
 ```
