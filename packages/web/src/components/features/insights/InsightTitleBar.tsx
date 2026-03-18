@@ -6,6 +6,7 @@ type Props = {
   lastScan: string | undefined;
   scanning: boolean;
   modelLabel: string | null;
+  filteredCount: number | null;
   onScan: () => void;
   onConfig: () => void;
 };
@@ -16,6 +17,7 @@ export function InsightTitleBar({
   lastScan,
   scanning,
   modelLabel,
+  filteredCount,
   onScan,
   onConfig,
 }: Props) {
@@ -27,6 +29,11 @@ export function InsightTitleBar({
       )}
       {collectionDir && (
         <span className="agent-insight-page__dir">{collectionDir}</span>
+      )}
+      {filteredCount !== null && (
+        <span className="agent-insight-page__filter-badge">
+          ● {filteredCount} filtered
+        </span>
       )}
       <div className="agent-insight-page__title-actions">
         {lastScan && (

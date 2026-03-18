@@ -115,6 +115,7 @@ export function AgentInsightPage() {
         lastScan={state?.lastScan ?? undefined}
         scanning={state?.scanning ?? false}
         modelLabel={modelLabel}
+        filteredCount={activeFilter !== null ? filteredFiles.length : null}
         onScan={() => scan.mutate()}
         onConfig={() => setShowConfig(true)}
       />

@@ -22,6 +22,11 @@
   @apply ml-auto flex items-center gap-2 shrink-0;
 }
 
+.agent-insight-page__filter-badge {
+  @apply text-[11px] font-medium px-2.5 py-0.5 rounded-full
+    bg-sky-400/15 text-sky-600 whitespace-nowrap;
+}
+
 .agent-insight-page__last-scan {
   @apply text-xs text-muted-foreground;
 }

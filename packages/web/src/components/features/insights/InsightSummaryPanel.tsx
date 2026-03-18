@@ -11,7 +11,6 @@ import {
   ragLint,
   ciRag,
   filterMatches,
-  fileMatchesFilter,
 } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightMetricPills } from "@/components/features/insights/InsightMetricPills";
 import {
@@ -52,9 +51,6 @@ export function InsightSummaryPanel({
   const untrackedCount = files.filter(
     (f) => f.gitStatus === "untracked"
   ).length;
-  const filteredCount = activeFilter
-    ? files.filter((f) => fileMatchesFilter(f, activeFilter)).length
-    : 0;
 
   function gitActive(status: "modified" | "untracked") {
     return (
@@ -194,12 +190,6 @@ export function InsightSummaryPanel({
           activeFilter={activeFilter}
           onFilterToggle={onFilterToggle}
         />
-
-        {activeFilter && (
-          <span className="insight-summary-panel__filter-badge">
-            ● {filteredCount} filtered
-          </span>
-        )}
       </div>
     </div>
   );
