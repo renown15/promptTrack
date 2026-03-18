@@ -90,10 +90,12 @@ export function InsightSummaryPanel({
                     onFilterToggle({ type: "git", status: "modified" })
                   }
                   title={
-                    gitActive("modified") ? "Clear filter" : "Filter modified"
+                    gitActive("modified")
+                      ? "Clear filter"
+                      : "Filter modified files"
                   }
                 >
-                  {modifiedCount} M
+                  {modifiedCount} modified
                 </Badge>
               )}
               {untrackedCount > 0 && (
@@ -105,10 +107,12 @@ export function InsightSummaryPanel({
                     onFilterToggle({ type: "git", status: "untracked" })
                   }
                   title={
-                    gitActive("untracked") ? "Clear filter" : "Filter untracked"
+                    gitActive("untracked")
+                      ? "Clear filter"
+                      : "Filter untracked files"
                   }
                 >
-                  {untrackedCount} U
+                  {untrackedCount} untracked
                 </Badge>
               )}
             </div>
