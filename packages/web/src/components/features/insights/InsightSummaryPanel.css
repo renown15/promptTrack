@@ -79,17 +79,17 @@
 
 /* ── AI metric chips ─────────────────────────────────────── */
 .insight-summary-panel__chips {
-  @apply flex flex-col gap-1 p-1;
+  @apply flex flex-col gap-1.5 py-0.5;
 }
 
 .insight-summary-panel__chip {
   @apply flex items-center gap-1.5 text-[11px] px-1.5 py-0.5 rounded
-    border-0 w-full text-left whitespace-nowrap
+    border border-transparent w-full text-left whitespace-nowrap
     cursor-pointer hover:opacity-75 transition-opacity;
 }
 
 .insight-summary-panel__chip--active {
-  @apply ring-1 ring-current;
+  @apply border-current;
 }
 
 .insight-summary-panel__chip--red    { @apply text-red-700 bg-red-500/15; }
