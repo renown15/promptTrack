@@ -156,6 +156,12 @@ export function useScanInsights(collectionId: string) {
           };
         }
       );
+      void queryClient.invalidateQueries({
+        queryKey: ["insight-aggregate", collectionId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["ci-status", collectionId],
+      });
     },
   });
 }
