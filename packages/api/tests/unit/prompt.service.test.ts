@@ -148,6 +148,23 @@ describe("promptService", () => {
     });
   });
 
+  describe("archive", () => {
+    it("throws 404 when prompt not found", async () => {
+      vi.mocked(promptRepository.findById).mockResolvedValue(null);
+      await expect(promptService.archive("bad")).rejects.toThrow(PromptError);
+    });
+
+    it("calls archive on repository", async () => {
+      vi.mocked(promptRepository.findById).mockResolvedValue(basePrompt);
+      vi.mocked(promptRepository.archive).mockResolvedValue({
+        ...basePrompt,
+        isArchived: true,
+      });
+      await promptService.archive("p1");
+      expect(promptRepository.archive).toHaveBeenCalledWith("p1");
+    });
+  });
+
   describe("createVersion", () => {
     it("increments currentVersion", async () => {
       vi.mocked(promptRepository.findById).mockResolvedValue(basePrompt);

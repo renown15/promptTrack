@@ -126,6 +126,26 @@ describe("chainService", () => {
         expect.objectContaining({ slug: "test-chain-1" })
       );
     });
+
+    it("includes description when provided", async () => {
+      vi.mocked(chainRepository.findBySlug).mockResolvedValue(null);
+      vi.mocked(chainRepository.create).mockResolvedValue({
+        ...baseChain,
+        description: "A desc",
+      });
+      vi.mocked(chainRepository.findById).mockResolvedValue(baseChain);
+      vi.mocked(chainVersionRepository.findCurrent).mockResolvedValue(null);
+
+      await chainService.create("u1", {
+        name: "My Chain",
+        description: "A desc",
+        tags: [],
+      });
+
+      expect(chainRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "A desc" })
+      );
+    });
   });
 
   describe("update", () => {
@@ -158,6 +178,21 @@ describe("chainService", () => {
       expect(chainRepository.update).toHaveBeenCalledWith(
         "c1",
         expect.objectContaining({ name: "Updated" })
+      );
+    });
+
+    it("includes description when provided", async () => {
+      vi.mocked(chainRepository.findById).mockResolvedValue(baseChain);
+      vi.mocked(chainRepository.update).mockResolvedValue({
+        ...baseChain,
+        description: "New desc",
+      });
+
+      await chainService.update("c1", { description: "New desc" });
+
+      expect(chainRepository.update).toHaveBeenCalledWith(
+        "c1",
+        expect.objectContaining({ description: "New desc" })
       );
     });
   });
@@ -194,6 +229,37 @@ describe("chainService", () => {
         expect.objectContaining({ chainId: "c1", versionNumber: 2 })
       );
       expect(chainRepository.incrementVersion).toHaveBeenCalledWith("c1");
+    });
+
+    it("maps edges including optional label", async () => {
+      vi.mocked(chainRepository.findById).mockResolvedValue(baseChain);
+      vi.mocked(chainVersionRepository.create).mockResolvedValue(baseVersion);
+      vi.mocked(chainRepository.incrementVersion).mockResolvedValue({
+        ...baseChain,
+        currentVersion: 2,
+      });
+
+      await chainService.createVersion("c1", "u1", {
+        nodes: [],
+        edges: [
+          {
+            edgeId: "e1",
+            sourceNodeId: "n1",
+            targetNodeId: "n2",
+            label: "yes",
+          },
+          { edgeId: "e2", sourceNodeId: "n2", targetNodeId: "n3" },
+        ],
+      });
+
+      expect(chainVersionRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          edges: expect.arrayContaining([
+            expect.objectContaining({ edgeId: "e1", label: "yes" }),
+            expect.objectContaining({ edgeId: "e2" }),
+          ]),
+        })
+      );
     });
 
     it("resolves snapshot content for copy nodes", async () => {

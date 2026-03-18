@@ -140,6 +140,48 @@ describe("AuthService", () => {
       ).rejects.toThrow(AuthError);
     });
 
+    it("throws AuthError for wrong password", async () => {
+      vi.mocked(userRepository.findByEmail).mockResolvedValue({
+        id: "1",
+        email: "test@test.com",
+        passwordHash: "hash",
+        name: "Test",
+        role: "editor",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      const argon2 = await import("argon2");
+      vi.mocked(argon2.default.verify).mockResolvedValueOnce(false);
+
+      const service = buildAuthService(mockFastify);
+      await expect(
+        service.login({ email: "test@test.com", password: "wrongpass" })
+      ).rejects.toThrow(AuthError);
+    });
+
+    it("returns tokens on successful login", async () => {
+      vi.mocked(userRepository.findByEmail).mockResolvedValue({
+        id: "1",
+        email: "test@test.com",
+        passwordHash: "hash",
+        name: "Test",
+        role: "editor",
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      vi.mocked(refreshTokenRepository.create).mockResolvedValue(undefined);
+
+      const service = buildAuthService(mockFastify);
+      const result = await service.login({
+        email: "test@test.com",
+        password: "correct",
+      });
+      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty("refreshToken");
+    });
+
     it("throws AuthError for inactive user", async () => {
       vi.mocked(userRepository.findByEmail).mockResolvedValue({
         id: "1",
@@ -165,6 +207,25 @@ describe("AuthService", () => {
 
       const service = buildAuthService(mockFastify);
       await expect(service.refresh("bad_token")).rejects.toThrow(AuthError);
+    });
+
+    it("returns new tokens on valid refresh", async () => {
+      vi.mocked(refreshTokenRepository.findByToken).mockResolvedValue({
+        id: "1",
+        token: "valid_token",
+        userId: "u1",
+        expiresAt: new Date(Date.now() + 86400000),
+        createdAt: new Date(),
+      });
+      vi.mocked(refreshTokenRepository.deleteByToken).mockResolvedValue(
+        undefined
+      );
+      vi.mocked(refreshTokenRepository.create).mockResolvedValue(undefined);
+
+      const service = buildAuthService(mockFastify);
+      const result = await service.refresh("valid_token");
+      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty("refreshToken");
     });
 
     it("throws AuthError for expired token", async () => {
