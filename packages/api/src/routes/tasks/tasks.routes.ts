@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import type { FastifyInstance } from "fastify";
 
-const TASKS_PATH = join("/app", "TASKS.md");
+const TASKS_PATH = join(process.cwd(), "../../TASKS.md");
 
 export async function tasksRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.authenticate);
