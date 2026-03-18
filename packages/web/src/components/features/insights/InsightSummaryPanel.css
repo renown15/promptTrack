@@ -100,6 +100,10 @@
   @apply text-muted-foreground/50 cursor-default;
 }
 
+.insight-summary-panel__chips-footer {
+  @apply flex items-center gap-1 mt-0.5 pt-0.5 border-t border-border/50;
+}
+
 .insight-summary-panel__chip-count {
   @apply font-bold tabular-nums w-5 text-right shrink-0;
 }
