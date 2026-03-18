@@ -1,118 +1,103 @@
 .insight-summary-panel {
-  @apply flex flex-col px-4 py-2 gap-1.5
+  @apply flex flex-col px-4 py-3 gap-2
     border-b border-border bg-card shrink-0;
 }
 
 .insight-summary-panel__row {
-  @apply flex items-center gap-3 flex-wrap;
+  @apply flex items-stretch gap-2 flex-wrap;
 }
 
-/* Row 1 — file stats */
-.insight-summary-panel__stat {
-  @apply flex items-center gap-1;
+/* ── Tile shell ─────────────────────────────────────────── */
+.insight-summary-panel__tile {
+  @apply flex flex-col gap-1.5 px-3 py-2 rounded-lg
+    border border-border bg-muted/20 min-w-0;
 }
 
-.insight-summary-panel__stat-value {
-  @apply text-sm font-semibold text-foreground;
+.insight-summary-panel__tile--metric {
+  @apply min-w-[140px];
 }
 
-.insight-summary-panel__stat-label {
-  @apply text-xs text-muted-foreground;
+.insight-summary-panel__tile-header {
+  @apply flex items-center justify-between gap-3;
 }
 
-/* Row 2 — git / coverage / lint / CI */
-.insight-summary-panel__divider {
-  @apply w-px h-4 bg-border shrink-0;
+.insight-summary-panel__tile-label {
+  @apply text-[10px] font-semibold text-muted-foreground
+    uppercase tracking-wide whitespace-nowrap;
 }
 
-.insight-summary-panel__metric {
-  @apply flex items-center gap-1;
+.insight-summary-panel__tile-age {
+  @apply text-[10px] text-muted-foreground/60 whitespace-nowrap;
 }
 
-.insight-summary-panel__metric-label {
-  @apply text-xs text-muted-foreground;
+.insight-summary-panel__tile-body {
+  @apply flex items-center gap-1.5 flex-wrap;
 }
 
-.insight-summary-panel__aggregate {
-  @apply flex items-center gap-1;
+.insight-summary-panel__tile-chips {
+  @apply flex flex-col gap-0.5;
 }
 
-.insight-summary-panel__age {
-  @apply text-[10px] text-muted-foreground;
+/* Large number (files, lines, avg) */
+.insight-summary-panel__tile-num {
+  @apply text-xl font-bold text-foreground tabular-nums;
 }
 
-.insight-summary-panel__analyzed {
-  @apply text-[11px] text-muted-foreground/60 tabular-nums;
+/* "clean" state */
+.insight-summary-panel__tile-clean {
+  @apply text-sm font-semibold text-green-600;
 }
 
-.insight-summary-panel__filter-badge {
-  @apply ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full
-    bg-sky-400/15 text-sky-600;
+/* ── RAG badge inside tiles (coverage / lint / CI) ──────── */
+.insight-summary-panel__tile-rag {
+  @apply text-sm font-semibold px-2 py-0.5 rounded border-0
+    cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap;
 }
 
-/* Git filter pills */
+.insight-summary-panel__tile-rag--active {
+  @apply ring-2 ring-current ring-offset-1;
+}
+
+.insight-summary-panel__tile-rag--green {
+  @apply text-green-700 bg-green-500/15;
+}
+
+.insight-summary-panel__tile-rag--amber {
+  @apply text-yellow-700 bg-yellow-400/15;
+}
+
+.insight-summary-panel__tile-rag--red {
+  @apply text-red-700 bg-red-500/15;
+}
+
+/* ── Git filter pills ───────────────────────────────────── */
 .insight-summary-panel__count {
-  @apply text-[11px] font-medium px-1.5 py-0.5 rounded border-0
-    cursor-pointer hover:opacity-80 transition-opacity;
+  @apply text-sm font-semibold px-2 py-0.5 rounded border-0
+    cursor-pointer hover:opacity-80 transition-opacity whitespace-nowrap;
 }
 
 .insight-summary-panel__count--active {
-  @apply ring-1 ring-current;
+  @apply ring-2 ring-current ring-offset-1;
 }
 
 .insight-summary-panel__count--red {
-  @apply text-red-600 bg-red-500/10;
+  @apply text-red-700 bg-red-500/15;
 }
 
 .insight-summary-panel__count--amber {
-  @apply text-yellow-600 bg-yellow-400/10;
+  @apply text-yellow-700 bg-yellow-400/15;
 }
 
 .insight-summary-panel__count--green {
-  @apply text-green-600 bg-green-500/10;
+  @apply text-green-700 bg-green-500/15;
 }
 
-/* Coverage / lint / CI RAG badges */
-.insight-summary-panel__rag {
-  @apply text-[11px] font-medium px-1.5 py-0.5 rounded border-0
-    cursor-pointer hover:opacity-80 transition-opacity;
-}
-
-.insight-summary-panel__rag--active {
-  @apply ring-1 ring-current;
-}
-
-.insight-summary-panel__rag--green {
-  @apply text-green-600 bg-green-500/10;
-}
-
-.insight-summary-panel__rag--amber {
-  @apply text-yellow-600 bg-yellow-400/10;
-}
-
-.insight-summary-panel__rag--red {
-  @apply text-red-600 bg-red-500/10;
-}
-
-/* Row 3 — AI metric cards */
-.insight-summary-panel__cards {
-  @apply flex flex-wrap gap-2 pb-0.5;
-}
-
-.insight-summary-panel__card {
-  @apply flex flex-col gap-0.5 px-2.5 py-2 rounded-lg
-    border border-border bg-muted/20 min-w-[100px];
-}
-
-.insight-summary-panel__card-name {
-  @apply text-[10px] font-semibold text-muted-foreground
-    uppercase tracking-wide mb-1;
-}
-
+/* ── AI metric chips (inside metric tiles) ──────────────── */
 .insight-summary-panel__chip {
-  @apply flex items-center gap-2 text-[11px] px-1.5 py-0.5
-    rounded w-full text-left border-0
-    cursor-pointer hover:opacity-80 transition-opacity;
+  @apply flex items-center gap-2 text-[11px] px-2 py-0.5
+    rounded border-0 w-full text-left
+    cursor-pointer hover:opacity-80 transition-opacity
+    whitespace-nowrap;
 }
 
 .insight-summary-panel__chip--active {
@@ -136,13 +121,20 @@
 }
 
 .insight-summary-panel__chip--pending {
-  @apply text-muted-foreground/50 bg-transparent cursor-default;
+  @apply text-muted-foreground/50 bg-transparent cursor-default
+    flex items-center gap-2 text-[11px] px-2 py-0.5 w-full whitespace-nowrap;
 }
 
 .insight-summary-panel__chip-count {
-  @apply font-bold tabular-nums;
+  @apply font-bold tabular-nums w-6 text-right shrink-0;
 }
 
 .insight-summary-panel__chip-label {
   @apply font-normal;
+}
+
+/* ── Active filter badge ────────────────────────────────── */
+.insight-summary-panel__filter-badge {
+  @apply self-center text-[11px] font-medium px-2.5 py-1 rounded-full
+    bg-sky-400/15 text-sky-600 whitespace-nowrap;
 }

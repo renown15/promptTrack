@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type {
   FileSnapshotDTO,
   AggregateStatsDTO,
@@ -26,6 +27,26 @@ type Props = {
   onCIClick: () => void;
 };
 
+function Tile({
+  label,
+  age,
+  children,
+}: {
+  label: string;
+  age?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="insight-summary-panel__tile">
+      <div className="insight-summary-panel__tile-header">
+        <span className="insight-summary-panel__tile-label">{label}</span>
+        {age && <span className="insight-summary-panel__tile-age">{age}</span>}
+      </div>
+      <div className="insight-summary-panel__tile-body">{children}</div>
+    </div>
+  );
+}
+
 export function InsightSummaryPanel({
   files,
   metricLabels,
@@ -40,15 +61,6 @@ export function InsightSummaryPanel({
   const metricEntries = Object.entries(metricLabels);
   const metricNames = metricEntries.map(([n]) => n);
   const health = computeHealth(files, metricNames);
-  const analyzed =
-    metricNames.length > 0
-      ? files.filter((f) =>
-          metricNames.every((n) => {
-            const v = f.metrics[n];
-            return v !== undefined && v !== "pending";
-          })
-        ).length
-      : 0;
   const modifiedCount = files.filter((f) => f.gitStatus === "modified").length;
   const untrackedCount = files.filter(
     (f) => f.gitStatus === "untracked"
@@ -72,38 +84,30 @@ export function InsightSummaryPanel({
 
   return (
     <div className="insight-summary-panel">
-      {/* Row 1 — file stats */}
       <div className="insight-summary-panel__row">
-        <span className="insight-summary-panel__stat">
-          <span className="insight-summary-panel__stat-value">
+        <Tile label="files">
+          <span className="insight-summary-panel__tile-num">
             {files.length}
           </span>
-          <span className="insight-summary-panel__stat-label">files</span>
-        </span>
-        <span className="insight-summary-panel__stat">
-          <span className="insight-summary-panel__stat-value">
+        </Tile>
+
+        <Tile label="lines">
+          <span className="insight-summary-panel__tile-num">
             {totalLines.toLocaleString()}
           </span>
-          <span className="insight-summary-panel__stat-label">lines</span>
-        </span>
-        {avgLines > 0 && (
-          <span className="insight-summary-panel__stat">
-            <span className="insight-summary-panel__stat-value">
-              {avgLines}
-            </span>
-            <span className="insight-summary-panel__stat-label">
-              avg lines/file
-            </span>
-          </span>
-        )}
-      </div>
+        </Tile>
 
-      {/* Row 2 — git / coverage / lint / CI */}
-      <div className="insight-summary-panel__row">
-        {(modifiedCount > 0 || untrackedCount > 0) && (
-          <>
-            <span className="insight-summary-panel__metric">
-              <span className="insight-summary-panel__metric-label">git</span>
+        {avgLines > 0 && (
+          <Tile label="avg / file">
+            <span className="insight-summary-panel__tile-num">{avgLines}</span>
+          </Tile>
+        )}
+
+        <Tile label="git">
+          {modifiedCount === 0 && untrackedCount === 0 ? (
+            <span className="insight-summary-panel__tile-clean">clean</span>
+          ) : (
+            <div className="insight-summary-panel__tile-body">
               {modifiedCount > 0 &&
                 gitPill(
                   { type: "git", status: "modified" },
@@ -116,16 +120,14 @@ export function InsightSummaryPanel({
                   "red",
                   `${untrackedCount} U`
                 )}
-            </span>
-            <span className="insight-summary-panel__divider" />
-          </>
-        )}
+            </div>
+          )}
+        </Tile>
 
         {aggregate?.coverage && (
-          <span className="insight-summary-panel__aggregate">
-            <span className="insight-summary-panel__metric-label">cov</span>
+          <Tile label="coverage" age={timeAgo(aggregate.coverage.reportedAt)}>
             <button
-              className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__rag--active" : ""}`}
+              className={`insight-summary-panel__tile-rag insight-summary-panel__tile-rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__tile-rag--active" : ""}`}
               onClick={() => onFilterToggle({ type: "coverage" })}
               title={
                 activeFilter?.type === "coverage"
@@ -135,44 +137,38 @@ export function InsightSummaryPanel({
             >
               {aggregate.coverage.linesPct}%
             </button>
-            <span className="insight-summary-panel__age">
-              {timeAgo(aggregate.coverage.reportedAt)}
-            </span>
-          </span>
+          </Tile>
         )}
 
         {aggregate?.lint && (
-          <span className="insight-summary-panel__aggregate">
-            <span className="insight-summary-panel__metric-label">lint</span>
-            <button
-              className={`insight-summary-panel__rag insight-summary-panel__rag--${ragLint(aggregate.lint.errors)}${activeFilter?.type === "lint" ? " insight-summary-panel__rag--active" : ""}`}
-              onClick={() => onFilterToggle({ type: "lint" })}
-              title={
-                activeFilter?.type === "lint"
-                  ? "Clear filter"
-                  : "Filter: files with lint errors"
-              }
-            >
-              {aggregate.lint.errors === 0
-                ? "clean"
-                : `${aggregate.lint.errors} err`}
-            </button>
-            {aggregate.lint.warnings > 0 && (
-              <span className="insight-summary-panel__rag insight-summary-panel__rag--amber">
-                {aggregate.lint.warnings} warn
-              </span>
-            )}
-            <span className="insight-summary-panel__age">
-              {timeAgo(aggregate.lint.reportedAt)}
-            </span>
-          </span>
+          <Tile label="lint" age={timeAgo(aggregate.lint.reportedAt)}>
+            <div className="insight-summary-panel__tile-body">
+              <button
+                className={`insight-summary-panel__tile-rag insight-summary-panel__tile-rag--${ragLint(aggregate.lint.errors)}${activeFilter?.type === "lint" ? " insight-summary-panel__tile-rag--active" : ""}`}
+                onClick={() => onFilterToggle({ type: "lint" })}
+                title={
+                  activeFilter?.type === "lint"
+                    ? "Clear filter"
+                    : "Filter: files with lint errors"
+                }
+              >
+                {aggregate.lint.errors === 0
+                  ? "clean"
+                  : `${aggregate.lint.errors} err`}
+              </button>
+              {aggregate.lint.warnings > 0 && (
+                <span className="insight-summary-panel__tile-rag insight-summary-panel__tile-rag--amber">
+                  {aggregate.lint.warnings} warn
+                </span>
+              )}
+            </div>
+          </Tile>
         )}
 
         {ciStatus?.run && (
-          <span className="insight-summary-panel__aggregate">
-            <span className="insight-summary-panel__metric-label">CI</span>
+          <Tile label="CI" age={timeAgo(ciStatus.run.createdAt)}>
             <button
-              className={`insight-summary-panel__rag insight-summary-panel__rag--${ciRag(ciStatus.run.conclusion, ciStatus.run.status)}`}
+              className={`insight-summary-panel__tile-rag insight-summary-panel__tile-rag--${ciRag(ciStatus.run.conclusion, ciStatus.run.status)}`}
               onClick={onCIClick}
               title="View CI details"
             >
@@ -180,17 +176,9 @@ export function InsightSummaryPanel({
                 ? "running"
                 : (ciStatus.run.conclusion ?? "—")}
             </button>
-            <span className="insight-summary-panel__age">
-              {timeAgo(ciStatus.run.createdAt)}
-            </span>
-          </span>
+          </Tile>
         )}
 
-        {files.length > 0 && metricNames.length > 0 && (
-          <span className="insight-summary-panel__analyzed">
-            {analyzed}/{files.length} analyzed
-          </span>
-        )}
         {activeFilter && (
           <span className="insight-summary-panel__filter-badge">
             ● {filteredCount} filtered
@@ -198,7 +186,6 @@ export function InsightSummaryPanel({
         )}
       </div>
 
-      {/* Row 3 — AI metric cards */}
       {metricEntries.length > 0 && (
         <InsightMetricPills
           metricEntries={metricEntries}

@@ -49,65 +49,72 @@ export function InsightMetricPills({
   if (metricEntries.length === 0) return null;
 
   return (
-    <div className="insight-summary-panel__cards">
+    <div className="insight-summary-panel__row">
       {metricEntries.map(([name, label]) => {
         const h = health[name];
         if (!h) return null;
         const total = h.green + h.amber + h.red + h.error + h.pending;
         if (total === 0) return null;
         return (
-          <div key={name} className="insight-summary-panel__card">
-            <span className="insight-summary-panel__card-name">{label}</span>
-            {h.red > 0 && (
-              <MetricChip
-                filter={{ type: "metric", name, status: "red" }}
-                count={h.red}
-                label="critical"
-                colorClass="red"
-                activeFilter={activeFilter}
-                onFilterToggle={onFilterToggle}
-              />
-            )}
-            {h.amber > 0 && (
-              <MetricChip
-                filter={{ type: "metric", name, status: "amber" }}
-                count={h.amber}
-                label="warn"
-                colorClass="amber"
-                activeFilter={activeFilter}
-                onFilterToggle={onFilterToggle}
-              />
-            )}
-            {h.green > 0 && (
-              <MetricChip
-                filter={{ type: "metric", name, status: "green" }}
-                count={h.green}
-                label="ok"
-                colorClass="green"
-                activeFilter={activeFilter}
-                onFilterToggle={onFilterToggle}
-              />
-            )}
-            {h.error > 0 && (
-              <MetricChip
-                filter={{ type: "metric", name, status: "error" }}
-                count={h.error}
-                label="error"
-                colorClass="error"
-                activeFilter={activeFilter}
-                onFilterToggle={onFilterToggle}
-              />
-            )}
-            {h.pending > 0 && (
-              <span className="insight-summary-panel__chip insight-summary-panel__chip--pending">
-                <span className="insight-summary-panel__chip-count">
-                  {h.pending}
+          <div
+            key={name}
+            className="insight-summary-panel__tile insight-summary-panel__tile--metric"
+          >
+            <div className="insight-summary-panel__tile-header">
+              <span className="insight-summary-panel__tile-label">{label}</span>
+            </div>
+            <div className="insight-summary-panel__tile-chips">
+              {h.red > 0 && (
+                <MetricChip
+                  filter={{ type: "metric", name, status: "red" }}
+                  count={h.red}
+                  label="critical"
+                  colorClass="red"
+                  activeFilter={activeFilter}
+                  onFilterToggle={onFilterToggle}
+                />
+              )}
+              {h.amber > 0 && (
+                <MetricChip
+                  filter={{ type: "metric", name, status: "amber" }}
+                  count={h.amber}
+                  label="warn"
+                  colorClass="amber"
+                  activeFilter={activeFilter}
+                  onFilterToggle={onFilterToggle}
+                />
+              )}
+              {h.green > 0 && (
+                <MetricChip
+                  filter={{ type: "metric", name, status: "green" }}
+                  count={h.green}
+                  label="ok"
+                  colorClass="green"
+                  activeFilter={activeFilter}
+                  onFilterToggle={onFilterToggle}
+                />
+              )}
+              {h.error > 0 && (
+                <MetricChip
+                  filter={{ type: "metric", name, status: "error" }}
+                  count={h.error}
+                  label="error"
+                  colorClass="error"
+                  activeFilter={activeFilter}
+                  onFilterToggle={onFilterToggle}
+                />
+              )}
+              {h.pending > 0 && (
+                <span className="insight-summary-panel__chip insight-summary-panel__chip--pending">
+                  <span className="insight-summary-panel__chip-count">
+                    {h.pending}
+                  </span>
+                  <span className="insight-summary-panel__chip-label">
+                    pending
+                  </span>
                 </span>
-                <span className="insight-summary-panel__chip-label">
-                  pending
-                </span>
-              </span>
-            )}
+              )}
+            </div>
           </div>
         );
       })}
