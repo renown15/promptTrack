@@ -2,9 +2,9 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Active: full tile layout for InsightSummaryPanel
+## Active: proper equal-card tile layout
 
-- [x] Rewrite InsightSummaryPanel with Tile helper + all stats as tiles
-- [x] Update InsightMetricPills — tile appearance, fix clipping with min-w
-- [x] Full CSS rewrite for tile system
+- [ ] Single grid of equal cards, one row
+- [ ] InsightMetricPills returns Fragment (no wrapper div)
+- [ ] Clean CSS: shadow, border, title + content rows
 - [ ] make check + commit

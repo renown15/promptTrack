@@ -46,24 +46,19 @@ export function InsightMetricPills({
   activeFilter,
   onFilterToggle,
 }: Props) {
-  if (metricEntries.length === 0) return null;
-
   return (
-    <div className="insight-summary-panel__row">
+    <>
       {metricEntries.map(([name, label]) => {
         const h = health[name];
         if (!h) return null;
         const total = h.green + h.amber + h.red + h.error + h.pending;
         if (total === 0) return null;
         return (
-          <div
-            key={name}
-            className="insight-summary-panel__tile insight-summary-panel__tile--metric"
-          >
-            <div className="insight-summary-panel__tile-header">
+          <div key={name} className="insight-summary-panel__tile">
+            <div className="insight-summary-panel__tile-title">
               <span className="insight-summary-panel__tile-label">{label}</span>
             </div>
-            <div className="insight-summary-panel__tile-chips">
+            <div className="insight-summary-panel__chips">
               {h.red > 0 && (
                 <MetricChip
                   filter={{ type: "metric", name, status: "red" }}
@@ -118,6 +113,6 @@ export function InsightMetricPills({
           </div>
         );
       })}
-    </div>
+    </>
   );
 }
