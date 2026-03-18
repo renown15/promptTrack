@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type {
   FileSnapshotDTO,
   AggregateStatsDTO,
@@ -15,6 +14,12 @@ import {
   fileMatchesFilter,
 } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightMetricPills } from "@/components/features/insights/InsightMetricPills";
+import {
+  Tile,
+  StatRow,
+  PipelineRow,
+  Badge,
+} from "@/components/features/insights/InsightSummaryPanel.helpers";
 import "@/components/features/insights/InsightSummaryPanel.css";
 
 type Props = {
@@ -26,59 +31,6 @@ type Props = {
   onFilterToggle: (filter: InsightFilter) => void;
   onCIClick: () => void;
 };
-
-function Tile({
-  label,
-  age,
-  children,
-}: {
-  label: string;
-  age?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="insight-summary-panel__tile">
-      <div className="insight-summary-panel__tile-title">
-        <span className="insight-summary-panel__tile-label">{label}</span>
-        {age && <span className="insight-summary-panel__tile-age">{age}</span>}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function Badge({
-  children,
-  colorClass,
-  clickable,
-  active,
-  onClick,
-  title,
-}: {
-  children: ReactNode;
-  colorClass: string;
-  clickable?: boolean;
-  active?: boolean;
-  onClick?: () => void;
-  title?: string;
-}) {
-  const cls = [
-    "insight-summary-panel__badge",
-    `insight-summary-panel__badge--${colorClass}`,
-    clickable ? "insight-summary-panel__badge--clickable" : "",
-    active ? "insight-summary-panel__badge--active" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-  if (clickable && onClick) {
-    return (
-      <button className={cls} onClick={onClick} title={title}>
-        {children}
-      </button>
-    );
-  }
-  return <span className={cls}>{children}</span>;
-}
 
 export function InsightSummaryPanel({
   files,
@@ -111,26 +63,18 @@ export function InsightSummaryPanel({
     );
   }
 
+  const hasPipeline = aggregate?.coverage || aggregate?.lint || ciStatus?.run;
+
   return (
     <div className="insight-summary-panel">
       <div className="insight-summary-panel__grid">
-        <Tile label="files">
-          <span className="insight-summary-panel__tile-num">
-            {files.length}
-          </span>
+        <Tile label="codebase">
+          <StatRow label="files" value={String(files.length)} />
+          <StatRow label="lines" value={totalLines.toLocaleString()} />
+          {avgLines > 0 && (
+            <StatRow label="avg / file" value={String(avgLines)} />
+          )}
         </Tile>
-
-        <Tile label="lines">
-          <span className="insight-summary-panel__tile-num">
-            {totalLines.toLocaleString()}
-          </span>
-        </Tile>
-
-        {avgLines > 0 && (
-          <Tile label="avg / file">
-            <span className="insight-summary-panel__tile-num">{avgLines}</span>
-          </Tile>
-        )}
 
         <Tile label="git">
           {modifiedCount === 0 && untrackedCount === 0 ? (
@@ -146,9 +90,7 @@ export function InsightSummaryPanel({
                     onFilterToggle({ type: "git", status: "modified" })
                   }
                   title={
-                    gitActive("modified")
-                      ? "Clear filter"
-                      : "Filter modified files"
+                    gitActive("modified") ? "Clear filter" : "Filter modified"
                   }
                 >
                   {modifiedCount} M
@@ -163,9 +105,7 @@ export function InsightSummaryPanel({
                     onFilterToggle({ type: "git", status: "untracked" })
                   }
                   title={
-                    gitActive("untracked")
-                      ? "Clear filter"
-                      : "Filter untracked files"
+                    gitActive("untracked") ? "Clear filter" : "Filter untracked"
                   }
                 >
                   {untrackedCount} U
@@ -175,61 +115,72 @@ export function InsightSummaryPanel({
           )}
         </Tile>
 
-        {aggregate?.coverage && (
-          <Tile label="coverage" age={timeAgo(aggregate.coverage.reportedAt)}>
-            <Badge
-              colorClass={ragCoverage(aggregate.coverage.linesPct)}
-              clickable
-              active={activeFilter?.type === "coverage"}
-              onClick={() => onFilterToggle({ type: "coverage" })}
-              title={
-                activeFilter?.type === "coverage"
-                  ? "Clear filter"
-                  : "Filter by coverage"
-              }
-            >
-              {aggregate.coverage.linesPct}%
-            </Badge>
-          </Tile>
-        )}
-
-        {aggregate?.lint && (
-          <Tile label="lint" age={timeAgo(aggregate.lint.reportedAt)}>
-            <div className="insight-summary-panel__tile-badges">
-              <Badge
-                colorClass={ragLint(aggregate.lint.errors)}
-                clickable
-                active={activeFilter?.type === "lint"}
-                onClick={() => onFilterToggle({ type: "lint" })}
-                title={
-                  activeFilter?.type === "lint"
-                    ? "Clear filter"
-                    : "Filter files with lint errors"
-                }
+        {hasPipeline && (
+          <Tile label="pipeline">
+            {aggregate?.coverage && (
+              <PipelineRow
+                label="cov"
+                age={timeAgo(aggregate.coverage.reportedAt)}
               >
-                {aggregate.lint.errors === 0
-                  ? "clean"
-                  : `${aggregate.lint.errors} err`}
-              </Badge>
-              {aggregate.lint.warnings > 0 && (
-                <Badge colorClass="amber">{aggregate.lint.warnings} warn</Badge>
-              )}
-            </div>
-          </Tile>
-        )}
-
-        {ciStatus?.run && (
-          <Tile label="CI" age={timeAgo(ciStatus.run.createdAt)}>
-            <Badge
-              colorClass={ciRag(ciStatus.run.conclusion, ciStatus.run.status)}
-              clickable
-              onClick={onCIClick}
-              title="View CI details"
-            >
-              {ciStatus.run.status !== "completed"
-                ? "running"
-                : (ciStatus.run.conclusion ?? "—")}
-            </Badge>
+                <Badge
+                  colorClass={ragCoverage(aggregate.coverage.linesPct)}
+                  clickable
+                  active={activeFilter?.type === "coverage"}
+                  onClick={() => onFilterToggle({ type: "coverage" })}
+                  title={
+                    activeFilter?.type === "coverage"
+                      ? "Clear filter"
+                      : "Filter by coverage"
+                  }
+                >
+                  {aggregate.coverage.linesPct}%
+                </Badge>
+              </PipelineRow>
+            )}
+            {aggregate?.lint && (
+              <PipelineRow
+                label="lint"
+                age={timeAgo(aggregate.lint.reportedAt)}
+              >
+                <Badge
+                  colorClass={ragLint(aggregate.lint.errors)}
+                  clickable
+                  active={activeFilter?.type === "lint"}
+                  onClick={() => onFilterToggle({ type: "lint" })}
+                  title={
+                    activeFilter?.type === "lint"
+                      ? "Clear filter"
+                      : "Filter lint errors"
+                  }
+                >
+                  {aggregate.lint.errors === 0
+                    ? "clean"
+                    : `${aggregate.lint.errors} err`}
+                </Badge>
+                {aggregate.lint.warnings > 0 && (
+                  <Badge colorClass="amber">
+                    {aggregate.lint.warnings} warn
+                  </Badge>
+                )}
+              </PipelineRow>
+            )}
+            {ciStatus?.run && (
+              <PipelineRow label="CI" age={timeAgo(ciStatus.run.createdAt)}>
+                <Badge
+                  colorClass={ciRag(
+                    ciStatus.run.conclusion,
+                    ciStatus.run.status
+                  )}
+                  clickable
+                  onClick={onCIClick}
+                  title="View CI details"
+                >
+                  {ciStatus.run.status !== "completed"
+                    ? "running"
+                    : (ciStatus.run.conclusion ?? "—")}
+                </Badge>
+              </PipelineRow>
+            )}
           </Tile>
         )}
 

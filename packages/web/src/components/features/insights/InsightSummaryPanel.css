@@ -8,27 +8,14 @@
 
 /* ── Card shell ─────────────────────────────────────────── */
 .insight-summary-panel__tile {
-  @apply flex flex-col gap-2 px-3 py-2.5 rounded-lg
+  @apply flex flex-col gap-1.5 px-3 py-2.5 rounded-lg
     border border-border bg-card
-    shadow-sm flex-1 min-w-[100px];
-}
-
-.insight-summary-panel__tile-title {
-  @apply flex items-baseline justify-between gap-2;
+    shadow-sm flex-1 min-w-[110px];
 }
 
 .insight-summary-panel__tile-label {
   @apply text-[10px] font-semibold uppercase tracking-widest
-    text-muted-foreground whitespace-nowrap;
-}
-
-.insight-summary-panel__tile-age {
-  @apply text-[10px] text-muted-foreground/50 whitespace-nowrap font-normal;
-}
-
-/* ── Stat number (files / lines / avg) ──────────────────── */
-.insight-summary-panel__tile-num {
-  @apply text-2xl font-bold text-foreground tabular-nums leading-none;
+    text-muted-foreground whitespace-nowrap mb-0.5;
 }
 
 /* ── Clean state ────────────────────────────────────────── */
@@ -36,11 +23,42 @@
   @apply text-sm font-semibold text-green-600 leading-none;
 }
 
-/* ── Status badge (coverage / lint / CI / git) ──────────── */
+/* ── Codebase stat rows ──────────────────────────────────── */
+.insight-summary-panel__stat-row {
+  @apply flex items-baseline gap-2;
+}
+
+.insight-summary-panel__stat-value {
+  @apply text-base font-bold text-foreground tabular-nums leading-none w-14 text-right shrink-0;
+}
+
+.insight-summary-panel__stat-label {
+  @apply text-[11px] text-muted-foreground whitespace-nowrap;
+}
+
+/* ── Pipeline rows (cov / lint / CI) ─────────────────────── */
+.insight-summary-panel__pipeline-row {
+  @apply flex items-center gap-1.5;
+}
+
+.insight-summary-panel__pipeline-label {
+  @apply text-[11px] text-muted-foreground w-6 shrink-0;
+}
+
+.insight-summary-panel__pipeline-badge {
+  @apply flex items-center gap-1 flex-1;
+}
+
+.insight-summary-panel__pipeline-age {
+  @apply text-[10px] text-muted-foreground/50 whitespace-nowrap ml-auto;
+}
+
+/* ── Git badges ──────────────────────────────────────────── */
 .insight-summary-panel__tile-badges {
   @apply flex items-center gap-1.5 flex-wrap;
 }
 
+/* ── Status badge ────────────────────────────────────────── */
 .insight-summary-panel__badge {
   @apply text-xs font-semibold px-2 py-0.5 rounded-md border-0
     whitespace-nowrap leading-snug;
@@ -54,23 +72,12 @@
   @apply ring-2 ring-current ring-offset-1;
 }
 
-.insight-summary-panel__badge--green {
-  @apply text-green-700 bg-green-500/15;
-}
+.insight-summary-panel__badge--green  { @apply text-green-700 bg-green-500/15; }
+.insight-summary-panel__badge--amber  { @apply text-yellow-700 bg-yellow-400/20; }
+.insight-summary-panel__badge--red    { @apply text-red-700 bg-red-500/15; }
+.insight-summary-panel__badge--muted  { @apply text-muted-foreground bg-muted; }
 
-.insight-summary-panel__badge--amber {
-  @apply text-yellow-700 bg-yellow-400/20;
-}
-
-.insight-summary-panel__badge--red {
-  @apply text-red-700 bg-red-500/15;
-}
-
-.insight-summary-panel__badge--muted {
-  @apply text-muted-foreground bg-muted;
-}
-
-/* ── AI metric chips (stacked inside metric card) ───────── */
+/* ── AI metric chips ─────────────────────────────────────── */
 .insight-summary-panel__chips {
   @apply flex flex-col gap-0.5;
 }
@@ -101,7 +108,7 @@
   @apply font-normal;
 }
 
-/* ── Active filter badge ────────────────────────────────── */
+/* ── Active filter badge ─────────────────────────────────── */
 .insight-summary-panel__filter-badge {
   @apply self-center text-[11px] font-medium px-2.5 py-1 rounded-full
     bg-sky-400/15 text-sky-600 whitespace-nowrap shrink-0;
