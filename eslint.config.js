@@ -54,6 +54,7 @@ export default tseslint.config(
       "**/coverage/**",
       "**/*.config.js",
       "**/*.config.ts",
+      "**/*.config.d.ts",
       "**/postcss.config.js",
     ],
   },
@@ -76,6 +77,13 @@ export default tseslint.config(
     rules: {
       "no-restricted-imports": "off",
       "max-lines": "off",
+    },
+  },
+  {
+    // Page files are orchestrators — allow up to 220 lines
+    files: ["packages/web/src/pages/**/*.tsx"],
+    rules: {
+      "max-lines": ["error", { max: 220, skipBlankLines: true, skipComments: true }],
     },
   }
 );

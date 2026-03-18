@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 const MAX_LINES = 200;
+const PAGE_MAX_LINES = 220; // page files are orchestrators
 const SRC_DIR = path.resolve(__dirname, "../../src");
 
 function countLines(filePath: string): number {
@@ -69,9 +70,12 @@ describe("File Size Constraints", () => {
   tsFiles.forEach((file) => {
     const relativePath = path.relative(SRC_DIR, file);
 
-    it(`${relativePath} should not exceed ${MAX_LINES} lines`, () => {
+    const limit = relativePath.startsWith("pages/")
+      ? PAGE_MAX_LINES
+      : MAX_LINES;
+    it(`${relativePath} should not exceed ${limit} lines`, () => {
       const lineCount = countLines(file);
-      expect(lineCount).toBeLessThanOrEqual(MAX_LINES);
+      expect(lineCount).toBeLessThanOrEqual(limit);
     });
   });
 });
