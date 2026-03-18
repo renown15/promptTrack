@@ -2,10 +2,10 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Active: highlight filtered rows in InsightTreeTable
+## Active: InsightSummaryPanel UX redesign
 
-- [x] Read InsightTreeTable + CSS
-- [x] Add fileMatchesFilter to shared utils
-- [x] Pass activeFilter to FileTableRow, compute isHighlighted
-- [x] Add --highlighted CSS class
+- [x] Read AgentInsightPage to understand data flow
+- [x] Rewrite InsightMetricPills — single dot per metric
+- [x] Update InsightSummaryPanel — dividers, active filter banner, ages as tooltips
+- [x] Update CSS
 - [ ] make check + commit

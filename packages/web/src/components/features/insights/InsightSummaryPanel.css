@@ -4,7 +4,7 @@
 }
 
 .insight-summary-panel__row {
-  @apply flex items-center gap-3 flex-wrap;
+  @apply flex items-center gap-2 flex-wrap;
 }
 
 .insight-summary-panel__stat {
@@ -19,7 +19,6 @@
   @apply text-xs text-muted-foreground;
 }
 
-
 .insight-summary-panel__divider {
   @apply w-px h-4 bg-border shrink-0;
 }
@@ -32,12 +31,10 @@
   @apply text-xs text-muted-foreground;
 }
 
+/* Git filter pills */
 .insight-summary-panel__count {
-  @apply text-[11px] font-medium px-1 py-0.5 rounded;
-}
-
-.insight-summary-panel__count {
-  @apply cursor-pointer hover:opacity-80 transition-opacity;
+  @apply text-[11px] font-medium px-1.5 py-0.5 rounded
+    cursor-pointer hover:opacity-80 transition-opacity border-0;
 }
 
 .insight-summary-panel__count--active {
@@ -56,20 +53,14 @@
   @apply text-green-600 bg-green-500/10;
 }
 
-.insight-summary-panel__count--error {
-  @apply text-foreground/70 bg-muted;
-}
-
-.insight-summary-panel__count--pending {
-  @apply text-muted-foreground bg-muted;
-}
-
+/* Coverage / lint / CI badges */
 .insight-summary-panel__aggregate {
   @apply flex items-center gap-1;
 }
 
 .insight-summary-panel__rag {
-  @apply text-[11px] font-medium px-1 py-0.5 rounded;
+  @apply text-[11px] font-medium px-1.5 py-0.5 rounded border-0
+    cursor-pointer hover:opacity-80 transition-opacity;
 }
 
 .insight-summary-panel__rag--active {
@@ -88,7 +79,43 @@
   @apply text-red-600 bg-red-500/10;
 }
 
-.insight-summary-panel__age {
-  @apply text-[10px] text-muted-foreground;
+/* AI metric dot badges */
+.insight-summary-panel__dot {
+  @apply text-[11px] font-semibold min-w-[1.25rem] px-1 py-0.5
+    rounded text-white border-0 text-center leading-none;
 }
 
+.insight-summary-panel__dot--red {
+  @apply bg-red-500 cursor-pointer hover:bg-red-600 transition-colors;
+}
+
+.insight-summary-panel__dot--amber {
+  @apply bg-yellow-400 cursor-pointer hover:bg-yellow-500 transition-colors;
+}
+
+.insight-summary-panel__dot--green {
+  @apply bg-green-500 cursor-pointer hover:bg-green-600 transition-colors;
+}
+
+.insight-summary-panel__dot--error {
+  @apply bg-muted-foreground/50 cursor-pointer hover:opacity-80 transition-opacity;
+}
+
+.insight-summary-panel__dot--pending {
+  @apply bg-muted-foreground/25 text-muted-foreground cursor-default;
+}
+
+.insight-summary-panel__dot--active {
+  @apply ring-2 ring-offset-1 ring-current;
+}
+
+/* Analyzed count */
+.insight-summary-panel__analyzed {
+  @apply text-[11px] text-muted-foreground/60 tabular-nums;
+}
+
+/* Active filter badge */
+.insight-summary-panel__filter-badge {
+  @apply ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full
+    bg-sky-400/15 text-sky-600;
+}

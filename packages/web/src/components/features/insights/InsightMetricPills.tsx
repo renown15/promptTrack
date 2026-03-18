@@ -10,25 +10,37 @@ type Props = {
   onFilterToggle: (filter: InsightFilter) => void;
 };
 
+type DotStatus = "red" | "amber" | "green" | "error" | "pending";
+
+function worstStatus(h: MetricHealth): DotStatus | null {
+  if (h.red > 0) return "red";
+  if (h.error > 0) return "error";
+  if (h.amber > 0) return "amber";
+  if (h.pending > 0) return "pending";
+  if (h.green > 0) return "green";
+  return null;
+}
+
+function worstCount(h: MetricHealth, status: DotStatus): number {
+  return h[status === "error" ? "error" : status] ?? 0;
+}
+
+function breakdown(h: MetricHealth): string {
+  const parts: string[] = [];
+  if (h.red > 0) parts.push(`${h.red} critical`);
+  if (h.amber > 0) parts.push(`${h.amber} warn`);
+  if (h.green > 0) parts.push(`${h.green} ok`);
+  if (h.error > 0) parts.push(`${h.error} error`);
+  if (h.pending > 0) parts.push(`${h.pending} pending`);
+  return parts.join(" · ");
+}
+
 export function InsightMetricPills({
   metricEntries,
   health,
   activeFilter,
   onFilterToggle,
 }: Props) {
-  function pill(filter: InsightFilter, colorClass: string, label: string) {
-    const active = activeFilter !== null && filterMatches(activeFilter, filter);
-    return (
-      <button
-        className={`insight-summary-panel__count insight-summary-panel__count--${colorClass}${active ? " insight-summary-panel__count--active" : ""}`}
-        onClick={() => onFilterToggle(filter)}
-        title={active ? "Clear filter" : `Filter: ${label}`}
-      >
-        {label}
-      </button>
-    );
-  }
-
   if (metricEntries.length === 0) return null;
 
   return (
@@ -37,38 +49,47 @@ export function InsightMetricPills({
       {metricEntries.map(([name, label]) => {
         const h = health[name];
         if (!h) return null;
-        const total = h.green + h.amber + h.red + h.error + h.pending;
-        if (total === 0) return null;
+        const worst = worstStatus(h);
+        if (worst === null) return null;
+
+        const count = worstCount(h, worst);
+        const isClickable = worst !== "pending";
+        const filter: InsightFilter | null = isClickable
+          ? {
+              type: "metric",
+              name,
+              status: worst === "error" ? "error" : worst,
+            }
+          : null;
+        const isActive =
+          filter !== null &&
+          activeFilter !== null &&
+          filterMatches(activeFilter, filter);
+
+        const dotClass = [
+          "insight-summary-panel__dot",
+          `insight-summary-panel__dot--${worst}`,
+          isActive ? "insight-summary-panel__dot--active" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const tooltipText = `${breakdown(h)}${isClickable ? ` — ${isActive ? "clear filter" : "click to filter"}` : ""}`;
+
         return (
           <span key={name} className="insight-summary-panel__metric">
             <span className="insight-summary-panel__metric-label">{label}</span>
-            {h.red > 0 &&
-              pill(
-                { type: "metric", name, status: "red" },
-                "red",
-                `${h.red} critical`
-              )}
-            {h.amber > 0 &&
-              pill(
-                { type: "metric", name, status: "amber" },
-                "amber",
-                `${h.amber} warn`
-              )}
-            {h.green > 0 &&
-              pill(
-                { type: "metric", name, status: "green" },
-                "green",
-                `${h.green} ok`
-              )}
-            {h.error > 0 &&
-              pill(
-                { type: "metric", name, status: "error" },
-                "error",
-                `${h.error} err`
-              )}
-            {h.pending > 0 && (
-              <span className="insight-summary-panel__count insight-summary-panel__count--pending">
-                {h.pending} pending
+            {filter ? (
+              <button
+                className={dotClass}
+                onClick={() => onFilterToggle(filter)}
+                title={tooltipText}
+              >
+                {count}
+              </button>
+            ) : (
+              <span className={dotClass} title={tooltipText}>
+                {count}
               </span>
             )}
           </span>

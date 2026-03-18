@@ -11,6 +11,7 @@ import {
   ragLint,
   ciRag,
   filterMatches,
+  fileMatchesFilter,
 } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightMetricPills } from "@/components/features/insights/InsightMetricPills";
 import "@/components/features/insights/InsightSummaryPanel.css";
@@ -52,8 +53,11 @@ export function InsightSummaryPanel({
   const untrackedCount = files.filter(
     (f) => f.gitStatus === "untracked"
   ).length;
+  const filteredCount = activeFilter
+    ? files.filter((f) => fileMatchesFilter(f, activeFilter)).length
+    : 0;
 
-  function pill(filter: InsightFilter, colorClass: string, label: string) {
+  function gitPill(filter: InsightFilter, colorClass: string, label: string) {
     const active = activeFilter !== null && filterMatches(activeFilter, filter);
     return (
       <button
@@ -92,77 +96,59 @@ export function InsightSummaryPanel({
           </span>
         )}
       </div>
+
       <div className="insight-summary-panel__row">
         {(modifiedCount > 0 || untrackedCount > 0) && (
           <>
-            <span className="insight-summary-panel__divider" />
             <span className="insight-summary-panel__metric">
               <span className="insight-summary-panel__metric-label">git</span>
               {modifiedCount > 0 &&
-                pill(
+                gitPill(
                   { type: "git", status: "modified" },
                   "amber",
                   `${modifiedCount} M`
                 )}
               {untrackedCount > 0 &&
-                pill(
+                gitPill(
                   { type: "git", status: "untracked" },
                   "red",
                   `${untrackedCount} U`
                 )}
             </span>
+            <span className="insight-summary-panel__divider" />
           </>
         )}
 
         {aggregate?.coverage && (
-          <>
-            <span className="insight-summary-panel__divider" />
-            <span className="insight-summary-panel__aggregate">
-              <span className="insight-summary-panel__metric-label">
-                coverage
-              </span>
-              <button
-                className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__rag--active" : ""}`}
-                onClick={() => onFilterToggle({ type: "coverage" })}
-                title={
-                  activeFilter?.type === "coverage"
-                    ? "Clear filter"
-                    : "Filter: files with coverage data"
-                }
-              >
-                {aggregate.coverage.linesPct}%
-              </button>
-              <span className="insight-summary-panel__age">
-                {timeAgo(aggregate.coverage.reportedAt)}
-              </span>
-            </span>
-          </>
+          <span className="insight-summary-panel__aggregate">
+            <span className="insight-summary-panel__metric-label">cov</span>
+            <button
+              className={`insight-summary-panel__rag insight-summary-panel__rag--${ragCoverage(aggregate.coverage.linesPct)}${activeFilter?.type === "coverage" ? " insight-summary-panel__rag--active" : ""}`}
+              onClick={() => onFilterToggle({ type: "coverage" })}
+              title={`${aggregate.coverage.linesPct}% line coverage · ${timeAgo(aggregate.coverage.reportedAt)} — ${activeFilter?.type === "coverage" ? "clear filter" : "filter by coverage"}`}
+            >
+              {aggregate.coverage.linesPct}%
+            </button>
+          </span>
         )}
+
         {aggregate?.lint && (
           <span className="insight-summary-panel__aggregate">
             <span className="insight-summary-panel__metric-label">lint</span>
             <button
               className={`insight-summary-panel__rag insight-summary-panel__rag--${ragLint(aggregate.lint.errors)}${activeFilter?.type === "lint" ? " insight-summary-panel__rag--active" : ""}`}
               onClick={() => onFilterToggle({ type: "lint" })}
-              title={
-                activeFilter?.type === "lint"
-                  ? "Clear filter"
-                  : "Filter: files with lint errors"
-              }
+              title={`${aggregate.lint.errors} errors · ${aggregate.lint.warnings} warnings · ${timeAgo(aggregate.lint.reportedAt)} — ${activeFilter?.type === "lint" ? "clear filter" : "filter files with errors"}`}
             >
               {aggregate.lint.errors === 0
                 ? "clean"
                 : `${aggregate.lint.errors} err`}
             </button>
-            {aggregate.lint.warnings > 0 && (
-              <span className="insight-summary-panel__rag insight-summary-panel__rag--amber">
-                {aggregate.lint.warnings} warn
-              </span>
-            )}
-            <span className="insight-summary-panel__age">
-              {timeAgo(aggregate.lint.reportedAt)}
-            </span>
           </span>
+        )}
+
+        {(aggregate?.coverage || aggregate?.lint) && ciStatus?.run && (
+          <span className="insight-summary-panel__divider" />
         )}
 
         {ciStatus?.run && (
@@ -171,28 +157,12 @@ export function InsightSummaryPanel({
             <button
               className={`insight-summary-panel__rag insight-summary-panel__rag--${ciRag(ciStatus.run.conclusion, ciStatus.run.status)}`}
               onClick={onCIClick}
-              title="View CI details"
+              title={`CI ${ciStatus.run.conclusion ?? ciStatus.run.status} · ${timeAgo(ciStatus.run.createdAt)} — view details`}
             >
               {ciStatus.run.status !== "completed"
                 ? "running"
                 : (ciStatus.run.conclusion ?? "—")}
             </button>
-            <span className="insight-summary-panel__age">
-              {timeAgo(ciStatus.run.createdAt)}
-            </span>
-          </span>
-        )}
-
-        {files.length > 0 && metricNames.length > 0 && (
-          <span className="insight-summary-panel__aggregate">
-            <span className="insight-summary-panel__metric-label">
-              analyzed
-            </span>
-            <span
-              className={`insight-summary-panel__rag insight-summary-panel__rag--${analyzed === files.length ? "green" : analyzed > 0 ? "amber" : "red"}`}
-            >
-              {analyzed} / {files.length}
-            </span>
           </span>
         )}
 
@@ -202,6 +172,18 @@ export function InsightSummaryPanel({
           activeFilter={activeFilter}
           onFilterToggle={onFilterToggle}
         />
+
+        {files.length > 0 && metricNames.length > 0 && (
+          <span className="insight-summary-panel__analyzed">
+            {analyzed}/{files.length}
+          </span>
+        )}
+
+        {activeFilter && (
+          <span className="insight-summary-panel__filter-badge">
+            ● {filteredCount} filtered
+          </span>
+        )}
       </div>
     </div>
   );
