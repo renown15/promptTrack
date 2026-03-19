@@ -23,7 +23,6 @@
   @apply font-mono;
 }
 
-
 .project-page__body {
   @apply grid gap-5;
   grid-template-columns: 1fr 1fr;

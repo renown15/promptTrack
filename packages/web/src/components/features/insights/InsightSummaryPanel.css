@@ -72,10 +72,18 @@
   @apply ring-2 ring-current ring-offset-1;
 }
 
-.insight-summary-panel__badge--green  { @apply text-green-700 bg-green-500/15; }
-.insight-summary-panel__badge--amber  { @apply text-yellow-700 bg-yellow-400/20; }
-.insight-summary-panel__badge--red    { @apply text-red-700 bg-red-500/15; }
-.insight-summary-panel__badge--muted  { @apply text-muted-foreground bg-muted; }
+.insight-summary-panel__badge--green {
+  @apply text-green-700 bg-green-500/15;
+}
+.insight-summary-panel__badge--amber {
+  @apply text-yellow-700 bg-yellow-400/20;
+}
+.insight-summary-panel__badge--red {
+  @apply text-red-700 bg-red-500/15;
+}
+.insight-summary-panel__badge--muted {
+  @apply text-muted-foreground bg-muted;
+}
 
 /* ── AI metric chips ─────────────────────────────────────── */
 .insight-summary-panel__chips {
@@ -92,10 +100,18 @@
   @apply border-current;
 }
 
-.insight-summary-panel__chip--red    { @apply text-red-700 bg-red-500/15; }
-.insight-summary-panel__chip--amber  { @apply text-yellow-700 bg-yellow-400/15; }
-.insight-summary-panel__chip--green  { @apply text-green-700 bg-green-500/15; }
-.insight-summary-panel__chip--error  { @apply text-foreground/50 bg-muted; }
+.insight-summary-panel__chip--red {
+  @apply text-red-700 bg-red-500/15;
+}
+.insight-summary-panel__chip--amber {
+  @apply text-yellow-700 bg-yellow-400/15;
+}
+.insight-summary-panel__chip--green {
+  @apply text-green-700 bg-green-500/15;
+}
+.insight-summary-panel__chip--error {
+  @apply text-foreground/50 bg-muted;
+}
 .insight-summary-panel__chip--pending {
   @apply text-muted-foreground/50 cursor-default;
 }
@@ -111,4 +127,3 @@
 .insight-summary-panel__chip-label {
   @apply font-normal;
 }
-

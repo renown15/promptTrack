@@ -69,12 +69,24 @@
   @apply w-2 h-2 rounded-full shrink-0;
 }
 
-.insight-detail-panel__metric--green .insight-detail-panel__metric-dot { @apply bg-green-500; }
-.insight-detail-panel__metric--amber .insight-detail-panel__metric-dot { @apply bg-yellow-400; }
-.insight-detail-panel__metric--red .insight-detail-panel__metric-dot { @apply bg-red-500; }
-.insight-detail-panel__metric--error .insight-detail-panel__metric-dot { @apply bg-foreground/60; }
-.insight-detail-panel__metric--pending .insight-detail-panel__metric-dot { @apply bg-muted-foreground/40 animate-pulse; }
-.insight-detail-panel__metric--unrun .insight-detail-panel__metric-dot { @apply bg-muted-foreground/20; }
+.insight-detail-panel__metric--green .insight-detail-panel__metric-dot {
+  @apply bg-green-500;
+}
+.insight-detail-panel__metric--amber .insight-detail-panel__metric-dot {
+  @apply bg-yellow-400;
+}
+.insight-detail-panel__metric--red .insight-detail-panel__metric-dot {
+  @apply bg-red-500;
+}
+.insight-detail-panel__metric--error .insight-detail-panel__metric-dot {
+  @apply bg-foreground/60;
+}
+.insight-detail-panel__metric--pending .insight-detail-panel__metric-dot {
+  @apply bg-muted-foreground/40 animate-pulse;
+}
+.insight-detail-panel__metric--unrun .insight-detail-panel__metric-dot {
+  @apply bg-muted-foreground/20;
+}
 
 .insight-detail-panel__metric-label {
   @apply font-medium text-foreground flex-1;
@@ -109,9 +121,15 @@
   @apply h-full rounded-full transition-all duration-300 block;
 }
 
-.insight-detail-panel__cov-fill--green { @apply bg-green-500; }
-.insight-detail-panel__cov-fill--amber { @apply bg-yellow-400; }
-.insight-detail-panel__cov-fill--red { @apply bg-red-500; }
+.insight-detail-panel__cov-fill--green {
+  @apply bg-green-500;
+}
+.insight-detail-panel__cov-fill--amber {
+  @apply bg-yellow-400;
+}
+.insight-detail-panel__cov-fill--red {
+  @apply bg-red-500;
+}
 
 .insight-detail-panel__cov-pct {
   @apply w-10 text-right text-muted-foreground tabular-nums shrink-0;
@@ -122,9 +140,15 @@
   @apply ml-2 text-[10px] px-1 py-0.5 rounded font-normal;
 }
 
-.insight-detail-panel__lint-badge--error { @apply text-red-600 bg-red-500/10; }
-.insight-detail-panel__lint-badge--warn { @apply text-yellow-600 bg-yellow-400/10; }
-.insight-detail-panel__lint-badge--ok { @apply text-green-600 bg-green-500/10; }
+.insight-detail-panel__lint-badge--error {
+  @apply text-red-600 bg-red-500/10;
+}
+.insight-detail-panel__lint-badge--warn {
+  @apply text-yellow-600 bg-yellow-400/10;
+}
+.insight-detail-panel__lint-badge--ok {
+  @apply text-green-600 bg-green-500/10;
+}
 
 .insight-detail-panel__lint-messages {
   @apply flex flex-col overflow-y-auto;

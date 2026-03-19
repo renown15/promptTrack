@@ -66,8 +66,12 @@
 }
 
 @keyframes insight-row-flash {
-  0% { @apply bg-primary/15; }
-  100% { @apply bg-transparent; }
+  0% {
+    @apply bg-primary/15;
+  }
+  100% {
+    @apply bg-transparent;
+  }
 }
 
 /* Column widths */

@@ -1,19 +1,7 @@
 import chokidar, { type FSWatcher } from "chokidar";
 import { extname } from "path";
 import { insightService } from "@/services/insight.service.js";
-
-const CODE_EXTENSIONS = new Set([
-  ".ts",
-  ".tsx",
-  ".js",
-  ".mjs",
-  ".cjs",
-  ".jsx",
-  ".py",
-  ".go",
-  ".rs",
-  ".css",
-]);
+import { CODE_EXTENSIONS } from "@/services/insight.scanner.js";
 
 const IGNORE_DIRS = [
   "**/node_modules/**",
@@ -96,6 +84,7 @@ export const watcherService = {
     });
 
     watcher.on("unlink", (filePath) => {
+      if (!CODE_EXTENSIONS.has(extname(filePath).toLowerCase())) return;
       insightService.removeFile(collectionId, directory, filePath);
     });
 

@@ -1,4 +1,4 @@
-.PHONY: dev dev-api dev-web dev-log logs db db-stop db-logs db-studio db-dump db-restore db-reset migrate migrate-dev push test test-unit test-integration test-e2e lint lint-report typecheck build clean stop help
+.PHONY: dev dev-api dev-web dev-log logs db db-stop db-logs db-studio db-dump db-restore db-reset migrate migrate-dev push test test-unit test-integration test-e2e lint lint-report typecheck build clean stop ci help
 
 # Default target
 .DEFAULT_GOAL := help
@@ -132,6 +132,14 @@ test-coverage: ## Run all tests (unit + integration) with combined coverage repo
 check: ## Smoke test — typecheck + build (run before declaring work complete)
 	pnpm typecheck
 	pnpm build
+
+ci: ## Full CI simulation — lint, format-check, typecheck, unit tests, build, integration tests
+	pnpm lint
+	pnpm format:check
+	pnpm typecheck
+	pnpm test:unit
+	pnpm build
+	$(MAKE) test-integration
 
 lint: ## Run ESLint
 	pnpm lint

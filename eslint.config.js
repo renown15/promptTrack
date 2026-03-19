@@ -73,7 +73,12 @@ export default tseslint.config(
   },
   {
     // Test files: allow relative imports (can't use @/ which points to src/) and longer files
-    files: ["**/tests/**/*.ts", "**/tests/**/*.tsx", "**/*.test.ts", "**/*.test.tsx"],
+    files: [
+      "**/tests/**/*.ts",
+      "**/tests/**/*.tsx",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+    ],
     rules: {
       "no-restricted-imports": "off",
       "max-lines": "off",
@@ -83,7 +88,10 @@ export default tseslint.config(
     // Page files are orchestrators — allow up to 220 lines
     files: ["packages/web/src/pages/**/*.tsx"],
     rules: {
-      "max-lines": ["error", { max: 220, skipBlankLines: true, skipComments: true }],
+      "max-lines": [
+        "error",
+        { max: 220, skipBlankLines: true, skipComments: true },
+      ],
     },
   }
 );

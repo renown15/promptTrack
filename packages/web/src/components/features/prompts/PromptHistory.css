@@ -52,7 +52,8 @@
   @apply absolute left-[-5px] top-1.5 w-2 h-2 rounded-full bg-border shrink-0;
 }
 
-.prompt-history__item:has(.prompt-history__checkbox:checked) .prompt-history__dot {
+.prompt-history__item:has(.prompt-history__checkbox:checked)
+  .prompt-history__dot {
   @apply bg-primary;
 }
 
