@@ -1,10 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { promptsApi } from "@/api/endpoints/prompts";
+import { useMutate } from "@/hooks/useMutate";
 import type {
   CreatePromptInput,
   UpdatePromptInput,
   CreatePromptVersionInput,
 } from "@prompttrack/shared";
+
+const KEYS = {
+  all: ["prompts"] as const,
+  tree: ["collections", "tree"] as const,
+};
 
 export function usePrompts(params?: {
   environment?: string;
@@ -13,6 +19,14 @@ export function usePrompts(params?: {
   return useQuery({
     queryKey: ["prompts", params],
     queryFn: () => promptsApi.list(params),
+  });
+}
+
+export function usePrompt(id: string) {
+  return useQuery({
+    queryKey: ["prompts", id],
+    queryFn: () => promptsApi.getById(id),
+    enabled: Boolean(id),
   });
 }
 
@@ -52,52 +66,30 @@ export function usePromptSearchDetails(ids: string[]) {
   });
 }
 
-export function usePrompt(id: string) {
-  return useQuery({
-    queryKey: ["prompts", id],
-    queryFn: () => promptsApi.getById(id),
-    enabled: Boolean(id),
-  });
-}
-
 export function useCreatePrompt() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreatePromptInput) => promptsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prompts"] });
-    },
-  });
+  return useMutate(
+    (data: CreatePromptInput) => promptsApi.create(data),
+    [KEYS.all]
+  );
 }
 
 export function useUpdatePrompt(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: UpdatePromptInput) => promptsApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prompts"] });
-    },
-  });
+  return useMutate(
+    (data: UpdatePromptInput) => promptsApi.update(id, data),
+    [KEYS.all]
+  );
 }
 
 export function useDeletePrompt() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => promptsApi.archive(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prompts"] });
-      queryClient.invalidateQueries({ queryKey: ["collections", "tree"] });
-    },
-  });
+  return useMutate(
+    (id: string) => promptsApi.archive(id),
+    [KEYS.all, KEYS.tree]
+  );
 }
 
 export function useCreatePromptVersion(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreatePromptVersionInput) =>
-      promptsApi.createVersion(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prompts", id] });
-    },
-  });
+  return useMutate(
+    (data: CreatePromptVersionInput) => promptsApi.createVersion(id, data),
+    [["prompts", id]]
+  );
 }

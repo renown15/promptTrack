@@ -149,3 +149,13 @@
 .insight-tree-table__count--unrun {
   @apply text-muted-foreground/40;
 }
+
+.insight-tree-table__inspect-btn {
+  @apply ml-auto opacity-0 text-sm leading-none px-1 rounded transition-opacity;
+}
+.insight-tree-table__file-row:hover .insight-tree-table__inspect-btn {
+  @apply opacity-60;
+}
+.insight-tree-table__inspect-btn:hover {
+  @apply opacity-100;
+}

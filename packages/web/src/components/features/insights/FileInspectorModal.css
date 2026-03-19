@@ -1,0 +1,102 @@
+.file-inspector__overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm;
+}
+
+.file-inspector__modal {
+  @apply flex flex-col w-[92vw] max-w-7xl h-[88vh] rounded-lg overflow-hidden shadow-2xl;
+  background: #1e1e2e;
+  border: 1px solid #313244;
+}
+
+.file-inspector__header {
+  @apply flex items-center gap-3 px-4 py-3 shrink-0;
+  background: #181825;
+  border-bottom: 1px solid #313244;
+}
+
+.file-inspector__title {
+  @apply text-sm font-semibold text-slate-100;
+}
+
+.file-inspector__path {
+  @apply text-xs text-slate-500 truncate flex-1;
+}
+
+.file-inspector__line-count {
+  @apply text-xs text-slate-500 tabular-nums shrink-0;
+}
+
+.file-inspector__close {
+  @apply text-slate-400 hover:text-slate-100 text-base leading-none ml-auto;
+}
+
+.file-inspector__body {
+  @apply flex flex-1 overflow-hidden;
+}
+
+/* Left pane */
+.file-inspector__pane--content {
+  @apply flex-1 overflow-auto;
+  border-right: 1px solid #313244;
+}
+
+.file-inspector__code {
+  @apply text-xs leading-relaxed p-4 m-0 min-h-full;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+  color: #cdd6f4;
+  white-space: pre;
+  tab-size: 2;
+}
+
+/* Right pane */
+.file-inspector__pane--meta {
+  @apply w-80 shrink-0 overflow-y-auto flex flex-col gap-4 p-4;
+}
+
+.file-inspector__section {
+  @apply flex flex-col gap-2;
+}
+
+.file-inspector__section-title {
+  @apply text-[11px] font-semibold uppercase tracking-wider text-slate-500 pb-1;
+  border-bottom: 1px solid #313244;
+}
+
+/* Summary */
+.file-inspector__summary {
+  @apply text-xs text-slate-300 leading-relaxed;
+}
+
+.file-inspector__summary-loading,
+.file-inspector__summary-error {
+  @apply text-xs text-slate-500 italic;
+}
+
+/* Metric rows */
+.file-inspector__metric {
+  @apply flex items-start gap-2 py-1;
+}
+
+.file-inspector__metric-dot {
+  @apply w-2 h-2 rounded-full mt-0.5 shrink-0;
+}
+
+.file-inspector__metric--green .file-inspector__metric-dot { @apply bg-emerald-400; }
+.file-inspector__metric--amber .file-inspector__metric-dot { @apply bg-amber-400; }
+.file-inspector__metric--red .file-inspector__metric-dot { @apply bg-red-400; }
+.file-inspector__metric--pending .file-inspector__metric-dot { @apply bg-slate-600; }
+.file-inspector__metric--error .file-inspector__metric-dot { @apply bg-rose-700; }
+
+.file-inspector__metric-label {
+  @apply text-[11px] font-medium text-slate-400 w-16 shrink-0;
+}
+
+.file-inspector__metric-text {
+  @apply text-xs text-slate-300 leading-relaxed;
+}
+
+/* Loading / error states */
+.file-inspector__loading,
+.file-inspector__error {
+  @apply p-4 text-sm text-slate-500 italic;
+}

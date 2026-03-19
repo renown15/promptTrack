@@ -38,6 +38,12 @@ export const DEFAULT_METRICS: MetricDefinition[] = [
     description:
       "Does this file adhere to industry-standard engineering practices that support DevSecOps? Consider: error handling, observability (logging/tracing), testability, immutability, principle of least privilege, secrets management, and absence of technical debt that would impede secure delivery.",
   },
+  {
+    name: "dry",
+    label: "DRY",
+    description:
+      "Does this file repeat patterns that should be abstracted? Look for: copy-pasted blocks of near-identical code, boilerplate that could be a helper or factory, multiple functions with the same shape differing only in a parameter, and any logic duplicated from nearby files. Green = minimal repetition. Amber = some duplication worth noting. Red = significant repetition that should be refactored.",
+  },
 ];
 
 const MAX_CONTENT_CHARS = 6000;

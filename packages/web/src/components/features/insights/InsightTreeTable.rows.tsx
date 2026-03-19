@@ -63,6 +63,7 @@ type FileRowProps = {
   activeFilter: InsightFilter | null;
   metricEntries: [string, string][];
   onSelect: (path: string) => void;
+  onInspect: (path: string) => void;
 };
 
 export function FileTableRow({
@@ -72,6 +73,7 @@ export function FileTableRow({
   activeFilter,
   metricEntries,
   onSelect,
+  onInspect,
 }: FileRowProps) {
   const isFlashing = row.file.relativePath === flashPath;
   const isSelected = row.file.relativePath === selectedPath;
@@ -114,6 +116,16 @@ export function FileTableRow({
             U
           </span>
         )}
+        <button
+          className="insight-tree-table__inspect-btn"
+          title="Inspect file"
+          onClick={(e) => {
+            e.stopPropagation();
+            onInspect(row.file.relativePath);
+          }}
+        >
+          👓
+        </button>
       </div>
       <div className="insight-tree-table__col insight-tree-table__col--lines">
         {row.file.lineCount}

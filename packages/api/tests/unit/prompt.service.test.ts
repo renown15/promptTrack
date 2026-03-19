@@ -94,6 +94,39 @@ describe("promptService", () => {
       );
     });
 
+    it("passes description when provided", async () => {
+      vi.mocked(promptRepository.findBySlug).mockResolvedValue(null);
+      vi.mocked(promptRepository.create).mockResolvedValue(basePrompt);
+      vi.mocked(promptVersionRepository.create).mockResolvedValue({
+        id: "pv1",
+        versionNumber: 1,
+        content: "Hello",
+        role: "user",
+        changelog: null,
+        modelParameters: {},
+        promptId: "p1",
+        createdBy: "u1",
+        createdAt: new Date(),
+        variables: [],
+      });
+      vi.mocked(promptRepository.findById).mockResolvedValue(basePrompt);
+      vi.mocked(promptVersionRepository.findByPromptId).mockResolvedValue([]);
+
+      await promptService.create("u1", {
+        name: "With Desc",
+        description: "a description",
+        content: "Hello",
+        tags: [],
+        role: "user",
+        variables: [],
+        modelParameters: { temperature: 0.7, maxTokens: 1000 },
+      });
+
+      expect(promptRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ description: "a description" })
+      );
+    });
+
     it("appends suffix for duplicate slugs", async () => {
       vi.mocked(promptRepository.findBySlug)
         .mockResolvedValueOnce(basePrompt)
@@ -144,6 +177,31 @@ describe("promptService", () => {
       });
       await expect(promptService.update("p1", { name: "New" })).rejects.toThrow(
         PromptError
+      );
+    });
+
+    it("passes optional fields when provided", async () => {
+      vi.mocked(promptRepository.findById).mockResolvedValue(basePrompt);
+      vi.mocked(promptRepository.update).mockResolvedValue({
+        ...basePrompt,
+        description: "new desc",
+        tags: ["a"],
+        parentId: "parent1",
+      } as never);
+
+      await promptService.update("p1", {
+        description: "new desc",
+        tags: ["a"],
+        parentId: "parent1",
+      });
+
+      expect(promptRepository.update).toHaveBeenCalledWith(
+        "p1",
+        expect.objectContaining({
+          description: "new desc",
+          tags: ["a"],
+          parentId: "parent1",
+        })
       );
     });
   });

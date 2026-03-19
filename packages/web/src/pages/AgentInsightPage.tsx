@@ -22,6 +22,7 @@ import { InsightDetailPanel } from "@/components/features/insights/InsightDetail
 import { CIDetailPanel } from "@/components/features/insights/CIDetailPanel";
 import { InsightRepoSummaryPanel } from "@/components/features/insights/InsightRepoSummaryPanel";
 import { OllamaConfigModal } from "@/components/features/insights/OllamaConfigModal";
+import { FileInspectorModal } from "@/components/features/insights/FileInspectorModal";
 import "@/pages/AgentInsightPage.css";
 
 const HANDLE_H = 8;
@@ -44,6 +45,7 @@ export function AgentInsightPage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [showConfig, setShowConfig] = useState(false);
+  const [inspectedFile, setInspectedFile] = useState<string | null>(null);
   const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [showCIDetail, setShowCIDetail] = useState(false);
@@ -152,6 +154,7 @@ export function AgentInsightPage() {
                   highlightedPath={highlightedPath}
                   selectedPath={selectedFile}
                   onFileSelect={handleFileSelect}
+                  onInspect={setInspectedFile}
                   activeFilter={activeFilter}
                   onClearFilter={() => setActiveFilter(null)}
                 />
@@ -213,6 +216,14 @@ export function AgentInsightPage() {
       </div>
 
       {showConfig && <OllamaConfigModal onClose={() => setShowConfig(false)} />}
+      {inspectedFile && id && (
+        <FileInspectorModal
+          collectionId={id}
+          relativePath={inspectedFile}
+          metricLabels={metricLabels}
+          onClose={() => setInspectedFile(null)}
+        />
+      )}
     </div>
   );
 }

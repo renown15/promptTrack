@@ -1,11 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { chainsApi } from "@/api/endpoints/chains";
+import { useMutate } from "@/hooks/useMutate";
 import type {
   CreateChainInput,
   UpdateChainInput,
   CreateChainVersionInput,
   SerialiseChainInput,
 } from "@prompttrack/shared";
+
+const KEYS = {
+  all: ["chains"] as const,
+};
 
 export function useChains(params?: {
   isArchived?: boolean;
@@ -26,42 +31,29 @@ export function useChain(id: string) {
 }
 
 export function useCreateChain() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreateChainInput) => chainsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chains"] });
-    },
-  });
+  return useMutate(
+    (data: CreateChainInput) => chainsApi.create(data),
+    [KEYS.all]
+  );
 }
 
 export function useUpdateChain(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: UpdateChainInput) => chainsApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chains"] });
-    },
-  });
+  return useMutate(
+    (data: UpdateChainInput) => chainsApi.update(id, data),
+    [KEYS.all]
+  );
 }
 
 export function useCreateChainVersion(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreateChainVersionInput) =>
-      chainsApi.createVersion(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chains", id] });
-    },
-  });
+  return useMutate(
+    (data: CreateChainVersionInput) => chainsApi.createVersion(id, data),
+    [["chains", id]]
+  );
 }
 
 export function useSerialiseChain(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: SerialiseChainInput) => chainsApi.serialise(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["chains", id] });
-    },
-  });
+  return useMutate(
+    (data: SerialiseChainInput) => chainsApi.serialise(id, data),
+    [["chains", id]]
+  );
 }

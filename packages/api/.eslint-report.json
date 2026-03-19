@@ -231,7 +231,29 @@
     "usedDeprecatedRules": []
   },
   {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/routes/insights/ci.routes.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
     "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/routes/insights/insights.routes.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/routes/insights/repo-summary.routes.ts",
     "messages": [],
     "suppressedMessages": [],
     "errorCount": 0,
@@ -265,6 +287,17 @@
   },
   {
     "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/routes/settings/settings.routes.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/routes/tasks/tasks.routes.ts",
     "messages": [],
     "suppressedMessages": [],
     "errorCount": 0,
@@ -330,7 +363,29 @@
     "usedDeprecatedRules": []
   },
   {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/ci.service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
     "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/collection.service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/discovery.per-file.ts",
     "messages": [],
     "suppressedMessages": [],
     "errorCount": 0,
@@ -353,6 +408,17 @@
   },
   {
     "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/docs.service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/insight.analyzer.ts",
     "messages": [],
     "suppressedMessages": [],
     "errorCount": 0,
@@ -419,6 +485,17 @@
   },
   {
     "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/prompt.service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/marklewis/dev/promptTrack/packages/api/src/services/repo-summary.service.ts",
     "messages": [],
     "suppressedMessages": [],
     "errorCount": 0,

@@ -51,6 +51,7 @@ export const CODE_EXTENSIONS = new Set([
   ".go",
   ".rs",
   ".css",
+  ".md",
 ]);
 
 export const SKIP_DIRS = new Set([

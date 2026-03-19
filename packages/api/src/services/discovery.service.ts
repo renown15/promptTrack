@@ -1,5 +1,9 @@
 import { readFile, readdir, stat } from "fs/promises";
 import { join } from "path";
+import {
+  parseCoverageAggregate,
+  parseLintAggregate,
+} from "@/services/discovery.formats.js";
 
 export interface AggregateStatsDTO {
   coverage: { linesPct: number; reportedAt: string } | null;
@@ -57,11 +61,12 @@ export const discoveryService = {
       }
     }
 
-    // Conventional default paths
+    // Conventional default paths (Jest/Vitest and Python coverage.py)
     for (const rel of [
       "coverage/coverage-summary.json",
       ".coverage/coverage-summary.json",
       "test-results/coverage-summary.json",
+      "coverage.json", // Python: `coverage json` / `pytest --cov-report=json`
     ]) {
       const full = join(dir, rel);
       if (await fileExists(full)) return full;
@@ -112,15 +117,11 @@ export const discoveryService = {
       const p = await this.findCoverageReport(d);
       if (!p) continue;
       try {
-        type Summary = Record<
-          string,
-          { lines: { total: number; covered: number } }
-        >;
-        const raw = JSON.parse(await readFile(p, "utf-8")) as Summary;
-        const total = raw["total"];
-        if (total) {
-          covLines += total.lines.total;
-          covCovered += total.lines.covered;
+        const raw = JSON.parse(await readFile(p, "utf-8")) as unknown;
+        const totals = parseCoverageAggregate(raw);
+        if (totals) {
+          covLines += totals.total;
+          covCovered += totals.covered;
           const mtime = new Date((await stat(p)).mtime);
           if (!covReportedAt || mtime > covReportedAt) covReportedAt = mtime;
         }
@@ -138,7 +139,6 @@ export const discoveryService = {
         : null;
 
     // Aggregate lint across all found reports
-    type EslintFile = { errorCount: number; warningCount: number };
     let lintErrors = 0,
       lintWarnings = 0;
     let lintReportedAt: Date | null = null;
@@ -149,11 +149,10 @@ export const discoveryService = {
       if (!p || seenLint.has(p)) continue;
       seenLint.add(p);
       try {
-        const report = JSON.parse(await readFile(p, "utf-8")) as EslintFile[];
-        for (const r of report) {
-          lintErrors += r.errorCount;
-          lintWarnings += r.warningCount;
-        }
+        const report = JSON.parse(await readFile(p, "utf-8")) as unknown[];
+        const { errors, warnings } = parseLintAggregate(report);
+        lintErrors += errors;
+        lintWarnings += warnings;
         const mtime = new Date((await stat(p)).mtime);
         if (!lintReportedAt || mtime > lintReportedAt) lintReportedAt = mtime;
       } catch {
@@ -189,12 +188,14 @@ export const discoveryService = {
       }
     }
 
-    // Conventional paths
+    // Conventional paths (ESLint and Ruff)
     for (const rel of [
       ".eslint-report.json",
       "eslint-report.json",
       "reports/eslint.json",
       ".reports/eslint.json",
+      ".ruff-report.json", // Ruff: `ruff check --output-format=json > .ruff-report.json`
+      "ruff-report.json",
     ]) {
       const full = join(dir, rel);
       if (await fileExists(full)) return full;

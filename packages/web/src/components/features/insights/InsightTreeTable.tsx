@@ -18,6 +18,7 @@ type Props = {
   highlightedPath: string | null;
   selectedPath: string | null;
   onFileSelect: (relativePath: string) => void;
+  onInspect: (relativePath: string) => void;
   activeFilter: InsightFilter | null;
   onClearFilter: () => void;
 };
@@ -42,6 +43,7 @@ export function InsightTreeTable({
   highlightedPath,
   selectedPath,
   onFileSelect,
+  onInspect,
   activeFilter,
   onClearFilter,
 }: Props) {
@@ -165,6 +167,7 @@ export function InsightTreeTable({
               activeFilter={activeFilter}
               metricEntries={metricEntries}
               onSelect={onFileSelect}
+              onInspect={onInspect}
             />
           );
         })}

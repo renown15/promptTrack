@@ -14,6 +14,7 @@ import { fsRoutes } from "@/routes/fs/fs.routes.js";
 import { insightRoutes } from "@/routes/insights/insights.routes.js";
 import { ciRoutes } from "@/routes/insights/ci.routes.js";
 import { repoSummaryRoutes } from "@/routes/insights/repo-summary.routes.js";
+import { fileInspectorRoutes } from "@/routes/insights/file-inspector.routes.js";
 import { settingsRoutes } from "@/routes/settings/settings.routes.js";
 import { tasksRoutes } from "@/routes/tasks/tasks.routes.js";
 import { collectionRepository } from "@/repositories/collection.repository.js";
@@ -70,6 +71,7 @@ async function buildApp() {
   await fastify.register(insightRoutes, { prefix: "/api/collections" });
   await fastify.register(ciRoutes, { prefix: "/api/collections" });
   await fastify.register(repoSummaryRoutes, { prefix: "/api/collections" });
+  await fastify.register(fileInspectorRoutes, { prefix: "/api/collections" });
   await fastify.register(settingsRoutes, { prefix: "/api/settings" });
   await fastify.register(tasksRoutes, { prefix: "/api/tasks" });
 

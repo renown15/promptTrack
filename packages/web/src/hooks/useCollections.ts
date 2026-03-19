@@ -1,102 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { collectionsApi } from "@/api/endpoints/collections";
+import { useMutate } from "@/hooks/useMutate";
 import type {
   CreateCollectionInput,
   UpdateCollectionInput,
 } from "@prompttrack/shared";
 export type { DocFile } from "@/api/endpoints/collections";
 
+const KEYS = {
+  all: ["collections"] as const,
+  tree: ["collections", "tree"] as const,
+};
+
 export function useProjectTree() {
   return useQuery({
-    queryKey: ["collections", "tree"],
+    queryKey: KEYS.tree,
     queryFn: () => collectionsApi.getTree(),
   });
 }
 
 export function useCollections() {
-  return useQuery({
-    queryKey: ["collections"],
-    queryFn: () => collectionsApi.list(),
-  });
-}
-
-export function useCreateCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: CreateCollectionInput) => collectionsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
-}
-
-export function useUpdateCollection(id: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: UpdateCollectionInput) =>
-      collectionsApi.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
-}
-
-export function useDeleteCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => collectionsApi.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
-}
-
-export function useAddPromptToCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      collectionId,
-      promptId,
-    }: {
-      collectionId: string;
-      promptId: string;
-    }) => collectionsApi.addPrompt(collectionId, promptId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
-}
-
-export function useRemovePromptFromCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      collectionId,
-      promptId,
-    }: {
-      collectionId: string;
-      promptId: string;
-    }) => collectionsApi.removePrompt(collectionId, promptId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
-}
-
-export function useAddChainToCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      collectionId,
-      chainId,
-    }: {
-      collectionId: string;
-      chainId: string;
-    }) => collectionsApi.addChain(collectionId, chainId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
+  return useQuery({ queryKey: KEYS.all, queryFn: () => collectionsApi.list() });
 }
 
 export function useCollectionDocs(id: string, enabled: boolean) {
@@ -115,18 +39,52 @@ export function useDocContent(id: string, file: string | null) {
   });
 }
 
+export function useCreateCollection() {
+  return useMutate(
+    (data: CreateCollectionInput) => collectionsApi.create(data),
+    [KEYS.all]
+  );
+}
+
+export function useUpdateCollection(id: string) {
+  return useMutate(
+    (data: UpdateCollectionInput) => collectionsApi.update(id, data),
+    [KEYS.all]
+  );
+}
+
+export function useDeleteCollection() {
+  return useMutate((id: string) => collectionsApi.delete(id), [KEYS.all]);
+}
+
+export function useAddPromptToCollection() {
+  return useMutate(
+    ({ collectionId, promptId }: { collectionId: string; promptId: string }) =>
+      collectionsApi.addPrompt(collectionId, promptId),
+    [KEYS.all]
+  );
+}
+
+export function useRemovePromptFromCollection() {
+  return useMutate(
+    ({ collectionId, promptId }: { collectionId: string; promptId: string }) =>
+      collectionsApi.removePrompt(collectionId, promptId),
+    [KEYS.all]
+  );
+}
+
+export function useAddChainToCollection() {
+  return useMutate(
+    ({ collectionId, chainId }: { collectionId: string; chainId: string }) =>
+      collectionsApi.addChain(collectionId, chainId),
+    [KEYS.all]
+  );
+}
+
 export function useRemoveChainFromCollection() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      collectionId,
-      chainId,
-    }: {
-      collectionId: string;
-      chainId: string;
-    }) => collectionsApi.removeChain(collectionId, chainId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["collections"] });
-    },
-  });
+  return useMutate(
+    ({ collectionId, chainId }: { collectionId: string; chainId: string }) =>
+      collectionsApi.removeChain(collectionId, chainId),
+    [KEYS.all]
+  );
 }

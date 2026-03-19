@@ -42,6 +42,7 @@ export function InsightSummaryPanel({
 }: Props) {
   const totalLines = files.reduce((s, f) => s + f.lineCount, 0);
   const avgLines = files.length > 0 ? Math.round(totalLines / files.length) : 0;
+  const mdCount = files.filter((f) => f.relativePath.endsWith(".md")).length;
   const metricEntries = Object.entries(metricLabels);
   const health = computeHealth(
     files,
@@ -70,6 +71,7 @@ export function InsightSummaryPanel({
           {avgLines > 0 && (
             <StatRow label="avg / file" value={String(avgLines)} />
           )}
+          {mdCount > 0 && <StatRow label="md files" value={String(mdCount)} />}
         </Tile>
 
         <Tile label="git">

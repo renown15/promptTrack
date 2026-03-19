@@ -8,7 +8,9 @@ Always maintain `/Users/marklewis/dev/promptTrack/TASKS.md` throughout every tas
 2. **After completing each step**: immediately update the file, marking that item `- [x]`
 3. **When done**: reset the file to `## Status: idle`
 
-Never batch updates — update after every individual step, not at the end.
+**Never batch updates.** Update TASKS.md after every individual step — not at the end.
+This means: write the file, do the step, write the file again. Every time. No exceptions.
+The file is visible live in the UI; users can see if you are skipping updates.
 
 ## Always run before declaring work complete
 
@@ -69,3 +71,31 @@ Unit tests alone are not sufficient. `make check` must pass.
 - pnpm workspaces — use `make` targets, not pnpm directly
 - Ports: web=5173, api=3051, postgres=5451
 - `packages/shared` — Zod schemas shared by api and web
+
+## Agent Insight — supported report formats
+
+The insight scanner (`discovery.service.ts`, `discovery.per-file.ts`) reads coverage and lint reports from the collection's directory. Both aggregate stats (pipeline tile) and per-file overlays are derived from these files.
+
+### Coverage
+
+| Format                     | File                             | Language |
+| -------------------------- | -------------------------------- | -------- |
+| Jest / Vitest JSON summary | `coverage/coverage-summary.json` | JS / TS  |
+| Python coverage.py JSON    | `coverage.json`                  | Python   |
+
+- Jest/Vitest: detected by presence of `"total"` key; per-file entries are absolute paths with `lines.pct`
+- Python: detected by presence of `"totals"` key; per-file entries are under `"files"` with `summary.percent_covered`
+
+### Lint
+
+| Format      | File                  | Language |
+| ----------- | --------------------- | -------- |
+| ESLint JSON | `.eslint-report.json` | JS / TS  |
+| Ruff JSON   | `.ruff-report.json`   | Python   |
+
+- ESLint: array of `{ filePath, errorCount, warningCount }` — one entry per file
+- Ruff: array of `{ filename, code, message }` — one entry per violation; errors counted by grouping
+
+### Adding a new format
+
+To add support for another language's coverage or lint tool, update `parseCoverageAggregate` / `parseCoveragePerFile` / `parseLintAggregate` / `parseLintPerFile` in those two service files. Detection is format-based (key sniffing), so no config flags are needed.

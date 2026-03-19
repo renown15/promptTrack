@@ -9,6 +9,7 @@ type Props = {
   file: FileSnapshotDTO;
   metricLabels: Record<string, string>;
   onRetry?: () => void;
+  onInspect?: (path: string) => void;
 };
 
 function timeAgo(iso: string): string {
@@ -25,7 +26,12 @@ function isMetricError(v: unknown): v is FileMetricError {
   return typeof v === "object" && v !== null && "error" in v;
 }
 
-export function FileInsightCard({ file, metricLabels, onRetry }: Props) {
+export function FileInsightCard({
+  file,
+  metricLabels,
+  onRetry,
+  onInspect,
+}: Props) {
   const labelEntries = Object.entries(metricLabels);
 
   const failedMetrics = labelEntries.flatMap(([name, label]) => {
@@ -40,6 +46,15 @@ export function FileInsightCard({ file, metricLabels, onRetry }: Props) {
       <div className="file-insight-card__header">
         <span className="file-insight-card__name">{file.name}</span>
         <span className="file-insight-card__type">.{file.fileType}</span>
+        {onInspect && (
+          <button
+            className="file-insight-card__inspect-btn"
+            title="Inspect file"
+            onClick={() => onInspect(file.relativePath)}
+          >
+            👓
+          </button>
+        )}
       </div>
       <div className="file-insight-card__meta">
         <span>{file.lineCount}L</span>

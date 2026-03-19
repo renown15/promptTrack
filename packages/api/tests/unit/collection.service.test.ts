@@ -103,6 +103,30 @@ describe("collectionService", () => {
         expect.objectContaining({ name: "Updated" })
       );
     });
+
+    it("passes description and directory when provided", async () => {
+      vi.mocked(collectionRepository.findById).mockResolvedValue(
+        baseCollection
+      );
+      vi.mocked(collectionRepository.update).mockResolvedValue({
+        ...baseCollection,
+        description: "new desc",
+        directory: "/some/dir",
+      } as never);
+
+      await collectionService.update("col1", {
+        description: "new desc",
+        directory: "/some/dir",
+      });
+
+      expect(collectionRepository.update).toHaveBeenCalledWith(
+        "col1",
+        expect.objectContaining({
+          description: "new desc",
+          directory: "/some/dir",
+        })
+      );
+    });
   });
 
   describe("delete", () => {
@@ -245,6 +269,71 @@ describe("collectionService", () => {
       expect(tree.ungrouped.chains).toHaveLength(1);
       expect(tree.ungrouped.chains[0].prompts).toHaveLength(1);
       expect(tree.ungrouped.chains[0].prompts[0].id).toBe("p1");
+    });
+
+    it("maps chain prompts from chains inside collections", async () => {
+      vi.mocked(collectionRepository.getTree).mockResolvedValue({
+        collections: [
+          {
+            id: "col1",
+            name: "Col",
+            description: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            prompts: [],
+            chains: [
+              {
+                chainId: "c1",
+                collectionId: "col1",
+                chain: {
+                  id: "c1",
+                  name: "Chain A",
+                  slug: "chain-a",
+                  versions: [
+                    {
+                      nodes: [
+                        {
+                          prompt: {
+                            id: "p1",
+                            name: "P1",
+                            slug: "p-1",
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        ],
+        ungroupedPrompts: [],
+        ungroupedChains: [],
+      });
+
+      const tree = await collectionService.getTree();
+
+      expect(tree.collections[0].chains).toHaveLength(1);
+      expect(tree.collections[0].chains[0].prompts).toHaveLength(1);
+      expect(tree.collections[0].chains[0].prompts[0].id).toBe("p1");
+    });
+
+    it("returns empty prompts for chains with no versions", async () => {
+      vi.mocked(collectionRepository.getTree).mockResolvedValue({
+        collections: [],
+        ungroupedPrompts: [],
+        ungroupedChains: [
+          {
+            id: "c1",
+            name: "Empty Chain",
+            slug: "empty-chain",
+            versions: [],
+          },
+        ],
+      });
+
+      const tree = await collectionService.getTree();
+      expect(tree.ungrouped.chains[0].prompts).toEqual([]);
     });
   });
 });
