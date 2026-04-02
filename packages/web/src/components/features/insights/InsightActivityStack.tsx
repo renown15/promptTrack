@@ -83,6 +83,13 @@ export function InsightActivityStack({
                         : file.lineDelta}
                     </span>
                   )}
+                  {file.problemScore > 0 && (
+                    <span
+                      className={`insight-activity-stack__score insight-activity-stack__score--${file.problemScore >= 10 ? "high" : file.problemScore >= 5 ? "mid" : "low"}`}
+                    >
+                      ⚠ {file.problemScore}
+                    </span>
+                  )}
                   <span className="insight-activity-stack__card-time">
                     {analyzing ? "analyzing…" : timeAgo(file.updatedAt)}
                   </span>

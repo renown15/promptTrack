@@ -43,6 +43,22 @@
     transition-colors shrink-0;
 }
 
+.file-insight-card__score {
+  @apply text-[10px] font-medium ml-auto shrink-0;
+}
+
+.file-insight-card__score--low {
+  @apply text-yellow-600;
+}
+
+.file-insight-card__score--mid {
+  @apply text-orange-500;
+}
+
+.file-insight-card__score--high {
+  @apply text-red-600;
+}
+
 .file-insight-card__path {
   @apply text-[10px] font-mono text-muted-foreground/60 truncate mt-auto;
 }

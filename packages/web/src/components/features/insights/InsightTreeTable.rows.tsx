@@ -41,6 +41,15 @@ export function FolderTableRow({ row, metricNames, onToggle }: FolderRowProps) {
       <div className="insight-tree-table__col insight-tree-table__col--lines">
         {row.stats.totalLines.toLocaleString()}
       </div>
+      <div className="insight-tree-table__col insight-tree-table__col--score">
+        {row.stats.maxProblemScore > 0 && (
+          <span
+            className={`insight-tree-table__score insight-tree-table__score--${row.stats.maxProblemScore >= 10 ? "high" : row.stats.maxProblemScore >= 5 ? "mid" : "low"}`}
+          >
+            {row.stats.maxProblemScore}
+          </span>
+        )}
+      </div>
       {metricNames.map((name) => {
         const counts = row.stats.metricCounts[name];
         return (
@@ -129,6 +138,15 @@ export function FileTableRow({
       </div>
       <div className="insight-tree-table__col insight-tree-table__col--lines">
         {row.file.lineCount}
+      </div>
+      <div className="insight-tree-table__col insight-tree-table__col--score">
+        {row.file.problemScore > 0 && (
+          <span
+            className={`insight-tree-table__score insight-tree-table__score--${row.file.problemScore >= 10 ? "high" : row.file.problemScore >= 5 ? "mid" : "low"}`}
+          >
+            {row.file.problemScore}
+          </span>
+        )}
       </div>
       {metricEntries.map(([name, label]) => (
         <div

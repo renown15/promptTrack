@@ -3,7 +3,17 @@
   "ignorePaths": [],
   "dictionaryDefinitions": [],
   "dictionaries": [],
-  "words": ["ollama"],
+  "words": [
+    "cuid",
+    "modelcontextprotocol",
+    "ollama",
+    "prompttrack",
+    "pytest",
+    "serialise",
+    "serialised",
+    "serialiser",
+    "unrun"
+  ],
   "ignoreWords": [],
   "import": []
 }

@@ -128,6 +128,7 @@ export function AgentInsightPage() {
         aggregate={aggregate ?? null}
         ciStatus={ciStatus ?? null}
         activeFilter={activeFilter}
+        gitignoreWarnings={state?.gitignoreWarnings ?? []}
         onFilterToggle={handleFilterToggle}
         onCIClick={handleCIClick}
       />

@@ -1,32 +1,34 @@
-import { useEffect, useCallback, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { insightsApi, type FileSnapshotDTO } from "@/api/endpoints/insights";
+import type { FileSnapshotDTO } from "@/api/endpoints/insights";
+import { insightsApi } from "@/api/endpoints/insights";
 import { useAuthStore } from "@/stores/authStore";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef } from "react";
 
 export type {
-  FileSnapshotDTO,
-  InsightStateDTO,
+  AggregateStatsDTO,
+  CIJobDTO,
+  CIStatusDTO,
+  CIStepDTO,
+  CoverageDetailDTO,
+  FileDetailDTO,
   FileMetric,
   FileMetricError,
-  FileDetailDTO,
-  CoverageDetailDTO,
+  FileSnapshotDTO,
+  InsightFilter,
+  InsightStateDTO,
   LintDetailDTO,
   LintMessageDTO,
-  AggregateStatsDTO,
-  CIStatusDTO,
-  CIJobDTO,
-  CIStepDTO,
-  InsightFilter,
 } from "@/api/endpoints/insights";
 
-// Read-only: shares cache with useInsights but does not open an SSE connection
-export function useInsightFilesCache(collectionId: string) {
-  return useQuery({
-    queryKey: ["insights", collectionId],
-    queryFn: () => insightsApi.getState(collectionId),
-    enabled: !!collectionId,
-  });
-}
+export {
+  useCIStatus,
+  useFileDetail,
+  useGenerateRepoSummary,
+  useInsightAggregate,
+  useInsightFilesCache,
+  useRetryInsightFile,
+  useScanInsights,
+} from "@/hooks/useInsights.auxiliary";
 
 export function useInsights(collectionId: string, onScanComplete?: () => void) {
   const onScanCompleteRef = useRef(onScanComplete);
@@ -123,17 +125,8 @@ export function useInsights(collectionId: string, onScanComplete?: () => void) {
       onScanCompleteRef.current?.();
     });
 
-    return () => es.close();
-  }, [collectionId, mergeFile, queryClient]);
-
-  return query;
-}
-
-export function useScanInsights(collectionId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: () => insightsApi.scan(collectionId),
-    onSuccess: () => {
+    es.addEventListener("gitignore_updated", (e) => {
+      const data = JSON.parse(e.data) as { warnings: string[] };
       queryClient.setQueryData(
         ["insights", collectionId],
         (
@@ -142,70 +135,13 @@ export function useScanInsights(collectionId: string) {
             : never
         ) => {
           if (!prev) return prev;
-          return {
-            ...prev,
-            scanning: true,
-            files: prev.files.map((f) => {
-              const hasErrors = Object.values(f.metrics).some(
-                (v) =>
-                  v === null ||
-                  (typeof v === "object" && v !== null && "error" in v)
-              );
-              return hasErrors ? { ...f, metrics: {} } : f;
-            }),
-          };
+          return { ...prev, gitignoreWarnings: data.warnings };
         }
       );
-      void queryClient.invalidateQueries({
-        queryKey: ["insight-aggregate", collectionId],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["ci-status", collectionId],
-      });
-    },
-  });
-}
+    });
 
-export function useFileDetail(
-  collectionId: string,
-  relativePath: string | null
-) {
-  return useQuery({
-    queryKey: ["insight-detail", collectionId, relativePath],
-    queryFn: () => insightsApi.getFileDetail(collectionId, relativePath!),
-    enabled: !!collectionId && !!relativePath,
-    staleTime: 0,
-  });
-}
+    return () => es.close();
+  }, [collectionId, mergeFile, queryClient]);
 
-export function useRetryInsightFile(collectionId: string) {
-  return useMutation({
-    mutationFn: (relativePath: string) =>
-      insightsApi.retryFile(collectionId, relativePath),
-  });
-}
-
-export function useInsightAggregate(collectionId: string) {
-  return useQuery({
-    queryKey: ["insight-aggregate", collectionId],
-    queryFn: () => insightsApi.getAggregateStats(collectionId),
-    enabled: !!collectionId,
-    staleTime: 60_000,
-  });
-}
-
-export function useGenerateRepoSummary(collectionId: string) {
-  return useMutation({
-    mutationFn: () => insightsApi.generateRepoSummary(collectionId),
-  });
-}
-
-export function useCIStatus(collectionId: string) {
-  return useQuery({
-    queryKey: ["ci-status", collectionId],
-    queryFn: () => insightsApi.getCIStatus(collectionId),
-    enabled: !!collectionId,
-    staleTime: 60_000,
-    refetchInterval: 120_000,
-  });
+  return query;
 }

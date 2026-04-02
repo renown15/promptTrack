@@ -13,6 +13,19 @@ export interface DocFile {
   updatedAt: string;
 }
 
+export interface ApiKeyRecord {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  collectionId: string;
+  createdAt: string;
+  revokedAt: string | null;
+}
+
+export interface CreatedApiKey extends ApiKeyRecord {
+  key: string;
+}
+
 export const collectionsApi = {
   list: async (): Promise<CollectionDTO[]> => {
     const response = await apiClient.get<CollectionDTO[]>("/collections");
@@ -71,5 +84,24 @@ export const collectionsApi = {
       { params: { file } }
     );
     return response.data.content;
+  },
+
+  listApiKeys: async (id: string): Promise<ApiKeyRecord[]> => {
+    const response = await apiClient.get<ApiKeyRecord[]>(
+      `/collections/${id}/api-keys`
+    );
+    return response.data;
+  },
+
+  createApiKey: async (id: string, name: string): Promise<CreatedApiKey> => {
+    const response = await apiClient.post<CreatedApiKey>(
+      `/collections/${id}/api-keys`,
+      { name }
+    );
+    return response.data;
+  },
+
+  revokeApiKey: async (id: string, keyId: string): Promise<void> => {
+    await apiClient.delete(`/collections/${id}/api-keys/${keyId}`);
   },
 };

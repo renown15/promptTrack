@@ -64,6 +64,13 @@ export function FileInsightCard({
             Cov: {Math.round(file.coverage)}%
           </span>
         )}
+        {file.problemScore > 0 && (
+          <span
+            className={`file-insight-card__score file-insight-card__score--${file.problemScore >= 10 ? "high" : file.problemScore >= 5 ? "mid" : "low"}`}
+          >
+            ⚠ {file.problemScore}
+          </span>
+        )}
       </div>
       {labelEntries.length > 0 && (
         <div className="file-insight-card__metrics">

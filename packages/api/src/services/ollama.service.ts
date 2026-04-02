@@ -5,6 +5,7 @@ export interface MetricDefinition {
   name: string;
   label: string;
   description: string;
+  trackSensitiveRefs?: boolean;
 }
 
 export const DEFAULT_METRICS: MetricDefinition[] = [
@@ -30,7 +31,8 @@ export const DEFAULT_METRICS: MetricDefinition[] = [
     name: "security",
     label: "Sec",
     description:
-      "Does this file contain security vulnerabilities or risky patterns? Look for injection risks, hardcoded secrets, insecure defaults, improper input validation, unsafe deserialization, or exposure of sensitive data.",
+      "Does this file contain security vulnerabilities or risky patterns? Look for injection risks, hardcoded secrets, insecure defaults, improper input validation, unsafe deserialization, or exposure of sensitive data. Also identify any file paths or filename patterns referenced, loaded, or written by this code that contain sensitive data (e.g. .env files, credential files, private keys, secrets config) and list them in sensitiveRefs.",
+    trackSensitiveRefs: true,
   },
   {
     name: "eng_quality",
@@ -60,6 +62,14 @@ function buildPrompt(
       ? content.slice(0, MAX_CONTENT_CHARS) + "\n... (truncated)"
       : content;
 
+  const responseFormat = metric.trackSensitiveRefs
+    ? `{"status":"green","summary":"one sentence","sensitiveRefs":["path/to/file","*.ext"]}`
+    : `{"status":"green","summary":"one sentence"}`;
+
+  const extraInstruction = metric.trackSensitiveRefs
+    ? `\nsensitiveRefs must be an array of file paths or glob patterns referenced in this code that should be excluded from version control (e.g. ".env", ".env.local", "secrets.json", "*.pem"). Use [] if none found.`
+    : "";
+
   return `Review this file for: ${metric.description}
 
 File: ${relativePath} (${lineCount} lines, type: .${fileType})
@@ -69,9 +79,9 @@ ${body}
 \`\`\`
 
 Respond with ONLY this JSON, no other text:
-{"status":"green","summary":"one sentence"}
+${responseFormat}
 
-status must be "green" (good), "amber" (minor concerns), or "red" (significant issues).`;
+status must be "green" (good), "amber" (minor concerns), or "red" (significant issues).${extraInstruction}`;
 }
 
 async function callOllama(
@@ -101,11 +111,21 @@ function parseMetricResponse(raw: string): MetricResult {
       throw new Error(`No JSON in response: ${trimmed.slice(0, 120)}`);
     obj = JSON.parse(match[0]);
   }
-  const parsed = obj as { status?: string; summary?: string };
+  const parsed = obj as {
+    status?: string;
+    summary?: string;
+    sensitiveRefs?: unknown;
+  };
   const status = parsed.status as "green" | "amber" | "red";
   if (!["green", "amber", "red"].includes(status))
     throw new Error(`Unexpected status value: ${JSON.stringify(status)}`);
-  return { status, summary: parsed.summary ?? "" };
+  const result: MetricResult = { status, summary: parsed.summary ?? "" };
+  if (Array.isArray(parsed.sensitiveRefs)) {
+    result.sensitiveRefs = parsed.sensitiveRefs.filter(
+      (r): r is string => typeof r === "string" && r.length > 0
+    );
+  }
+  return result;
 }
 
 export const ollamaService = {

@@ -5,7 +5,7 @@ import type {
   CreateCollectionInput,
   UpdateCollectionInput,
 } from "@prompttrack/shared";
-export type { DocFile } from "@/api/endpoints/collections";
+export type { DocFile, ApiKeyRecord } from "@/api/endpoints/collections";
 
 const KEYS = {
   all: ["collections"] as const,
@@ -86,5 +86,26 @@ export function useRemoveChainFromCollection() {
     ({ collectionId, chainId }: { collectionId: string; chainId: string }) =>
       collectionsApi.removeChain(collectionId, chainId),
     [KEYS.all]
+  );
+}
+
+export function useApiKeys(collectionId: string) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "api-keys"],
+    queryFn: () => collectionsApi.listApiKeys(collectionId),
+  });
+}
+
+export function useCreateApiKey(collectionId: string) {
+  return useMutate(
+    (name: string) => collectionsApi.createApiKey(collectionId, name),
+    [["collections", collectionId, "api-keys"]]
+  );
+}
+
+export function useRevokeApiKey(collectionId: string) {
+  return useMutate(
+    (keyId: string) => collectionsApi.revokeApiKey(collectionId, keyId),
+    [["collections", collectionId, "api-keys"]]
   );
 }

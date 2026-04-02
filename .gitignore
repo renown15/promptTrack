@@ -54,3 +54,6 @@ playwright/.cache/
 # Changeset
 .changeset/*.md
 !.changeset/config.json
+
+# MCP server config (contains credentials)
+.mcp.json

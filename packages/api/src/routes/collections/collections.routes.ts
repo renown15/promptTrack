@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { collectionService } from "@/services/collection.service.js";
 import { docsService } from "@/services/docs.service.js";
+import { apiKeyService } from "@/services/api-key.service.js";
 import { z } from "zod";
 import {
   CreateCollectionSchema,
@@ -8,6 +9,8 @@ import {
   CollectionIdParamSchema,
   CollectionPromptParamSchema,
   CollectionChainParamSchema,
+  ApiKeyParamSchema,
+  CreateApiKeyBodySchema,
 } from "@/routes/collections/collections.schemas.js";
 
 export async function collectionRoutes(fastify: FastifyInstance) {
@@ -77,6 +80,24 @@ export async function collectionRoutes(fastify: FastifyInstance) {
       return reply.code(400).send({ error: "No directory set" });
     const files = await docsService.list(collection.directory);
     return files;
+  });
+
+  fastify.get("/:id/api-keys", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    return apiKeyService.list(id);
+  });
+
+  fastify.post("/:id/api-keys", async (request, reply) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { name } = CreateApiKeyBodySchema.parse(request.body);
+    const { record, plaintext } = await apiKeyService.generate(id, name);
+    return reply.code(201).send({ ...record, key: plaintext });
+  });
+
+  fastify.delete("/:id/api-keys/:keyId", async (request, reply) => {
+    const { id, keyId } = ApiKeyParamSchema.parse(request.params);
+    await apiKeyService.revoke(keyId, id);
+    return reply.code(204).send();
   });
 
   fastify.get("/:id/docs/content", async (request, reply) => {

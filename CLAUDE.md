@@ -15,7 +15,7 @@ The file is visible live in the UI; users can see if you are skipping updates.
 ## Always run before declaring work complete
 
 ```
-make check   # typecheck + vite build
+make check   # lint + typecheck + vite build
 ```
 
 Unit tests alone are not sufficient. `make check` must pass.

@@ -82,25 +82,41 @@ model Collection {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  prompts        PromptCollection[]
-  chains         ChainCollection[]
-  fileSnapshots  FileSnapshotRecord[]
+  prompts       PromptCollection[]
+  chains        ChainCollection[]
+  fileSnapshots FileSnapshotRecord[]
+  apiKeys       ApiKey[]
 
   @@map("collections")
 }
 
-model FileSnapshotRecord {
-  id           String     @id @default(cuid())
-  collectionId String     @map("collection_id")
-  relativePath String     @map("relative_path")
+model ApiKey {
+  id           String    @id @default(cuid())
   name         String
-  fileType     String     @map("file_type")
-  lineCount    Int        @map("line_count")
-  coverage     Float?
-  metrics      Json       @default("{}")
-  scannedAt    DateTime   @default(now()) @map("scanned_at")
+  keyHash      String    @unique @map("key_hash")
+  keyPrefix    String    @map("key_prefix")
+  collectionId String    @map("collection_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  revokedAt    DateTime? @map("revoked_at")
 
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId])
+  @@map("api_keys")
+}
+
+model FileSnapshotRecord {
+  id           String   @id @default(cuid())
+  collectionId String   @map("collection_id")
+  relativePath String   @map("relative_path")
+  name         String
+  fileType     String   @map("file_type")
+  lineCount    Int      @map("line_count")
+  coverage     Float?
+  metrics      Json     @default("{}")
+  scannedAt    DateTime @default(now()) @map("scanned_at")
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@index([collectionId, relativePath])
   @@index([collectionId, scannedAt])
@@ -141,17 +157,17 @@ model Prompt {
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  parentId     String?  @map("parent_id")
-  parent       Prompt?  @relation("PromptHierarchy", fields: [parentId], references: [id])
-  children     Prompt[] @relation("PromptHierarchy")
+  parentId String?  @map("parent_id")
+  parent   Prompt?  @relation("PromptHierarchy", fields: [parentId], references: [id])
+  children Prompt[] @relation("PromptHierarchy")
 
   createdBy String @map("created_by")
   creator   User   @relation(fields: [createdBy], references: [id])
 
-  versions     PromptVersion[]
-  chainNodes   ChainNode[]
-  auditLogs    AuditLog[]
-  collections  PromptCollection[]
+  versions    PromptVersion[]
+  chainNodes  ChainNode[]
+  auditLogs   AuditLog[]
+  collections PromptCollection[]
 
   @@index([createdBy])
   @@index([environment])
@@ -195,15 +211,15 @@ model TemplateVariable {
 }
 
 model Chain {
-  id             String      @id @default(cuid())
+  id             String   @id @default(cuid())
   name           String
-  slug           String      @unique
+  slug           String   @unique
   description    String?
   tags           String[]
-  currentVersion Int         @default(1) @map("current_version")
-  isArchived     Boolean     @default(false) @map("is_archived")
-  createdAt      DateTime    @default(now()) @map("created_at")
-  updatedAt      DateTime    @updatedAt @map("updated_at")
+  currentVersion Int      @default(1) @map("current_version")
+  isArchived     Boolean  @default(false) @map("is_archived")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   createdBy String @map("created_by")
   creator   User   @relation(fields: [createdBy], references: [id])

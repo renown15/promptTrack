@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "prompttrack": {
+      "url": "http://localhost:3051/api/mcp",
+      "headers": {
+        "Authorization": "Bearer pt_your_key_here"
+      }
+    }
+  }
+}

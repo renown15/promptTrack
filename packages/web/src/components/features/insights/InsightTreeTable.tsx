@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
 import {
   buildTree,
+  buildTypeTree,
   flattenVisible,
   collectAllFolderPaths,
   rowId,
@@ -10,6 +11,7 @@ import {
   FolderTableRow,
   FileTableRow,
 } from "@/components/features/insights/InsightTreeTable.rows";
+import { InsightTreeTableToolbar } from "@/components/features/insights/InsightTreeTableToolbar";
 import "@/components/features/insights/InsightTreeTable.css";
 
 type Props = {
@@ -23,20 +25,6 @@ type Props = {
   onClearFilter: () => void;
 };
 
-function filterLabel(filter: InsightFilter): string {
-  if (filter.type === "git")
-    return filter.status === "modified" ? "Modified files" : "Untracked files";
-  if (filter.type === "coverage") return "Files with coverage";
-  if (filter.type === "lint") return "Files with lint errors";
-  const statusLabels: Record<string, string> = {
-    red: "critical",
-    amber: "warn",
-    green: "ok",
-    error: "error",
-  };
-  return `${filter.name} — ${statusLabels[filter.status] ?? filter.status}`;
-}
-
 export function InsightTreeTable({
   files,
   metricLabels,
@@ -49,6 +37,7 @@ export function InsightTreeTable({
 }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [flashPath, setFlashPath] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"tree" | "type" | "score">("tree");
 
   const metricNames = useMemo(() => Object.keys(metricLabels), [metricLabels]);
   const metricEntries = useMemo(
@@ -57,29 +46,59 @@ export function InsightTreeTable({
   );
 
   const tree = useMemo(() => buildTree(files), [files]);
+  const typeTree = useMemo(() => buildTypeTree(files), [files]);
+  const activeTree =
+    viewMode === "tree" || viewMode === "score" ? tree : typeTree;
   const allFolderPaths = useMemo(
-    () => new Set(collectAllFolderPaths(tree)),
-    [tree]
+    () => new Set(collectAllFolderPaths(activeTree)),
+    [activeTree]
   );
   const effectiveExpanded = activeFilter ? allFolderPaths : expanded;
 
+  const scoreRows = useMemo(
+    () =>
+      [...files]
+        .filter((f) => f.problemScore > 0)
+        .sort((a, b) => b.problemScore - a.problemScore)
+        .map((f) => ({ kind: "file" as const, file: f, depth: 0 })),
+    [files]
+  );
+
   const rows = useMemo(
-    () => flattenVisible(tree, 0, effectiveExpanded, metricNames, true),
-    [tree, effectiveExpanded, metricNames]
+    () =>
+      viewMode === "score"
+        ? scoreRows
+        : flattenVisible(activeTree, 0, effectiveExpanded, metricNames, true),
+    [viewMode, scoreRows, activeTree, effectiveExpanded, metricNames]
   );
 
   useEffect(() => {
+    setExpanded(new Set());
+  }, [viewMode]);
+
+  useEffect(() => {
     if (!highlightedPath) return;
-    const parts = highlightedPath.split("/");
-    const ancestors = parts
-      .slice(0, -1)
-      .map((_, i) => parts.slice(0, i + 1).join("/"))
-      .filter(Boolean);
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      ancestors.forEach((p) => next.add(p));
-      return next;
-    });
+    if (viewMode === "type") {
+      const file = files.find((f) => f.relativePath === highlightedPath);
+      if (file) {
+        setExpanded((prev) => {
+          const next = new Set(prev);
+          next.add(`__type__${file.fileType}`);
+          return next;
+        });
+      }
+    } else {
+      const parts = highlightedPath.split("/");
+      const ancestors = parts
+        .slice(0, -1)
+        .map((_, i) => parts.slice(0, i + 1).join("/"))
+        .filter(Boolean);
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        ancestors.forEach((p) => next.add(p));
+        return next;
+      });
+    }
     setFlashPath(highlightedPath);
     setTimeout(() => {
       document
@@ -101,33 +120,17 @@ export function InsightTreeTable({
 
   return (
     <div className="insight-tree-table">
-      <div className="insight-tree-table__toolbar">
-        <button
-          className="insight-tree-table__toolbar-btn"
-          onClick={() => setExpanded(new Set(collectAllFolderPaths(tree)))}
-        >
-          Expand all
-        </button>
-        <button
-          className="insight-tree-table__toolbar-btn"
-          onClick={() => setExpanded(new Set())}
-        >
-          Collapse all
-        </button>
-        {activeFilter && (
-          <span className="insight-tree-table__filter-banner">
-            <span className="insight-tree-table__filter-label">
-              {filterLabel(activeFilter)} ({files.length})
-            </span>
-            <button
-              className="insight-tree-table__filter-clear"
-              onClick={onClearFilter}
-            >
-              ✕ clear
-            </button>
-          </span>
-        )}
-      </div>
+      <InsightTreeTableToolbar
+        viewMode={viewMode}
+        onViewMode={setViewMode}
+        activeFilter={activeFilter}
+        fileCount={files.length}
+        onExpandAll={() =>
+          setExpanded(new Set(collectAllFolderPaths(activeTree)))
+        }
+        onCollapseAll={() => setExpanded(new Set())}
+        onClearFilter={onClearFilter}
+      />
 
       <div className="insight-tree-table__header">
         <div className="insight-tree-table__col insight-tree-table__col--name">
@@ -135,6 +138,9 @@ export function InsightTreeTable({
         </div>
         <div className="insight-tree-table__col insight-tree-table__col--lines">
           Lines
+        </div>
+        <div className="insight-tree-table__col insight-tree-table__col--score">
+          Score
         </div>
         {metricEntries.map(([name, label]) => (
           <div

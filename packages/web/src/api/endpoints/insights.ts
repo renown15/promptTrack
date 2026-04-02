@@ -20,12 +20,14 @@ export interface FileSnapshotDTO {
   lintErrors: number | null;
   gitStatus: "untracked" | "modified" | "clean" | null;
   metrics: Record<string, FileMetric | FileMetricError | "pending" | null>;
+  problemScore: number;
 }
 
 export interface InsightStateDTO {
   files: FileSnapshotDTO[];
   lastScan: string | null;
   scanning: boolean;
+  gitignoreWarnings: string[];
 }
 
 export interface MetricDefinition {
@@ -113,14 +115,6 @@ export interface AggregateStatsDTO {
   lint: { errors: number; warnings: number; reportedAt: string } | null;
 }
 
-export interface OllamaConfigDTO {
-  id: string;
-  endpoint: string;
-  model: string;
-  metrics: Record<string, boolean>;
-  defaultMetrics: MetricDefinition[];
-}
-
 export const insightsApi = {
   getState: async (collectionId: string): Promise<InsightStateDTO> => {
     const r = await apiClient.get<InsightStateDTO>(
@@ -179,31 +173,5 @@ export const insightsApi = {
       `/collections/${collectionId}/insights/ci`
     );
     return r.data;
-  },
-
-  getOllamaConfig: async (): Promise<OllamaConfigDTO> => {
-    const r = await apiClient.get<OllamaConfigDTO>("/settings/ollama");
-    return r.data;
-  },
-
-  updateOllamaConfig: async (
-    data: Omit<OllamaConfigDTO, "id" | "defaultMetrics">
-  ): Promise<OllamaConfigDTO> => {
-    const r = await apiClient.put<OllamaConfigDTO>("/settings/ollama", data);
-    return r.data;
-  },
-
-  testOllamaConnection: async (endpoint: string): Promise<boolean> => {
-    const r = await apiClient.post<{ ok: boolean }>("/settings/ollama/test", {
-      endpoint,
-    });
-    return r.data.ok;
-  },
-
-  getOllamaModels: async (endpoint: string): Promise<string[]> => {
-    const r = await apiClient.get<{ models: string[] }>(
-      `/settings/ollama/models?endpoint=${encodeURIComponent(endpoint)}`
-    );
-    return r.data.models;
   },
 };

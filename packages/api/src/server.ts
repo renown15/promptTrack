@@ -17,6 +17,8 @@ import { repoSummaryRoutes } from "@/routes/insights/repo-summary.routes.js";
 import { fileInspectorRoutes } from "@/routes/insights/file-inspector.routes.js";
 import { settingsRoutes } from "@/routes/settings/settings.routes.js";
 import { tasksRoutes } from "@/routes/tasks/tasks.routes.js";
+import { agentRoutes } from "@/routes/agent/agent.routes.js";
+import { mcpRoutes } from "@/routes/mcp/mcp.routes.js";
 import { collectionRepository } from "@/repositories/collection.repository.js";
 import { watcherService } from "@/services/watcher.service.js";
 import { seedCache } from "@/services/insight.service.js";
@@ -74,6 +76,8 @@ async function buildApp() {
   await fastify.register(fileInspectorRoutes, { prefix: "/api/collections" });
   await fastify.register(settingsRoutes, { prefix: "/api/settings" });
   await fastify.register(tasksRoutes, { prefix: "/api/tasks" });
+  await fastify.register(agentRoutes, { prefix: "/api/agent" });
+  await fastify.register(mcpRoutes, { prefix: "/api" });
 
   fastify.get("/health", async () => ({
     status: "ok",

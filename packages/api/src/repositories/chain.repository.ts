@@ -30,9 +30,15 @@ type UpdateChainData = {
 export const chainRepository = {
   async findAll(filters?: {
     isArchived?: boolean | undefined;
+    collectionId?: string | undefined;
   }): Promise<ChainRecord[]> {
     return prisma.chain.findMany({
-      where: { isArchived: filters?.isArchived ?? false },
+      where: {
+        isArchived: filters?.isArchived ?? false,
+        ...(filters?.collectionId !== undefined && {
+          collections: { some: { collectionId: filters.collectionId } },
+        }),
+      },
       orderBy: { updatedAt: "desc" },
     });
   },

@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { ollamaService, DEFAULT_METRICS } from "@/services/ollama.service.js";
+import { getModelStatuses, pullModel } from "@/services/ollama.models.js";
 
 const OllamaConfigBodySchema = z.object({
   endpoint: z.string().url(),
@@ -33,5 +34,42 @@ export async function settingsRoutes(fastify: FastifyInstance) {
       .parse(request.query);
     const models = await ollamaService.listModels(endpoint);
     return { models };
+  });
+
+  fastify.get("/ollama/recommended", async () => {
+    const cfg = await ollamaService.getConfig();
+    const installed = await ollamaService.listModels(cfg.endpoint);
+    const statuses = getModelStatuses(installed, cfg.model);
+    return { models: statuses, currentModel: cfg.model };
+  });
+
+  fastify.post("/ollama/pull", async (request, reply) => {
+    const { model } = z
+      .object({ model: z.string().min(1) })
+      .parse(request.body);
+    const cfg = await ollamaService.getConfig();
+
+    reply.raw.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
+    const send = (data: object) =>
+      reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
+
+    try {
+      await pullModel(cfg.endpoint, model, (status, progress) => {
+        send({ status, ...(progress !== undefined && { progress }) });
+      });
+      send({ status: "success", done: true });
+    } catch (err) {
+      send({
+        status: "error",
+        error: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      reply.raw.end();
+    }
   });
 }

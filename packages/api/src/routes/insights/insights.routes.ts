@@ -207,15 +207,19 @@ export async function insightRoutes(fastify: FastifyInstance) {
     const onFileUpdated = (data: unknown) => send("file_updated", data);
     const onFileRemoved = (data: unknown) => send("file_removed", data);
     const onScanComplete = (data: unknown) => send("scan_complete", data);
+    const onGitignoreUpdated = (data: unknown) =>
+      send("gitignore_updated", data);
 
     insightEmitter.on(`file_updated:${id}`, onFileUpdated);
     insightEmitter.on(`file_removed:${id}`, onFileRemoved);
     insightEmitter.on(`scan_complete:${id}`, onScanComplete);
+    insightEmitter.on(`gitignore_updated:${id}`, onGitignoreUpdated);
 
     request.raw.on("close", () => {
       insightEmitter.off(`file_updated:${id}`, onFileUpdated);
       insightEmitter.off(`file_removed:${id}`, onFileRemoved);
       insightEmitter.off(`scan_complete:${id}`, onScanComplete);
+      insightEmitter.off(`gitignore_updated:${id}`, onGitignoreUpdated);
       res.end();
     });
   });

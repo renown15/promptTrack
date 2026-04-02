@@ -1,0 +1,111 @@
+.agent-keys {
+  @apply flex flex-col rounded-xl border border-border bg-card overflow-hidden;
+  grid-column: 1 / -1;
+}
+
+.agent-keys__header {
+  @apply flex items-center px-4 py-3 border-b border-border bg-muted/30 shrink-0;
+}
+
+.agent-keys__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.agent-keys__form {
+  @apply flex gap-2 px-4 py-3 border-b border-border;
+}
+
+.agent-keys__input {
+  @apply flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm
+    text-foreground placeholder:text-muted-foreground focus:outline-none
+    focus:ring-1 focus:ring-ring;
+}
+
+.agent-keys__add-btn {
+  @apply rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-medium
+    hover:opacity-90 transition-opacity disabled:opacity-50;
+}
+
+.agent-keys__list {
+  @apply flex flex-col divide-y divide-border;
+}
+
+.agent-keys__empty {
+  @apply px-4 py-3 text-sm text-muted-foreground;
+}
+
+.agent-keys__row {
+  @apply flex items-center justify-between px-4 py-2.5;
+}
+
+.agent-keys__row--revoked {
+  @apply opacity-50;
+}
+
+.agent-keys__row-info {
+  @apply flex items-center gap-3;
+}
+
+.agent-keys__row-name {
+  @apply text-sm font-medium text-foreground;
+}
+
+.agent-keys__row-prefix {
+  @apply text-xs font-mono text-muted-foreground;
+}
+
+.agent-keys__row-date {
+  @apply text-xs text-muted-foreground;
+}
+
+.agent-keys__row-actions {
+  @apply flex items-center gap-3;
+}
+
+.agent-keys__view-btn {
+  @apply text-xs text-muted-foreground hover:text-foreground hover:underline;
+}
+
+.agent-keys__revoke-btn {
+  @apply text-xs text-destructive hover:underline;
+}
+
+/* Modal */
+
+.agent-keys-modal__overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60;
+}
+
+.agent-keys-modal {
+  @apply flex flex-col w-full max-w-2xl rounded-xl border border-border bg-card shadow-xl;
+}
+
+.agent-keys-modal__header {
+  @apply flex items-center justify-between px-5 py-4 border-b border-border;
+}
+
+.agent-keys-modal__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.agent-keys-modal__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors;
+}
+
+.agent-keys-modal__body {
+  @apply flex flex-col gap-4 px-5 py-4;
+}
+
+.agent-keys-modal__warning {
+  @apply text-sm text-muted-foreground;
+}
+
+.agent-keys-modal__snippet {
+  @apply rounded-lg bg-muted px-4 py-3 text-xs font-mono text-foreground
+    whitespace-pre overflow-x-auto;
+}
+
+.agent-keys-modal__copy-btn {
+  @apply self-start rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm
+    font-medium hover:opacity-90 transition-opacity;
+}

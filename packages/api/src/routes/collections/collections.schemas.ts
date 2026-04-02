@@ -17,3 +17,12 @@ export const CollectionChainParamSchema = z.object({
   id: z.string(),
   chainId: z.string(),
 });
+
+export const ApiKeyParamSchema = z.object({
+  id: z.string(),
+  keyId: z.string(),
+});
+
+export const CreateApiKeyBodySchema = z.object({
+  name: z.string().min(1).max(100),
+});

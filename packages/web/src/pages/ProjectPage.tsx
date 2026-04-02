@@ -6,6 +6,7 @@ import { PromptHistory } from "@/components/features/prompts/PromptHistory";
 import { ExecutivePromptModal } from "@/components/features/prompts/ExecutivePromptModal";
 import { DirPicker } from "@/components/features/collections/DirPicker";
 import { DocsPanel } from "@/components/features/collections/DocsPanel";
+import { AgentKeysPanel } from "@/components/features/collections/AgentKeysPanel";
 import "@/pages/ProjectPage.css";
 
 export function ProjectPage() {
@@ -71,6 +72,7 @@ export function ProjectPage() {
         </section>
 
         {id && collection?.directory && <DocsPanel collectionId={id} />}
+        {id && <AgentKeysPanel collectionId={id} />}
       </div>
 
       {executiveIds && id && (

@@ -1,5 +1,18 @@
 {
   "permissions": {
-    "allow": ["Bash(GIT_DIR=.git bash .husky/pre-commit)"]
+    "allow": [
+      "Bash(GIT_DIR=.git bash .husky/pre-commit)",
+      "Bash(npm show:*)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/marklewis/dev/promptTrack/**)",
+      "Bash(done)",
+      "Bash(kill -9 54644 54634)",
+      "Bash(ls /Users/marklewis/dev/promptTrack/node_modules/.pnpm/@modelcontextprotocol+sdk@*/node_modules/@modelcontextprotocol/sdk/dist/esm/server/)",
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"list_problem_files\", \"input\": {\"repo\": \"PromptTack\"}}')",
+      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"list_source_control_issues\", \"input\": {\"repo\": \"PromptTack\"}}')",
+      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"get_repo_status\", \"input\": {\"repo\": \"PromptTack\"}}')"
+    ]
   }
 }

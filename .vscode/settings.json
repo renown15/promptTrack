@@ -5,8 +5,8 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "typescript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.preferences.importModuleSpecifier": "non-relative",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "eslint.workingDirectories": [{ "pattern": "packages/*" }],
   "files.associations": {
     "*.css": "tailwindcss"
@@ -16,7 +16,12 @@
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
   "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
+    "editor.defaultFormatter": "Prisma.prisma",
+    "editor.formatOnSave": false
+  },
+  "prisma.linting": false,
+  "[prisma][source]": {
+    "diagnostics.ignored": ["*"]
   },
   "files.exclude": {
     "**/node_modules": true,
@@ -29,5 +34,8 @@
     "**/coverage": true
   },
   "makefile.configureOnOpen": true,
-  "makefile.makePath": "/usr/bin/make"
+  "makefile.makePath": "/usr/bin/make",
+  "problems.exclude": {
+    "**/prisma/schema.prisma": true
+  }
 }

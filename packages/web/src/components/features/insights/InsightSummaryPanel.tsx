@@ -1,25 +1,19 @@
 import type {
-  FileSnapshotDTO,
   AggregateStatsDTO,
   CIStatusDTO,
+  FileSnapshotDTO,
   InsightFilter,
 } from "@/api/endpoints/insights";
-import {
-  computeHealth,
-  timeAgo,
-  ragCoverage,
-  ragLint,
-  ciRag,
-  filterMatches,
-} from "@/components/features/insights/InsightSummaryPanel.utils";
+import { CodebaseTile } from "@/components/features/insights/CodebaseTile";
+import { GitTile } from "@/components/features/insights/GitTile";
 import { InsightMetricPills } from "@/components/features/insights/InsightMetricPills";
-import {
-  Tile,
-  StatRow,
-  PipelineRow,
-  Badge,
-} from "@/components/features/insights/InsightSummaryPanel.helpers";
 import "@/components/features/insights/InsightSummaryPanel.css";
+import {
+  Badge,
+  Tile,
+} from "@/components/features/insights/InsightSummaryPanel.helpers";
+import { computeHealth } from "@/components/features/insights/InsightSummaryPanel.utils";
+import { PipelineTile } from "@/components/features/insights/PipelineTile";
 
 type Props = {
   files: FileSnapshotDTO[];
@@ -27,6 +21,7 @@ type Props = {
   aggregate: AggregateStatsDTO | null;
   ciStatus: CIStatusDTO | null;
   activeFilter: InsightFilter | null;
+  gitignoreWarnings: string[];
   onFilterToggle: (filter: InsightFilter) => void;
   onCIClick: () => void;
 };
@@ -37,12 +32,10 @@ export function InsightSummaryPanel({
   aggregate,
   ciStatus,
   activeFilter,
+  gitignoreWarnings,
   onFilterToggle,
   onCIClick,
 }: Props) {
-  const totalLines = files.reduce((s, f) => s + f.lineCount, 0);
-  const avgLines = files.length > 0 ? Math.round(totalLines / files.length) : 0;
-  const mdCount = files.filter((f) => f.relativePath.endsWith(".md")).length;
   const metricEntries = Object.entries(metricLabels);
   const health = computeHealth(
     files,
@@ -52,137 +45,41 @@ export function InsightSummaryPanel({
   const untrackedCount = files.filter(
     (f) => f.gitStatus === "untracked"
   ).length;
-
-  function gitActive(status: "modified" | "untracked") {
-    return (
-      activeFilter !== null &&
-      filterMatches(activeFilter, { type: "git", status })
-    );
-  }
-
-  const hasPipeline = aggregate?.coverage || aggregate?.lint || ciStatus?.run;
+  const noRemote = ciStatus !== null && ciStatus.error === "no_remote";
+  const hasScanned = files.length > 0;
 
   return (
     <div className="insight-summary-panel">
       <div className="insight-summary-panel__grid">
         <Tile label="codebase">
-          <StatRow label="files" value={String(files.length)} />
-          <StatRow label="lines" value={totalLines.toLocaleString()} />
-          {avgLines > 0 && (
-            <StatRow label="avg / file" value={String(avgLines)} />
-          )}
-          {mdCount > 0 && <StatRow label="md files" value={String(mdCount)} />}
+          <CodebaseTile files={files} gitignoreWarnings={gitignoreWarnings} />
         </Tile>
 
         <Tile label="git">
-          {modifiedCount === 0 && untrackedCount === 0 ? (
-            <span className="insight-summary-panel__tile-clean">clean</span>
-          ) : (
-            <div className="insight-summary-panel__tile-badges">
-              {modifiedCount > 0 && (
-                <Badge
-                  colorClass="amber"
-                  clickable
-                  active={gitActive("modified")}
-                  onClick={() =>
-                    onFilterToggle({ type: "git", status: "modified" })
-                  }
-                  title={
-                    gitActive("modified")
-                      ? "Clear filter"
-                      : "Filter modified files"
-                  }
-                >
-                  {modifiedCount} modified
-                </Badge>
-              )}
-              {untrackedCount > 0 && (
-                <Badge
-                  colorClass="red"
-                  clickable
-                  active={gitActive("untracked")}
-                  onClick={() =>
-                    onFilterToggle({ type: "git", status: "untracked" })
-                  }
-                  title={
-                    gitActive("untracked")
-                      ? "Clear filter"
-                      : "Filter untracked files"
-                  }
-                >
-                  {untrackedCount} untracked
-                </Badge>
-              )}
-            </div>
+          {noRemote && (
+            <Badge colorClass="red" title="No git remote origin configured">
+              no remote
+            </Badge>
+          )}
+          {!noRemote && (
+            <GitTile
+              modifiedCount={modifiedCount}
+              untrackedCount={untrackedCount}
+              activeFilter={activeFilter}
+              onFilterToggle={onFilterToggle}
+            />
           )}
         </Tile>
 
-        {hasPipeline && (
+        {hasScanned && (
           <Tile label="pipeline">
-            {aggregate?.coverage && (
-              <PipelineRow
-                label="cov"
-                age={timeAgo(aggregate.coverage.reportedAt)}
-              >
-                <Badge
-                  colorClass={ragCoverage(aggregate.coverage.linesPct)}
-                  clickable
-                  active={activeFilter?.type === "coverage"}
-                  onClick={() => onFilterToggle({ type: "coverage" })}
-                  title={
-                    activeFilter?.type === "coverage"
-                      ? "Clear filter"
-                      : "Filter by coverage"
-                  }
-                >
-                  {aggregate.coverage.linesPct}%
-                </Badge>
-              </PipelineRow>
-            )}
-            {aggregate?.lint && (
-              <PipelineRow
-                label="lint"
-                age={timeAgo(aggregate.lint.reportedAt)}
-              >
-                <Badge
-                  colorClass={ragLint(aggregate.lint.errors)}
-                  clickable
-                  active={activeFilter?.type === "lint"}
-                  onClick={() => onFilterToggle({ type: "lint" })}
-                  title={
-                    activeFilter?.type === "lint"
-                      ? "Clear filter"
-                      : "Filter lint errors"
-                  }
-                >
-                  {aggregate.lint.errors === 0
-                    ? "clean"
-                    : `${aggregate.lint.errors} err`}
-                </Badge>
-                {aggregate.lint.warnings > 0 && (
-                  <Badge colorClass="amber">
-                    {aggregate.lint.warnings} warn
-                  </Badge>
-                )}
-              </PipelineRow>
-            )}
-            {ciStatus?.run && (
-              <PipelineRow label="CI" age={timeAgo(ciStatus.run.createdAt)}>
-                <Badge
-                  colorClass={ciRag(
-                    ciStatus.run.conclusion,
-                    ciStatus.run.status
-                  )}
-                  clickable
-                  onClick={onCIClick}
-                  title="View CI details"
-                >
-                  {ciStatus.run.status !== "completed"
-                    ? "running"
-                    : (ciStatus.run.conclusion ?? "—")}
-                </Badge>
-              </PipelineRow>
-            )}
+            <PipelineTile
+              aggregate={aggregate}
+              ciStatus={ciStatus}
+              activeFilter={activeFilter}
+              onFilterToggle={onFilterToggle}
+              onCIClick={onCIClick}
+            />
           </Tile>
         )}
 

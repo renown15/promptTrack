@@ -3,18 +3,20 @@ import {
   useOllamaConfig,
   useUpdateOllamaConfig,
   useTestOllamaConnection,
-  useOllamaModels,
+  useOllamaRecommended,
+  useOllamaPull,
 } from "@/hooks/useOllamaConfig";
+import { OllamaRecommendedModels } from "@/components/features/insights/OllamaRecommendedModels";
 import "@/components/features/insights/OllamaConfigModal.css";
 
-type Props = {
-  onClose: () => void;
-};
+type Props = { onClose: () => void };
 
 export function OllamaConfigModal({ onClose }: Props) {
   const { data: cfg, isLoading } = useOllamaConfig();
+  const { data: recommended } = useOllamaRecommended();
   const update = useUpdateOllamaConfig();
   const test = useTestOllamaConnection();
+  const { pulling, pull } = useOllamaPull();
 
   const [endpoint, setEndpoint] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
@@ -23,10 +25,6 @@ export function OllamaConfigModal({ onClose }: Props) {
     boolean
   > | null>(null);
   const [testResult, setTestResult] = useState<boolean | null>(null);
-
-  const endpointForModels =
-    endpoint ?? cfg?.endpoint ?? "http://localhost:11434";
-  const { data: availableModels } = useOllamaModels(endpointForModels);
 
   if (isLoading || !cfg) {
     return (
@@ -43,15 +41,16 @@ export function OllamaConfigModal({ onClose }: Props) {
   const currentMetrics = metricsOverride ?? cfg.metrics;
 
   function toggleMetric(name: string) {
-    const next = { ...currentMetrics };
-    next[name] = next[name] === false ? true : false;
+    const next = {
+      ...currentMetrics,
+      [name]: currentMetrics[name] === false ? true : false,
+    };
     setMetricsOverride(next);
   }
 
   async function handleTest() {
     setTestResult(null);
-    const ok = await test.mutateAsync(currentEndpoint);
-    setTestResult(ok);
+    setTestResult(await test.mutateAsync(currentEndpoint));
   }
 
   async function handleSave() {
@@ -61,6 +60,10 @@ export function OllamaConfigModal({ onClose }: Props) {
       metrics: currentMetrics,
     });
     onClose();
+  }
+
+  function handleSelectModel(name: string) {
+    setModel(name);
   }
 
   return (
@@ -109,24 +112,25 @@ export function OllamaConfigModal({ onClose }: Props) {
           </div>
 
           <div className="ollama-modal__field">
-            <label className="ollama-modal__label">Model</label>
-            {availableModels && availableModels.length > 0 ? (
-              <select
-                className="ollama-modal__input ollama-modal__select"
-                value={currentModel}
-                onChange={(e) => setModel(e.target.value)}
-              >
-                {availableModels.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-                {!availableModels.includes(currentModel) && (
-                  <option value={currentModel}>
-                    {currentModel} (not installed)
-                  </option>
-                )}
-              </select>
+            <label className="ollama-modal__label">
+              Model{" "}
+              {model && model !== cfg.model && (
+                <span className="ollama-modal__test-ok">
+                  {" "}
+                  (changed — save to apply)
+                </span>
+              )}
+            </label>
+            {recommended ? (
+              <OllamaRecommendedModels
+                models={recommended.models.map((m) => ({
+                  ...m,
+                  isCurrent: m.name === currentModel,
+                }))}
+                pulling={pulling}
+                onPull={(name) => void pull(name)}
+                onSelect={handleSelectModel}
+              />
             ) : (
               <input
                 className="ollama-modal__input"

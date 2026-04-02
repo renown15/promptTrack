@@ -129,7 +129,8 @@ test-coverage: ## Run all tests (unit + integration) with combined coverage repo
 
 ##@ Quality
 
-check: ## Smoke test — typecheck + build (run before declaring work complete)
+check: ## Smoke test — lint + typecheck + build (run before declaring work complete)
+	pnpm lint
 	pnpm typecheck
 	pnpm build
 

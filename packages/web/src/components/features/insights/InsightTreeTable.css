@@ -10,6 +10,14 @@
   @apply text-[11px] text-muted-foreground hover:text-foreground transition-colors;
 }
 
+.insight-tree-table__toolbar-btn--active {
+  @apply text-foreground font-medium;
+}
+
+.insight-tree-table__toolbar-sep {
+  @apply w-px h-3 bg-border shrink-0;
+}
+
 .insight-tree-table__filter-banner {
   @apply ml-auto flex items-center gap-2 text-[11px];
 }
@@ -82,6 +90,26 @@
 
 .insight-tree-table__col--lines {
   @apply w-14 text-right shrink-0 text-muted-foreground font-mono;
+}
+
+.insight-tree-table__col--score {
+  @apply w-12 shrink-0 text-right;
+}
+
+.insight-tree-table__score {
+  @apply text-[11px] font-medium;
+}
+
+.insight-tree-table__score--low {
+  @apply text-yellow-600;
+}
+
+.insight-tree-table__score--mid {
+  @apply text-orange-500;
+}
+
+.insight-tree-table__score--high {
+  @apply text-red-600;
 }
 
 .insight-tree-table__col--metric {
