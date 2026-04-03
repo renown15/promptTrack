@@ -74,6 +74,12 @@ export function fileMatchesFilter(
   if (filter.type === "coverage")
     return file.coverage !== null && file.coverage !== undefined;
   if (filter.type === "lint") return (file.lintErrors ?? 0) > 0;
+  if (filter.type === "security-refs") {
+    const sec = file.metrics["security"];
+    if (!sec || typeof sec !== "object" || "error" in sec) return false;
+    const refs = (sec as { sensitiveRefs?: string[] }).sensitiveRefs ?? [];
+    return filter.paths.some((p) => refs.includes(p));
+  }
   const v = file.metrics[filter.name];
   if (filter.status === "error")
     return v === null || (typeof v === "object" && v !== null && "error" in v);
@@ -90,6 +96,7 @@ export function filterMatches(a: InsightFilter, b: InsightFilter): boolean {
   if (a.type === "git" && b.type === "git") return a.status === b.status;
   if (a.type === "metric" && b.type === "metric")
     return a.name === b.name && a.status === b.status;
+  if (a.type === "security-refs" && b.type === "security-refs") return true;
   // coverage and lint filters have no additional discriminators
   return a.type === b.type;
 }

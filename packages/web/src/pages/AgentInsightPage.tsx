@@ -116,6 +116,7 @@ export function AgentInsightPage() {
         collectionDir={collection?.directory ?? undefined}
         lastScan={state?.lastScan ?? undefined}
         scanning={state?.scanning ?? false}
+        activeLlmCall={state?.activeLlmCall ?? null}
         modelLabel={modelLabel}
         filteredCount={activeFilter !== null ? filteredFiles.length : null}
         onScan={() => scan.mutate()}
@@ -172,6 +173,7 @@ export function AgentInsightPage() {
                   files={files}
                   metricLabels={metricLabels}
                   scanning={state?.scanning ?? false}
+                  activeLlmCall={state?.activeLlmCall ?? null}
                   onFileClick={(p) => {
                     setHighlightedPath(null);
                     setTimeout(() => setHighlightedPath(p), 0);

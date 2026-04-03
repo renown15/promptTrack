@@ -35,6 +35,10 @@
   @apply text-xs text-muted-foreground animate-pulse;
 }
 
+.agent-insight-page__llm-call {
+  @apply text-xs text-primary animate-pulse font-mono truncate max-w-64;
+}
+
 .agent-insight-page__scan-btn {
   @apply text-xs px-2.5 py-1 rounded border border-border
     text-muted-foreground hover:text-foreground hover:bg-muted/50

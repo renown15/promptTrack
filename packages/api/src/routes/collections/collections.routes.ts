@@ -1,17 +1,17 @@
-import type { FastifyInstance } from "fastify";
-import { collectionService } from "@/services/collection.service.js";
-import { docsService } from "@/services/docs.service.js";
-import { apiKeyService } from "@/services/api-key.service.js";
-import { z } from "zod";
 import {
-  CreateCollectionSchema,
-  UpdateCollectionSchema,
+  ApiKeyParamSchema,
+  CollectionChainParamSchema,
   CollectionIdParamSchema,
   CollectionPromptParamSchema,
-  CollectionChainParamSchema,
-  ApiKeyParamSchema,
   CreateApiKeyBodySchema,
+  CreateCollectionSchema,
+  UpdateCollectionSchema,
 } from "@/routes/collections/collections.schemas.js";
+import { apiKeyService } from "@/services/api-key.service.js";
+import { collectionService } from "@/services/collection.service.js";
+import { docsService } from "@/services/docs.service.js";
+import type { FastifyInstance } from "fastify";
+import { z } from "zod";
 
 export async function collectionRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.authenticate);
@@ -98,6 +98,17 @@ export async function collectionRoutes(fastify: FastifyInstance) {
     const { id, keyId } = ApiKeyParamSchema.parse(request.params);
     await apiKeyService.revoke(keyId, id);
     return reply.code(204).send();
+  });
+
+  fastify.get("/:id/api-keys/:keyId/key", async (request, reply) => {
+    const { id, keyId } = ApiKeyParamSchema.parse(request.params);
+    const plaintext = await apiKeyService.getFullKey(keyId, id);
+    if (!plaintext) {
+      return reply
+        .code(404)
+        .send({ error: "Key not found or already revoked" });
+    }
+    return { key: plaintext };
   });
 
   fastify.get("/:id/docs/content", async (request, reply) => {

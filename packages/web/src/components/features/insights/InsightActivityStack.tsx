@@ -1,4 +1,7 @@
-import type { FileSnapshotDTO } from "@/api/endpoints/insights";
+import type {
+  ActiveLlmCallDTO,
+  FileSnapshotDTO,
+} from "@/api/endpoints/insights";
 import { MetricBadge } from "@/components/features/insights/MetricBadge";
 import "@/components/features/insights/InsightActivityStack.css";
 
@@ -6,6 +9,7 @@ type Props = {
   files: FileSnapshotDTO[];
   metricLabels: Record<string, string>;
   scanning: boolean;
+  activeLlmCall: ActiveLlmCallDTO | null;
   onFileClick: (relativePath: string) => void;
 };
 
@@ -29,6 +33,7 @@ export function InsightActivityStack({
   files,
   metricLabels,
   scanning,
+  activeLlmCall,
   onFileClick,
 }: Props) {
   const metricEntries = Object.entries(metricLabels);
@@ -48,6 +53,21 @@ export function InsightActivityStack({
   return (
     <div className="insight-activity-stack">
       <div className="insight-activity-stack__header">Recent activity</div>
+      {activeLlmCall && (
+        <div className="insight-activity-stack__llm-status">
+          <div className="insight-activity-stack__llm-status-row">
+            <span className="insight-activity-stack__llm-label">
+              LLM analyzing · {activeLlmCall.metric}
+            </span>
+            <span className="insight-activity-stack__llm-model">
+              {activeLlmCall.model}
+            </span>
+          </div>
+          <div className="insight-activity-stack__llm-detail">
+            {activeLlmCall.file}
+          </div>
+        </div>
+      )}
       <div className="insight-activity-stack__cards">
         {recent.map((file) => {
           const analyzing = isPending(file);

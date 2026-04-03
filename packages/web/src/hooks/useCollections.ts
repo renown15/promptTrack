@@ -1,11 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { collectionsApi } from "@/api/endpoints/collections";
 import { useMutate } from "@/hooks/useMutate";
 import type {
   CreateCollectionInput,
   UpdateCollectionInput,
 } from "@prompttrack/shared";
-export type { DocFile, ApiKeyRecord } from "@/api/endpoints/collections";
+import { useQuery } from "@tanstack/react-query";
+export type { ApiKeyRecord, DocFile } from "@/api/endpoints/collections";
 
 const KEYS = {
   all: ["collections"] as const,
@@ -108,4 +108,11 @@ export function useRevokeApiKey(collectionId: string) {
     (keyId: string) => collectionsApi.revokeApiKey(collectionId, keyId),
     [["collections", collectionId, "api-keys"]]
   );
+}
+
+export function useGetFullApiKey(collectionId: string, keyId: string) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "api-keys", keyId, "key"],
+    queryFn: () => collectionsApi.getFullApiKey(collectionId, keyId),
+  });
 }

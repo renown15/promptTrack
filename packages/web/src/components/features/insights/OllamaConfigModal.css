@@ -45,6 +45,10 @@
     text-foreground outline-none focus:ring-1 focus:ring-ring;
 }
 
+.ollama-modal__input--short {
+  @apply flex-none w-24;
+}
+
 .ollama-modal__select {
   @apply cursor-pointer;
 }

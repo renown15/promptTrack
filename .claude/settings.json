@@ -12,7 +12,13 @@
       "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
       "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"list_problem_files\", \"input\": {\"repo\": \"PromptTack\"}}')",
       "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"list_source_control_issues\", \"input\": {\"repo\": \"PromptTack\"}}')",
-      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"get_repo_status\", \"input\": {\"repo\": \"PromptTack\"}}')"
+      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"get_repo_status\", \"input\": {\"repo\": \"PromptTack\"}}')",
+      "Bash(curl -s -X POST http://localhost:3051/api/agent/tools -H 'Content-Type: application/json' -H 'Authorization: Bearer pt_99139d7a5a1da1d30ed82db3640f2545488c9b12ea6630e558fef86118d51ae8' -d '{\"tool\": \"get_prompt\", \"input\": {\"id\": \"llm-oversight\"}}')",
+      "Bash(NAME=add_ollama_timeout_ms make migrate-dev)",
+      "Bash(psql postgresql://postgres:postgres@localhost:5451/prompttrack -c \"SELECT pid, query FROM pg_stat_activity WHERE query LIKE '%advisory%' OR query LIKE '%pg_advisory%';\")",
+      "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pg_advisory_unlock_all\\(\\);\")",
+      "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pid, locktype, mode, granted FROM pg_locks WHERE locktype = 'advisory';\")",
+      "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pg_terminate_backend\\(pid\\) FROM pg_locks WHERE locktype = 'advisory';\")"
     ]
   }
 }

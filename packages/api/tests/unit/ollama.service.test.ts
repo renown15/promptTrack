@@ -59,6 +59,7 @@ describe("ollamaService.getConfig", () => {
     expect(result.endpoint).toBe("http://localhost:11434");
     expect(result.model).toBe("qwen2.5-coder:7b");
     expect(result.metrics).toEqual({});
+    expect(result.timeoutMs).toBe(60_000);
   });
 });
 
@@ -70,6 +71,7 @@ describe("ollamaService.updateConfig", () => {
       endpoint: "http://remote:11434",
       model: "llama3",
       metrics: { complexity: false },
+      timeoutMs: 30_000,
     };
     vi.mocked(ollamaRepository.upsert).mockResolvedValue({
       id: "cfg1",
@@ -146,6 +148,7 @@ describe("ollamaService.analyzeMetric", () => {
   const baseOpts = {
     endpoint: "http://localhost:11434",
     model: "llama3",
+    timeoutMs: 60_000,
     metric,
     relativePath: "src/foo.ts",
     lineCount: 50,
@@ -217,6 +220,16 @@ describe("ollamaService.analyzeMetric", () => {
     } as Response);
     const result = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toHaveProperty("error");
+  });
+
+  it("passes timeoutMs to fetch signal", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ response: '{"status":"green","summary":"ok"}' }),
+    } as Response);
+    await ollamaService.analyzeMetric({ ...baseOpts, timeoutMs: 15_000 });
+    const init = vi.mocked(fetch).mock.calls[0]![1] as RequestInit;
+    expect(init.signal).toBeDefined();
   });
 
   it("truncates content exceeding 6000 chars", async () => {

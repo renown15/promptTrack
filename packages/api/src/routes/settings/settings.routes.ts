@@ -7,6 +7,7 @@ const OllamaConfigBodySchema = z.object({
   endpoint: z.string().url(),
   model: z.string().min(1),
   metrics: z.record(z.boolean()),
+  timeoutMs: z.number().int().min(5000).max(300_000).default(60_000),
 });
 
 export async function settingsRoutes(fastify: FastifyInstance) {

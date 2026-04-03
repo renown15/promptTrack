@@ -87,13 +87,14 @@ status must be "green" (good), "amber" (minor concerns), or "red" (significant i
 async function callOllama(
   endpoint: string,
   model: string,
-  prompt: string
+  prompt: string,
+  timeoutMs: number
 ): Promise<string> {
   const res = await fetch(`${endpoint}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ model, prompt, stream: false, format: "json" }),
-    signal: AbortSignal.timeout(60_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`Ollama HTTP ${res.status}`);
   const data = (await res.json()) as { response: string };
@@ -137,6 +138,7 @@ export const ollamaService = {
         endpoint: "http://localhost:11434",
         model: "qwen2.5-coder:7b",
         metrics: {},
+        timeoutMs: 60_000,
       }
     );
   },
@@ -145,6 +147,7 @@ export const ollamaService = {
     endpoint: string;
     model: string;
     metrics: Record<string, boolean>;
+    timeoutMs: number;
   }) {
     return ollamaRepository.upsert(data);
   },
@@ -180,6 +183,7 @@ export const ollamaService = {
   async analyzeMetric(opts: {
     endpoint: string;
     model: string;
+    timeoutMs: number;
     metric: MetricDefinition;
     relativePath: string;
     lineCount: number;
@@ -194,7 +198,12 @@ export const ollamaService = {
         opts.fileType,
         opts.content
       );
-      const raw = await callOllama(opts.endpoint, opts.model, prompt);
+      const raw = await callOllama(
+        opts.endpoint,
+        opts.model,
+        prompt,
+        opts.timeoutMs
+      );
       return parseMetricResponse(raw);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

@@ -64,8 +64,8 @@ db-studio: ## Open Prisma Studio
 migrate: ## Run migrations (production)
 	pnpm db:migrate
 
-migrate-dev: ## Create and run migration (development)
-	pnpm --filter @prompttrack/api db:migrate:dev
+migrate-dev: ## Create and run migration (development) — pass NAME=my_name to skip prompt
+	pnpm --filter @prompttrack/api exec prisma migrate dev --name $(or $(NAME),migration_$(shell date +%s))
 
 push: ## Push schema to db (no migration)
 	pnpm db:push

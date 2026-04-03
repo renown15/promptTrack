@@ -6,6 +6,8 @@ function filterLabel(filter: InsightFilter): string {
     return filter.status === "modified" ? "Modified files" : "Untracked files";
   if (filter.type === "coverage") return "Files with coverage";
   if (filter.type === "lint") return "Files with lint errors";
+  if (filter.type === "security-refs")
+    return `Referencing unignored: ${filter.paths.join(", ")}`;
   const statusLabels: Record<string, string> = {
     red: "critical",
     amber: "warn",

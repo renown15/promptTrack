@@ -14,6 +14,7 @@ export const apiKeyRepository = {
     name: string;
     keyHash: string;
     keyPrefix: string;
+    key?: string;
     collectionId: string;
   }): Promise<ApiKeyRecord> {
     return prisma.apiKey.create({
@@ -24,6 +25,18 @@ export const apiKeyRepository = {
         keyPrefix: true,
         collectionId: true,
         createdAt: true,
+        revokedAt: true,
+      },
+    });
+  },
+
+  async findById(id: string) {
+    return prisma.apiKey.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        key: true,
+        collectionId: true,
         revokedAt: true,
       },
     });

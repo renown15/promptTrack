@@ -23,11 +23,19 @@ export interface FileSnapshotDTO {
   problemScore: number;
 }
 
+export interface ActiveLlmCallDTO {
+  file: string;
+  metric: string;
+  model: string;
+  startedAt: string;
+}
+
 export interface InsightStateDTO {
   files: FileSnapshotDTO[];
   lastScan: string | null;
   scanning: boolean;
   gitignoreWarnings: string[];
+  activeLlmCall: ActiveLlmCallDTO | null;
 }
 
 export interface MetricDefinition {
@@ -74,7 +82,8 @@ export type InsightFilter =
       status: "red" | "amber" | "green" | "error";
     }
   | { type: "coverage" }
-  | { type: "lint" };
+  | { type: "lint" }
+  | { type: "security-refs"; paths: string[] };
 
 export interface CIStepDTO {
   number: number;

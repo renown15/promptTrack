@@ -1,10 +1,14 @@
-import type { FileSnapshotDTO } from "@/api/endpoints/insights";
+import type {
+  ActiveLlmCallDTO,
+  FileSnapshotDTO,
+} from "@/api/endpoints/insights";
 import { insightsApi } from "@/api/endpoints/insights";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
 
 export type {
+  ActiveLlmCallDTO,
   AggregateStatsDTO,
   CIJobDTO,
   CIStatusDTO,
@@ -136,6 +140,36 @@ export function useInsights(collectionId: string, onScanComplete?: () => void) {
         ) => {
           if (!prev) return prev;
           return { ...prev, gitignoreWarnings: data.warnings };
+        }
+      );
+    });
+
+    es.addEventListener("llm_call_start", (e) => {
+      const data = JSON.parse(e.data) as ActiveLlmCallDTO;
+      queryClient.setQueryData(
+        ["insights", collectionId],
+        (
+          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
+            ? T
+            : never
+        ) => {
+          if (!prev) return prev;
+          return { ...prev, activeLlmCall: data };
+        }
+      );
+    });
+
+    es.addEventListener("llm_call_end", (e) => {
+      void e;
+      queryClient.setQueryData(
+        ["insights", collectionId],
+        (
+          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
+            ? T
+            : never
+        ) => {
+          if (!prev) return prev;
+          return { ...prev, activeLlmCall: null };
         }
       );
     });

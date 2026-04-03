@@ -1,4 +1,5 @@
-import type { FileSnapshotDTO } from "@/api/endpoints/insights";
+import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
+import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 import {
   Badge,
   StatRow,
@@ -7,15 +8,28 @@ import {
 type Props = {
   files: FileSnapshotDTO[];
   gitignoreWarnings: string[];
+  activeFilter: InsightFilter | null;
+  onFilterToggle: (filter: InsightFilter) => void;
 };
 
-export function CodebaseTile({ files, gitignoreWarnings }: Props) {
+export function CodebaseTile({
+  files,
+  gitignoreWarnings,
+  activeFilter,
+  onFilterToggle,
+}: Props) {
   const totalLines = files.reduce((s, f) => s + f.lineCount, 0);
   const avgLines = files.length > 0 ? Math.round(totalLines / files.length) : 0;
   const mdCount = files.filter((f) => f.relativePath.endsWith(".md")).length;
   const hasScanned = files.length > 0;
   const hasClaude = files.some((f) => f.relativePath === "CLAUDE.md");
-  const hasMemory = files.some((f) => f.relativePath === "MEMORY.md");
+
+  const secFilter: InsightFilter = {
+    type: "security-refs",
+    paths: gitignoreWarnings,
+  };
+  const secActive =
+    activeFilter !== null && filterMatches(activeFilter, secFilter);
 
   return (
     <>
@@ -28,15 +42,17 @@ export function CodebaseTile({ files, gitignoreWarnings }: Props) {
           no CLAUDE.md
         </Badge>
       )}
-      {hasScanned && !hasMemory && (
-        <Badge colorClass="amber" title="No MEMORY.md found in repo root">
-          no MEMORY.md
-        </Badge>
-      )}
       {gitignoreWarnings.length > 0 && (
         <Badge
           colorClass="amber"
-          title={`Sensitive paths not covered by .gitignore:\n${gitignoreWarnings.join("\n")}`}
+          clickable
+          active={secActive}
+          onClick={() => onFilterToggle(secFilter)}
+          title={
+            secActive
+              ? "Clear filter"
+              : `Filter to files referencing:\n${gitignoreWarnings.join("\n")}`
+          }
         >
           {gitignoreWarnings.length} unignored ref
           {gitignoreWarnings.length !== 1 ? "s" : ""}

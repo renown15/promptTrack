@@ -9,6 +9,7 @@ export interface OllamaConfigDTO {
   endpoint: string;
   model: string;
   metrics: Record<string, boolean>;
+  timeoutMs: number;
   defaultMetrics: MetricDefinition[];
 }
 
@@ -46,9 +47,12 @@ export const ollamaApi = {
     return r.data;
   },
 
-  updateConfig: async (
-    data: Omit<OllamaConfigDTO, "id" | "defaultMetrics">
-  ): Promise<OllamaConfigDTO> => {
+  updateConfig: async (data: {
+    endpoint: string;
+    model: string;
+    metrics: Record<string, boolean>;
+    timeoutMs: number;
+  }): Promise<OllamaConfigDTO> => {
     const r = await apiClient.put<OllamaConfigDTO>("/settings/ollama", data);
     return r.data;
   },

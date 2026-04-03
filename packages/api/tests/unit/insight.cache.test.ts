@@ -17,6 +17,7 @@ describe("insightCache", () => {
       expect(state.files.size).toBe(0);
       expect(state.lastScan).toBeNull();
       expect(state.scanning).toBe(false);
+      expect(state.activeLlmCall).toBeNull();
     });
 
     it("returns the same state on subsequent calls", () => {
@@ -44,6 +45,19 @@ describe("insightCache", () => {
       expect(result.files).toEqual([]);
       expect(result.lastScan).toBeNull();
       expect(result.scanning).toBe(false);
+      expect(result.activeLlmCall).toBeNull();
+    });
+
+    it("serializes activeLlmCall when set", () => {
+      const state = getOrCreateState("col1");
+      state.activeLlmCall = {
+        file: "src/foo.ts",
+        metric: "security",
+        model: "qwen2.5-coder:7b",
+        startedAt: "2024-01-01T00:00:00.000Z",
+      };
+      const result = serializeState(state);
+      expect(result.activeLlmCall).toEqual(state.activeLlmCall);
     });
 
     it("serializes files to array sorted with updatedAt as ISO string", () => {

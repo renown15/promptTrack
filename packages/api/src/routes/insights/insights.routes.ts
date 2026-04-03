@@ -4,8 +4,8 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { collectionService } from "@/services/collection.service.js";
 import { insightService } from "@/services/insight.service.js";
-import { insightEmitter } from "@/services/insight.emitter.js";
 import { discoveryService } from "@/services/discovery.service.js";
+import { attachInsightSSE } from "@/routes/insights/insights.sse.js";
 
 const CollectionIdSchema = z.object({ id: z.string() });
 
@@ -197,30 +197,6 @@ export async function insightRoutes(fastify: FastifyInstance) {
       "Access-Control-Allow-Credentials": "true",
     });
 
-    function send(event: string, data: unknown) {
-      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-    }
-
-    const currentState = insightService.getState(id);
-    send("state", currentState);
-
-    const onFileUpdated = (data: unknown) => send("file_updated", data);
-    const onFileRemoved = (data: unknown) => send("file_removed", data);
-    const onScanComplete = (data: unknown) => send("scan_complete", data);
-    const onGitignoreUpdated = (data: unknown) =>
-      send("gitignore_updated", data);
-
-    insightEmitter.on(`file_updated:${id}`, onFileUpdated);
-    insightEmitter.on(`file_removed:${id}`, onFileRemoved);
-    insightEmitter.on(`scan_complete:${id}`, onScanComplete);
-    insightEmitter.on(`gitignore_updated:${id}`, onGitignoreUpdated);
-
-    request.raw.on("close", () => {
-      insightEmitter.off(`file_updated:${id}`, onFileUpdated);
-      insightEmitter.off(`file_removed:${id}`, onFileRemoved);
-      insightEmitter.off(`scan_complete:${id}`, onScanComplete);
-      insightEmitter.off(`gitignore_updated:${id}`, onGitignoreUpdated);
-      res.end();
-    });
+    attachInsightSSE(id, res, () => {});
   });
 }

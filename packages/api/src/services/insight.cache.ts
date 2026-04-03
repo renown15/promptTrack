@@ -27,11 +27,19 @@ export interface FileSnapshot {
   metrics: Record<string, MetricValue>;
 }
 
+export interface ActiveLlmCall {
+  file: string;
+  metric: string;
+  model: string;
+  startedAt: string; // ISO string
+}
+
 export interface CollectionInsightState {
   files: Map<string, FileSnapshot>;
   lastScan: Date | null;
   scanning: boolean;
   gitignoreWarnings: string[];
+  activeLlmCall: ActiveLlmCall | null;
 }
 
 export const insightCache = new Map<string, CollectionInsightState>();
@@ -43,6 +51,7 @@ export function getOrCreateState(collectionId: string): CollectionInsightState {
       lastScan: null,
       scanning: false,
       gitignoreWarnings: [],
+      activeLlmCall: null,
     });
   }
   return insightCache.get(collectionId)!;
@@ -92,5 +101,6 @@ export function serializeState(state: CollectionInsightState) {
     lastScan: state.lastScan?.toISOString() ?? null,
     scanning: state.scanning,
     gitignoreWarnings: state.gitignoreWarnings,
+    activeLlmCall: state.activeLlmCall,
   };
 }

@@ -52,7 +52,12 @@ export function InsightSummaryPanel({
     <div className="insight-summary-panel">
       <div className="insight-summary-panel__grid">
         <Tile label="codebase">
-          <CodebaseTile files={files} gitignoreWarnings={gitignoreWarnings} />
+          <CodebaseTile
+            files={files}
+            gitignoreWarnings={gitignoreWarnings}
+            activeFilter={activeFilter}
+            onFilterToggle={onFilterToggle}
+          />
         </Tile>
 
         <Tile label="git">

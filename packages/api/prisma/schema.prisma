@@ -95,6 +95,7 @@ model ApiKey {
   name         String
   keyHash      String    @unique @map("key_hash")
   keyPrefix    String    @map("key_prefix")
+  key          String?   @map("key") // Encrypted plaintext, shown only once
   collectionId String    @map("collection_id")
   createdAt    DateTime  @default(now()) @map("created_at")
   revokedAt    DateTime? @map("revoked_at")
@@ -298,6 +299,7 @@ model OllamaConfig {
   endpoint  String   @default("http://localhost:11434")
   model     String   @default("llama3")
   metrics   Json     @default("{}")
+  timeoutMs Int      @default(60000) @map("timeout_ms")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("ollama_config")

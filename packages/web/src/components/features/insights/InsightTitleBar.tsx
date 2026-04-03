@@ -1,3 +1,4 @@
+import type { ActiveLlmCallDTO } from "@/api/endpoints/insights";
 import "@/pages/AgentInsightPage.css";
 
 type Props = {
@@ -5,6 +6,7 @@ type Props = {
   collectionDir: string | undefined;
   lastScan: string | undefined;
   scanning: boolean;
+  activeLlmCall: ActiveLlmCallDTO | null;
   modelLabel: string | null;
   filteredCount: number | null;
   onScan: () => void;
@@ -16,6 +18,7 @@ export function InsightTitleBar({
   collectionDir,
   lastScan,
   scanning,
+  activeLlmCall,
   modelLabel,
   filteredCount,
   onScan,
@@ -41,7 +44,15 @@ export function InsightTitleBar({
             {new Date(lastScan).toLocaleTimeString()}
           </span>
         )}
-        {scanning && (
+        {activeLlmCall && (
+          <span
+            className="agent-insight-page__llm-call"
+            title={`${activeLlmCall.model} · ${activeLlmCall.file}`}
+          >
+            ◉ {activeLlmCall.metric} · {activeLlmCall.file.split("/").pop()}
+          </span>
+        )}
+        {scanning && !activeLlmCall && (
           <span className="agent-insight-page__scanning">Scanning…</span>
         )}
         <button

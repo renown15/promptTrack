@@ -115,15 +115,31 @@ export async function runAnalysis(
   }
 
   for (const metric of metricsToRun) {
+    state.activeLlmCall = {
+      file: snap.relativePath,
+      metric: metric.name,
+      model: cfg.model,
+      startedAt: new Date().toISOString(),
+    };
+    insightEmitter.emit(`llm_call_start:${collectionId}`, state.activeLlmCall);
+
     const result = await ollamaService.analyzeMetric({
       endpoint: cfg.endpoint,
       model: cfg.model,
+      timeoutMs: cfg.timeoutMs ?? 60_000,
       metric,
       relativePath: snap.relativePath,
       lineCount: snap.lineCount,
       fileType: snap.fileType,
       content,
     });
+
+    state.activeLlmCall = null;
+    insightEmitter.emit(`llm_call_end:${collectionId}`, {
+      file: snap.relativePath,
+      metric: metric.name,
+    });
+
     const current = state.files.get(snap.relativePath);
     if (current) {
       current.metrics[metric.name] = result;

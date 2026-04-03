@@ -95,3 +95,23 @@
 .insight-activity-stack__empty {
   @apply text-xs text-muted-foreground/50 p-3;
 }
+
+.insight-activity-stack__llm-status {
+  @apply px-3 py-2 border-b border-primary/20 bg-primary/5 flex flex-col gap-0.5 shrink-0;
+}
+
+.insight-activity-stack__llm-status-row {
+  @apply flex items-center justify-between gap-2;
+}
+
+.insight-activity-stack__llm-label {
+  @apply text-[10px] font-medium text-primary;
+}
+
+.insight-activity-stack__llm-model {
+  @apply text-[10px] text-muted-foreground font-mono;
+}
+
+.insight-activity-stack__llm-detail {
+  @apply text-[10px] font-mono text-muted-foreground/70 truncate;
+}

@@ -1,7 +1,8 @@
-import { useState } from "react";
-import type { ApiKeyRecord } from "@/hooks/useCollections";
 import type { CreatedApiKey } from "@/api/endpoints/collections";
 import "@/components/features/collections/AgentKeysPanel.css";
+import type { ApiKeyRecord } from "@/hooks/useCollections";
+import { useGetFullApiKey } from "@/hooks/useCollections";
+import { useState } from "react";
 
 function mcpConfig(key: string) {
   return JSON.stringify(
@@ -77,7 +78,9 @@ export function ViewKeyModal({
   onClose: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const config = mcpConfig(`${apiKey.keyPrefix}...`);
+  const { data, isLoading } = useGetFullApiKey(apiKey.collectionId, apiKey.id);
+  const fullKey = data?.key;
+  const config = mcpConfig(fullKey || `${apiKey.keyPrefix}...`);
 
   function handleCopy() {
     void navigator.clipboard.writeText(config);
@@ -106,12 +109,24 @@ export function ViewKeyModal({
           </button>
         </div>
         <div className="agent-keys-modal__body">
-          <p className="agent-keys-modal__warning">
-            Replace <code>{apiKey.keyPrefix}...</code> with your actual key. The
-            full key was only shown once at creation time.
-          </p>
+          {isLoading ? (
+            <p className="agent-keys-modal__warning">Loading key...</p>
+          ) : !fullKey ? (
+            <p className="agent-keys-modal__warning">
+              Key not found. If revoked, create a new one.
+            </p>
+          ) : (
+            <p className="agent-keys-modal__warning">
+              Your full API key (use immediately in{" "}
+              <code>.claude/.mcp.json.local</code>):
+            </p>
+          )}
           <pre className="agent-keys-modal__snippet">{config}</pre>
-          <button className="agent-keys-modal__copy-btn" onClick={handleCopy}>
+          <button
+            className="agent-keys-modal__copy-btn"
+            onClick={handleCopy}
+            disabled={isLoading}
+          >
             {copied ? "Copied!" : "Copy to clipboard"}
           </button>
         </div>

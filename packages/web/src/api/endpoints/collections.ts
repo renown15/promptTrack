@@ -1,9 +1,9 @@
 import { apiClient } from "@/api/client";
 import type {
-  CreateCollectionInput,
-  UpdateCollectionInput,
   CollectionDTO,
+  CreateCollectionInput,
   ProjectTreeDTO,
+  UpdateCollectionInput,
 } from "@prompttrack/shared";
 
 export interface DocFile {
@@ -103,5 +103,15 @@ export const collectionsApi = {
 
   revokeApiKey: async (id: string, keyId: string): Promise<void> => {
     await apiClient.delete(`/collections/${id}/api-keys/${keyId}`);
+  },
+
+  getFullApiKey: async (
+    id: string,
+    keyId: string
+  ): Promise<{ key: string }> => {
+    const response = await apiClient.get<{ key: string }>(
+      `/collections/${id}/api-keys/${keyId}/key`
+    );
+    return response.data;
   },
 };

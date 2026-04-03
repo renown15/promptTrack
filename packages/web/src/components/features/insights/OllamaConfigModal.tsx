@@ -24,6 +24,7 @@ export function OllamaConfigModal({ onClose }: Props) {
     string,
     boolean
   > | null>(null);
+  const [timeoutSecs, setTimeoutSecs] = useState<number | null>(null);
   const [testResult, setTestResult] = useState<boolean | null>(null);
 
   if (isLoading || !cfg) {
@@ -39,6 +40,8 @@ export function OllamaConfigModal({ onClose }: Props) {
   const currentEndpoint = endpoint ?? cfg.endpoint;
   const currentModel = model ?? cfg.model;
   const currentMetrics = metricsOverride ?? cfg.metrics;
+  const currentTimeoutSecs =
+    timeoutSecs ?? Math.round((cfg.timeoutMs ?? 60_000) / 1000);
 
   function toggleMetric(name: string) {
     const next = {
@@ -58,6 +61,7 @@ export function OllamaConfigModal({ onClose }: Props) {
       endpoint: currentEndpoint,
       model: currentModel,
       metrics: currentMetrics,
+      timeoutMs: currentTimeoutSecs * 1000,
     });
     onClose();
   }
@@ -109,6 +113,18 @@ export function OllamaConfigModal({ onClose }: Props) {
             {testResult === false && (
               <span className="ollama-modal__test-fail">Cannot connect</span>
             )}
+          </div>
+
+          <div className="ollama-modal__field">
+            <label className="ollama-modal__label">Timeout (seconds)</label>
+            <input
+              className="ollama-modal__input ollama-modal__input--short"
+              type="number"
+              min={5}
+              max={300}
+              value={currentTimeoutSecs}
+              onChange={(e) => setTimeoutSecs(Number(e.target.value))}
+            />
           </div>
 
           <div className="ollama-modal__field">
