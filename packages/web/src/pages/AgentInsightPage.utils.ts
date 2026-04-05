@@ -1,5 +1,20 @@
 import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
 
+export function filterByExcludedPaths(
+  files: FileSnapshotDTO[],
+  excludedPaths: Set<string>
+): FileSnapshotDTO[] {
+  return files.filter((f) => {
+    const firstSegment = f.relativePath.split("/")[0] ?? "";
+    return (
+      !excludedPaths.has(firstSegment) &&
+      !Array.from(excludedPaths).some((ex) =>
+        f.relativePath.startsWith(ex + "/")
+      )
+    );
+  });
+}
+
 export function applyFilter(
   files: FileSnapshotDTO[],
   filter: InsightFilter | null

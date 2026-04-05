@@ -2,14 +2,21 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Status: idle
+## Status: completed
 
-### Last Session
+### In-Scope Directory Selection Feature — REPLACED WITH EXCLUSION ON-HOVER
 
-Implemented agent REST layer for stateless tool invocation:
+- [x] Database schema: Add in_scope_directories field to Collection
+- [x] Database migration: 20260405071146_add_in_scope_directories
+- [x] Backend: endpoints GET/:id/directory-structure and PATCH/:id/in-scope-directories
+- [x] Backend: collection.service.ts methods getDirectoryStructure() and updateInScopeDirectories()
+- [x] Frontend: DirectorySelector component (tree UI with checkboxes) — DEPRECATED
+- [x] Frontend: React hooks (useDirectoryStructure, useUpdateInScopeDirectories)
+- [x] API client: Added getDirectoryStructure() and updateInScopeDirectories() methods
+- [x] **Agent Insight Integration: Add 🚫 exclude icon on hover in tree rows**
+- [x] **Agent Insight UI: Gray out excluded nodes visually**
+- [x] **Agent Insight State: Track excluded paths and persist via API**
+- [x] **Scanning Filter: Updated insight.service.ts to respect excluded_directories**
+- [x] **File Walker: Updated walkCode() to skip excluded directory paths**
 
-- Created `/api/agent/tools` GET endpoint (tool definitions in OpenAI format)
-- Created `/api/agent/tools` POST endpoint (stateless tool invocation)
-- Split implementation: `agent.service.ts` (120 lines) + `agent-tool-handlers.ts` (180 lines)
-- All 8 MCP tools exposed via stateless REST: list/get prompts, chains, insights
-- Both `make check` + `make test` passing ✅
+**Implementation Complete: make check ✅**

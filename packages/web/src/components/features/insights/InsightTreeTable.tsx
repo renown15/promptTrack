@@ -1,18 +1,18 @@
-import { useState, useEffect, useMemo } from "react";
 import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
+import "@/components/features/insights/InsightTreeTable.css";
+import {
+  FileTableRow,
+  FolderTableRow,
+} from "@/components/features/insights/InsightTreeTable.rows";
 import {
   buildTree,
   buildTypeTree,
-  flattenVisible,
   collectAllFolderPaths,
+  flattenVisible,
   rowId,
 } from "@/components/features/insights/InsightTreeTable.utils";
-import {
-  FolderTableRow,
-  FileTableRow,
-} from "@/components/features/insights/InsightTreeTable.rows";
 import { InsightTreeTableToolbar } from "@/components/features/insights/InsightTreeTableToolbar";
-import "@/components/features/insights/InsightTreeTable.css";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
   files: FileSnapshotDTO[];
@@ -23,6 +23,8 @@ type Props = {
   onInspect: (relativePath: string) => void;
   activeFilter: InsightFilter | null;
   onClearFilter: () => void;
+  excludedPaths: Set<string>;
+  onExcludePath: (path: string) => void;
 };
 
 export function InsightTreeTable({
@@ -34,6 +36,8 @@ export function InsightTreeTable({
   onInspect,
   activeFilter,
   onClearFilter,
+  excludedPaths,
+  onExcludePath,
 }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [flashPath, setFlashPath] = useState<string | null>(null);
@@ -161,6 +165,8 @@ export function InsightTreeTable({
                 row={row}
                 metricNames={metricNames}
                 onToggle={toggleFolder}
+                isExcluded={excludedPaths.has(row.node.path)}
+                onExclude={onExcludePath}
               />
             );
           }

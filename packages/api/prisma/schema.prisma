@@ -75,12 +75,13 @@ model RefreshToken {
 }
 
 model Collection {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  directory   String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id                    String   @id @default(cuid())
+  name                  String
+  description           String?
+  directory             String?
+  in_scope_directories  String[] @default([]) @map("in_scope_directories")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
   prompts       PromptCollection[]
   chains        ChainCollection[]

@@ -1,29 +1,35 @@
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { useCollections } from "@/hooks/useCollections";
-import {
-  useInsights,
-  useScanInsights,
-  useFileDetail,
-  useInsightAggregate,
-  useCIStatus,
-  useGenerateRepoSummary,
-} from "@/hooks/useInsights";
-import type { InsightFilter } from "@/hooks/useInsights";
-import { useOllamaConfig } from "@/hooks/useOllamaConfig";
-import { useResizeHandle } from "@/hooks/useResizeHandle";
-import { applyFilter } from "@/pages/AgentInsightPage.utils";
-import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
-import { InsightTitleBar } from "@/components/features/insights/InsightTitleBar";
-import { InsightSummaryPanel } from "@/components/features/insights/InsightSummaryPanel";
-import { InsightTreeTable } from "@/components/features/insights/InsightTreeTable";
+import { CIDetailPanel } from "@/components/features/insights/CIDetailPanel";
+import { FileInspectorModal } from "@/components/features/insights/FileInspectorModal";
 import { InsightActivityStack } from "@/components/features/insights/InsightActivityStack";
 import { InsightDetailPanel } from "@/components/features/insights/InsightDetailPanel";
-import { CIDetailPanel } from "@/components/features/insights/CIDetailPanel";
 import { InsightRepoSummaryPanel } from "@/components/features/insights/InsightRepoSummaryPanel";
+import { InsightSummaryPanel } from "@/components/features/insights/InsightSummaryPanel";
+import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
+import { InsightTitleBar } from "@/components/features/insights/InsightTitleBar";
+import { InsightTreeTable } from "@/components/features/insights/InsightTreeTable";
 import { OllamaConfigModal } from "@/components/features/insights/OllamaConfigModal";
-import { FileInspectorModal } from "@/components/features/insights/FileInspectorModal";
+import {
+  useCollections,
+  useUpdateInScopeDirectories,
+} from "@/hooks/useCollections";
+import type { InsightFilter } from "@/hooks/useInsights";
+import {
+  useCIStatus,
+  useFileDetail,
+  useGenerateRepoSummary,
+  useInsightAggregate,
+  useInsights,
+  useScanInsights,
+} from "@/hooks/useInsights";
+import { useOllamaConfig } from "@/hooks/useOllamaConfig";
+import { useResizeHandle } from "@/hooks/useResizeHandle";
 import "@/pages/AgentInsightPage.css";
+import {
+  applyFilter,
+  filterByExcludedPaths,
+} from "@/pages/AgentInsightPage.utils";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 
 const HANDLE_H = 8;
 
@@ -33,6 +39,8 @@ export function AgentInsightPage() {
   const collection = collections?.find((c) => c.id === id);
 
   const [showSummary, setShowSummary] = useState(false);
+  const [excludedPaths, setExcludedPaths] = useState<Set<string>>(new Set());
+  const updateExclusions = useUpdateInScopeDirectories(id ?? "");
   const summary = useGenerateRepoSummary(id ?? "");
   const { data: state, isLoading } = useInsights(id ?? "", () => {
     setShowSummary(true);
@@ -50,7 +58,6 @@ export function AgentInsightPage() {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [showCIDetail, setShowCIDetail] = useState(false);
   const [activeFilter, setActiveFilter] = useState<InsightFilter | null>(null);
-
   const detail = useResizeHandle(
     "insight-detail-height",
     240,
@@ -76,6 +83,9 @@ export function AgentInsightPage() {
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
+  useEffect(() => {
+    setExcludedPaths(new Set(collection?.inScopeDirectories ?? []));
+  }, [collection?.inScopeDirectories]);
 
   const metricLabels: Record<string, string> = Object.fromEntries(
     (ollamaCfg?.defaultMetrics ?? []).map((m) => [m.name, m.label])
@@ -83,36 +93,39 @@ export function AgentInsightPage() {
   const modelLabel = ollamaCfg
     ? `${ollamaCfg.model} @ ${ollamaCfg.endpoint.replace("http://", "")}`
     : null;
-
-  const files = state?.files ?? [];
+  const allFiles = state?.files ?? [];
+  const files = filterByExcludedPaths(allFiles, excludedPaths);
   const filteredFiles = applyFilter(files, activeFilter);
   const { data: fileDetail, isLoading: detailLoading } = useFileDetail(
     id ?? "",
     selectedFile
   );
-
-  function handleFilterToggle(filter: InsightFilter) {
+  const handleFilterToggle = (filter: InsightFilter) =>
     setActiveFilter((prev) =>
       prev && filterMatches(prev, filter) ? null : filter
     );
-  }
-
-  function handleCIClick() {
+  const handleExcludePath = (path: string) => {
+    const newExcluded = new Set(excludedPaths);
+    if (newExcluded.has(path)) newExcluded.delete(path);
+    else newExcluded.add(path);
+    setExcludedPaths(newExcluded);
+    updateExclusions.mutate(Array.from(newExcluded));
+  };
+  const handleCIClick = () => {
     setShowSummary(false);
     setShowCIDetail((prev) => !prev);
     setSelectedFile(null);
-  }
-
-  function handleFileSelect(path: string) {
+  };
+  const handleFileSelect = (path: string) => {
     setShowSummary(false);
     setShowCIDetail(false);
     setSelectedFile((prev) => (prev === path ? null : path));
-  }
+  };
 
   return (
     <div className="agent-insight-page">
       <InsightTitleBar
-        collectionName={collection?.name ?? undefined}
+        collectionName={collection?.name}
         collectionDir={collection?.directory ?? undefined}
         lastScan={state?.lastScan ?? undefined}
         scanning={state?.scanning ?? false}
@@ -124,7 +137,7 @@ export function AgentInsightPage() {
       />
 
       <InsightSummaryPanel
-        files={files}
+        files={files.length > 0 ? files : allFiles}
         metricLabels={metricLabels}
         aggregate={aggregate ?? null}
         ciStatus={ciStatus ?? null}
@@ -159,6 +172,8 @@ export function AgentInsightPage() {
                   onInspect={setInspectedFile}
                   activeFilter={activeFilter}
                   onClearFilter={() => setActiveFilter(null)}
+                  excludedPaths={excludedPaths}
+                  onExcludePath={handleExcludePath}
                 />
               </div>
               <div

@@ -191,3 +191,20 @@
 .insight-tree-table__inspect-btn:hover {
   @apply opacity-100;
 }
+
+/* Exclusion controls */
+.insight-tree-table__folder-row--excluded {
+  @apply opacity-50 text-foreground/40;
+}
+
+.insight-tree-table__exclude-btn {
+  @apply opacity-0 text-base leading-none p-0 rounded transition-opacity hover:opacity-100;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.insight-tree-table__folder-row:hover .insight-tree-table__exclude-btn {
+  @apply opacity-60;
+}

@@ -1,8 +1,8 @@
-import { NavLink } from "react-router-dom";
+import "@/components/layout/ProjectTree.css";
 import { useProjectTree } from "@/hooks/useCollections";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import type { ChainSummaryDTO, PromptSummaryDTO } from "@prompttrack/shared";
-import "@/components/layout/ProjectTree.css";
+import { NavLink } from "react-router-dom";
 
 function PromptLink({ prompt }: { prompt: PromptSummaryDTO }) {
   return (
@@ -78,15 +78,26 @@ function ProjectSection({
             <span className="project-tree__empty">Empty</span>
           )}
           {directory && (
-            <NavLink
-              to={`/collections/${id}/insights`}
-              className={({ isActive }) =>
-                `project-tree__item project-tree__item--insight${isActive ? " project-tree__item--active" : ""}`
-              }
-            >
-              <span className="project-tree__icon">◈</span>
-              Agent Insight
-            </NavLink>
+            <>
+              <NavLink
+                to={`/collections/${id}/insights`}
+                className={({ isActive }) =>
+                  `project-tree__item project-tree__item--insight${isActive ? " project-tree__item--active" : ""}`
+                }
+              >
+                <span className="project-tree__icon">◈</span>
+                Agent Insight
+              </NavLink>
+              <NavLink
+                to={`/collections/${id}/analytics`}
+                className={({ isActive }) =>
+                  `project-tree__item project-tree__item--insight${isActive ? " project-tree__item--active" : ""}`
+                }
+              >
+                <span className="project-tree__icon">📊</span>
+                Agent Analytics
+              </NavLink>
+            </>
           )}
           {prompts.length > 0 && (
             <div className="project-tree__group">

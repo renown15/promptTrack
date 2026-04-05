@@ -1,17 +1,18 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthGuard } from "@/components/features/auth/AuthGuard";
 import { AppShell } from "@/components/layout/AppShell";
-import { LoginPage } from "@/pages/LoginPage";
-import { RegisterPage } from "@/pages/RegisterPage";
+import { AgentInsightPage } from "@/pages/AgentInsightPage";
+import { AnalyticsPage } from "@/pages/AnalyticsPage";
+import { ChainDetailPage } from "@/pages/ChainDetailPage";
+import { ChainsPage } from "@/pages/ChainsPage";
 import { DashboardPage } from "@/pages/DashboardPage";
-import { PromptsPage } from "@/pages/PromptsPage";
+import { LoginPage } from "@/pages/LoginPage";
+import { ProjectPage } from "@/pages/ProjectPage";
 import { PromptDetailPage } from "@/pages/PromptDetailPage";
 import { PromptNewPage } from "@/pages/PromptNewPage";
-import { ChainsPage } from "@/pages/ChainsPage";
-import { ChainDetailPage } from "@/pages/ChainDetailPage";
-import { ProjectPage } from "@/pages/ProjectPage";
-import { AgentInsightPage } from "@/pages/AgentInsightPage";
+import { PromptsPage } from "@/pages/PromptsPage";
+import { RegisterPage } from "@/pages/RegisterPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,10 @@ export function App() {
             <Route
               path="/collections/:id/insights"
               element={<AgentInsightPage />}
+            />
+            <Route
+              path="/collections/:id/analytics"
+              element={<AnalyticsPage />}
             />
             <Route path="/chains" element={<ChainsPage />} />
             <Route path="/chains/:id" element={<ChainDetailPage />} />

@@ -5,7 +5,14 @@ import type {
   UpdateCollectionInput,
 } from "@prompttrack/shared";
 import { useQuery } from "@tanstack/react-query";
-export type { ApiKeyRecord, DocFile } from "@/api/endpoints/collections";
+export type {
+  ApiKeyRecord,
+  CodeMakeup,
+  CoverageSnapshot,
+  DocFile,
+  FileCountSnapshot,
+  VolumeSnapshot,
+} from "@/api/endpoints/collections";
 
 const KEYS = {
   all: ["collections"] as const,
@@ -115,4 +122,68 @@ export function useGetFullApiKey(collectionId: string, keyId: string) {
     queryKey: ["collections", collectionId, "api-keys", keyId, "key"],
     queryFn: () => collectionsApi.getFullApiKey(collectionId, keyId),
   });
+}
+
+// Analytics hooks
+export function useAnalytics(collectionId: string, days: number = 30) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", days],
+    queryFn: () => collectionsApi.getAnalytics(collectionId, days),
+  });
+}
+
+export function useVolumeAnalytics(collectionId: string, days: number = 30) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", "volume", days],
+    queryFn: () => collectionsApi.getVolumeAnalytics(collectionId, days),
+  });
+}
+
+export function useCoverageAnalytics(collectionId: string, days: number = 30) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", "coverage", days],
+    queryFn: () => collectionsApi.getCoverageAnalytics(collectionId, days),
+  });
+}
+
+export function useFileCountAnalytics(collectionId: string, days: number = 30) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", "file-count", days],
+    queryFn: () => collectionsApi.getFileCountAnalytics(collectionId, days),
+  });
+}
+
+export function useCodeMakeupAnalytics(collectionId: string) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", "makeup"],
+    queryFn: () => collectionsApi.getCodeMakeupAnalytics(collectionId),
+  });
+}
+
+export function useGrowthAnalytics(collectionId: string, days: number = 30) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "analytics", "growth", days],
+    queryFn: () => collectionsApi.getGrowthAnalytics(collectionId, days),
+  });
+}
+
+export function useDirectoryStructure(collectionId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["collections", collectionId, "directory-structure"],
+    queryFn: () => collectionsApi.getDirectoryStructure(collectionId),
+    enabled,
+  });
+}
+
+export function useUpdateInScopeDirectories(collectionId: string) {
+  return useMutate(
+    async (directories: string[]) => {
+      const result = await collectionsApi.updateInScopeDirectories(
+        collectionId,
+        directories
+      );
+      return result;
+    },
+    [KEYS.all]
+  );
 }

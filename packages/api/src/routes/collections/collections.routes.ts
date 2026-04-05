@@ -7,6 +7,7 @@ import {
   CreateCollectionSchema,
   UpdateCollectionSchema,
 } from "@/routes/collections/collections.schemas.js";
+import { analyticsService } from "@/services/analytics.service.js";
 import { apiKeyService } from "@/services/api-key.service.js";
 import { collectionService } from "@/services/collection.service.js";
 import { docsService } from "@/services/docs.service.js";
@@ -126,5 +127,80 @@ export async function collectionRoutes(fastify: FastifyInstance) {
         return reply.code(403).send({ error: "Forbidden" });
       return reply.code(404).send({ error: "File not found" });
     }
+  });
+
+  // Analytics endpoints
+  const AnalyticsQuerySchema = z.object({
+    days: z.coerce.number().int().min(1).max(365).default(30),
+  });
+
+  fastify.get("/:id/analytics", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { days } = AnalyticsQuerySchema.parse(request.query);
+    return analyticsService.getFullAnalytics(id, days);
+  });
+
+  fastify.get("/:id/analytics/volume", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { days } = AnalyticsQuerySchema.parse(request.query);
+    const data = await analyticsService.getVolumeAnalytics(id, days);
+    return { data, rangeInDays: days };
+  });
+
+  fastify.get("/:id/analytics/coverage", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { days } = AnalyticsQuerySchema.parse(request.query);
+    const data = await analyticsService.getCoverageAnalytics(id, days);
+    return { data, rangeInDays: days };
+  });
+
+  fastify.get("/:id/analytics/file-count", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { days } = AnalyticsQuerySchema.parse(request.query);
+    const data = await analyticsService.getFileCountAnalytics(id, days);
+    return { data, rangeInDays: days };
+  });
+
+  fastify.get("/:id/analytics/makeup", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const data = await analyticsService.getCodeMakeupAnalytics(id);
+    return { data };
+  });
+
+  fastify.get("/:id/analytics/growth", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { days } = AnalyticsQuerySchema.parse(request.query);
+    const data = await analyticsService.getGrowthAnalytics(id, days);
+    return { data, rangeInDays: days };
+  });
+
+  // Directory scope management
+  fastify.get("/:id/directory-structure", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const collection = await collectionService.getById(id);
+    if (!collection.directory) {
+      throw new Error("No directory set");
+    }
+    try {
+      const structure = await collectionService.getDirectoryStructure(
+        collection.directory
+      );
+      return structure;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Error";
+      throw new Error(msg, { cause: err });
+    }
+  });
+
+  fastify.patch("/:id/in-scope-directories", async (request) => {
+    const { id } = CollectionIdParamSchema.parse(request.params);
+    const { directories } = z
+      .object({ directories: z.array(z.string()) })
+      .parse(request.body);
+    const updated = await collectionService.updateInScopeDirectories(
+      id,
+      directories
+    );
+    return updated;
   });
 }

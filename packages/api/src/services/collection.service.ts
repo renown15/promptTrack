@@ -1,12 +1,14 @@
 import { collectionRepository } from "@/repositories/collection.repository.js";
 import type {
-  CreateCollectionInput,
-  UpdateCollectionInput,
-  ProjectTreeDTO,
-  CollectionTreeItemDTO,
-  PromptSummaryDTO,
   ChainSummaryDTO,
+  CollectionTreeItemDTO,
+  CreateCollectionInput,
+  ProjectTreeDTO,
+  PromptSummaryDTO,
+  UpdateCollectionInput,
 } from "@prompttrack/shared";
+import { readdir } from "fs/promises";
+import { join } from "path";
 
 export class CollectionError extends Error {
   constructor(
@@ -20,35 +22,56 @@ export class CollectionError extends Error {
 
 export const collectionService = {
   async list() {
-    return collectionRepository.findAll();
+    const collections = await collectionRepository.findAll();
+    return collections.map(({ in_scope_directories, ...c }) => ({
+      ...c,
+      inScopeDirectories: in_scope_directories,
+    }));
   },
 
   async getById(id: string) {
     const c = await collectionRepository.findById(id);
     if (!c) throw new CollectionError("Collection not found", 404);
-    return c;
+    const { in_scope_directories, ...rest } = c;
+    return {
+      ...rest,
+      inScopeDirectories: in_scope_directories,
+    };
   },
 
   async create(input: CreateCollectionInput) {
-    return collectionRepository.create({
+    const c = await collectionRepository.create({
       name: input.name,
       ...(input.description !== undefined && {
         description: input.description,
       }),
       ...(input.directory !== undefined && { directory: input.directory }),
     });
+    const { in_scope_directories, ...rest } = c;
+    return {
+      ...rest,
+      inScopeDirectories: in_scope_directories,
+    };
   },
 
   async update(id: string, input: UpdateCollectionInput) {
     const c = await collectionRepository.findById(id);
     if (!c) throw new CollectionError("Collection not found", 404);
-    return collectionRepository.update(id, {
+    const updated = await collectionRepository.update(id, {
       ...(input.name !== undefined && { name: input.name }),
       ...(input.description !== undefined && {
         description: input.description,
       }),
       ...(input.directory !== undefined && { directory: input.directory }),
+      ...(input.in_scope_directories !== undefined && {
+        in_scope_directories: input.in_scope_directories,
+      }),
     });
+    const { in_scope_directories, ...rest } = updated;
+    return {
+      ...rest,
+      inScopeDirectories: in_scope_directories,
+    };
   },
 
   async delete(id: string) {
@@ -127,5 +150,54 @@ export const collectionService = {
     };
 
     return { collections, ungrouped };
+  },
+
+  async getDirectoryStructure(
+    basePath: string,
+    relativePath: string = ""
+  ): Promise<{
+    name: string;
+    path: string;
+    isDirectory: boolean;
+    children?: {
+      name: string;
+      path: string;
+      isDirectory: boolean;
+      children?: unknown[];
+    }[];
+  }> {
+    const fullPath = relativePath ? join(basePath, relativePath) : basePath;
+    const entries = await readdir(fullPath, { withFileTypes: true });
+
+    const directories = entries
+      .filter((e) => e.isDirectory() && !e.name.startsWith("."))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    const children = await Promise.all(
+      directories.map(async (dir) => {
+        const childPath = relativePath
+          ? join(relativePath, dir.name)
+          : dir.name;
+        return this.getDirectoryStructure(basePath, childPath);
+      })
+    );
+
+    const currentPath = relativePath || basePath.split("/").pop() || "root";
+    return {
+      name: relativePath
+        ? relativePath.split("/").pop() || currentPath
+        : currentPath,
+      path: relativePath || ".",
+      isDirectory: true,
+      children,
+    };
+  },
+
+  async updateInScopeDirectories(collectionId: string, directories: string[]) {
+    const c = await collectionRepository.findById(collectionId);
+    if (!c) throw new CollectionError("Collection not found", 404);
+    return collectionRepository.update(collectionId, {
+      in_scope_directories: directories,
+    });
   },
 };

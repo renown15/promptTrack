@@ -26,6 +26,39 @@ export interface CreatedApiKey extends ApiKeyRecord {
   key: string;
 }
 
+export interface VolumeSnapshot {
+  date: string;
+  totalFiles: number;
+  totalLines: number;
+  byFileType: Array<{
+    fileType: string;
+    fileCount: number;
+    lineCount: number;
+  }>;
+}
+
+export interface CoverageSnapshot {
+  date: string;
+  avgCoverage: number;
+  fileCount: number;
+  coveredFiles: number;
+}
+
+export interface FileCountSnapshot {
+  date: string;
+  byFileType: Array<{
+    fileType: string;
+    fileCount: number;
+  }>;
+}
+
+export interface CodeMakeup {
+  fileType: string;
+  fileCount: number;
+  lineCount: number;
+  avgCoverage: number | null;
+}
+
 export const collectionsApi = {
   list: async (): Promise<CollectionDTO[]> => {
     const response = await apiClient.get<CollectionDTO[]>("/collections");
@@ -111,6 +144,71 @@ export const collectionsApi = {
   ): Promise<{ key: string }> => {
     const response = await apiClient.get<{ key: string }>(
       `/collections/${id}/api-keys/${keyId}/key`
+    );
+    return response.data;
+  },
+
+  getAnalytics: async (id: string, days: number = 30) => {
+    const response = await apiClient.get(`/collections/${id}/analytics`, {
+      params: { days },
+    });
+    return response.data;
+  },
+
+  getVolumeAnalytics: async (id: string, days: number = 30) => {
+    const response = await apiClient.get(
+      `/collections/${id}/analytics/volume`,
+      {
+        params: { days },
+      }
+    );
+    return response.data;
+  },
+
+  getCoverageAnalytics: async (id: string, days: number = 30) => {
+    const response = await apiClient.get(
+      `/collections/${id}/analytics/coverage`,
+      { params: { days } }
+    );
+    return response.data;
+  },
+
+  getFileCountAnalytics: async (id: string, days: number = 30) => {
+    const response = await apiClient.get(
+      `/collections/${id}/analytics/file-count`,
+      { params: { days } }
+    );
+    return response.data;
+  },
+
+  getCodeMakeupAnalytics: async (id: string) => {
+    const response = await apiClient.get(`/collections/${id}/analytics/makeup`);
+    return response.data;
+  },
+
+  getGrowthAnalytics: async (id: string, days: number = 30) => {
+    const response = await apiClient.get(
+      `/collections/${id}/analytics/growth`,
+      {
+        params: { days },
+      }
+    );
+    return response.data;
+  },
+
+  getDirectoryStructure: async (id: string) => {
+    const response = await apiClient.get(
+      `/collections/${id}/directory-structure`
+    );
+    return response.data;
+  },
+
+  updateInScopeDirectories: async (id: string, directories: string[]) => {
+    const response = await apiClient.patch(
+      `/collections/${id}/in-scope-directories`,
+      {
+        directories,
+      }
     );
     return response.data;
   },

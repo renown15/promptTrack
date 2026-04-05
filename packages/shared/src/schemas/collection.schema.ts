@@ -10,6 +10,7 @@ export const UpdateCollectionSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
   directory: z.string().max(1000).nullable().optional(),
+  in_scope_directories: z.array(z.string()).optional(),
 });
 
 export const CollectionDTO = z.object({
@@ -17,6 +18,7 @@ export const CollectionDTO = z.object({
   name: z.string(),
   description: z.string().nullable(),
   directory: z.string().nullable(),
+  inScopeDirectories: z.array(z.string()).optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

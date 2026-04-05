@@ -1,24 +1,39 @@
 import type { InsightFilter } from "@/api/endpoints/insights";
-import { MetricBadge } from "@/components/features/insights/MetricBadge";
-import { MetricCountCell } from "@/components/features/insights/InsightTreeTable.utils";
 import { fileMatchesFilter } from "@/components/features/insights/InsightSummaryPanel.utils";
-import type {
-  FolderRow,
-  FileRow,
-} from "@/components/features/insights/InsightTreeTable.utils";
 import "@/components/features/insights/InsightTreeTable.css";
+import type {
+  FileRow,
+  FolderRow,
+} from "@/components/features/insights/InsightTreeTable.utils";
+import { MetricCountCell } from "@/components/features/insights/InsightTreeTable.utils";
+import { MetricBadge } from "@/components/features/insights/MetricBadge";
 
 type FolderRowProps = {
   row: FolderRow;
   metricNames: string[];
   onToggle: (path: string) => void;
+  isExcluded: boolean;
+  onExclude: (path: string) => void;
 };
 
-export function FolderTableRow({ row, metricNames, onToggle }: FolderRowProps) {
+export function FolderTableRow({
+  row,
+  metricNames,
+  onToggle,
+  isExcluded,
+  onExclude,
+}: FolderRowProps) {
+  const folderRowClass = [
+    "insight-tree-table__folder-row",
+    isExcluded ? "insight-tree-table__folder-row--excluded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div
       key={row.node.path}
-      className="insight-tree-table__folder-row"
+      className={folderRowClass}
       onClick={() => onToggle(row.node.path)}
       role="button"
       tabIndex={0}
@@ -37,6 +52,17 @@ export function FolderTableRow({ row, metricNames, onToggle }: FolderRowProps) {
         <span className="insight-tree-table__folder-count">
           {row.stats.fileCount}f
         </span>
+        <button
+          className="insight-tree-table__exclude-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onExclude(row.node.path);
+          }}
+          title={isExcluded ? "Include in analysis" : "Exclude from analysis"}
+          aria-label={isExcluded ? "Include" : "Exclude"}
+        >
+          🚫
+        </button>
       </div>
       <div className="insight-tree-table__col insight-tree-table__col--lines">
         {row.stats.totalLines.toLocaleString()}

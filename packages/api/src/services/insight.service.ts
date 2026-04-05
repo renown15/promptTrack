@@ -1,26 +1,27 @@
-import { relative } from "path";
-import {
-  getOrCreateState,
-  serializeState,
-  insightCache,
-  type FileSnapshot,
-  type MetricResult,
-  type MetricError,
-} from "@/services/insight.cache.js";
-import { insightEmitter } from "@/services/insight.emitter.js";
+import { collectionRepository } from "@/repositories/collection.repository.js";
 import { fileSnapshotRepository } from "@/repositories/file-snapshot.repository.js";
-import {
-  readSnapshot,
-  walkCode,
-  getGitStatus,
-} from "@/services/insight.scanner.js";
+import { getPerFileMaps } from "@/services/discovery.per-file.js";
 import {
   emitFileUpdated,
   runAnalysis,
   runAnalysisQueue,
 } from "@/services/insight.analyzer.js";
-import { getPerFileMaps } from "@/services/discovery.per-file.js";
+import {
+  getOrCreateState,
+  insightCache,
+  serializeState,
+  type FileSnapshot,
+  type MetricError,
+  type MetricResult,
+} from "@/services/insight.cache.js";
+import { insightEmitter } from "@/services/insight.emitter.js";
+import {
+  getGitStatus,
+  readSnapshot,
+  walkCode,
+} from "@/services/insight.scanner.js";
 import { ollamaService } from "@/services/ollama.service.js";
+import { relative } from "path";
 
 export const insightService = {
   async scan(collectionId: string, directory: string): Promise<void> {
@@ -28,6 +29,9 @@ export const insightService = {
     const state = getOrCreateState(collectionId);
     state.scanning = true;
     state.files.clear();
+
+    const collection = await collectionRepository.findById(collectionId);
+    const excludedDirs = collection?.in_scope_directories ?? [];
 
     const existingRecords =
       await fileSnapshotRepository.getLatestPerFile(collectionId);
@@ -47,7 +51,7 @@ export const insightService = {
       .enabledMetrics(ollamaCfg.metrics)
       .map((m) => m.name);
 
-    for await (const snap of walkCode(directory, directory, 0)) {
+    for await (const snap of walkCode(directory, directory, 0, excludedDirs)) {
       const baseline = baselines.get(snap.relativePath);
       snap.lineDelta =
         baseline !== undefined ? snap.lineCount - baseline : null;

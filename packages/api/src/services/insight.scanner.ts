@@ -1,8 +1,8 @@
-import { readdir, stat, readFile } from "fs/promises";
-import { execFile } from "child_process";
-import { promisify } from "util";
-import { join, relative, extname, basename } from "path";
 import type { FileSnapshot, GitFileStatus } from "@/services/insight.cache.js";
+import { execFile } from "child_process";
+import { readdir, readFile, stat } from "fs/promises";
+import { basename, extname, join, relative } from "path";
+import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
 
@@ -101,7 +101,8 @@ export async function readSnapshot(
 export async function* walkCode(
   dir: string,
   root: string,
-  depth: number
+  depth: number,
+  excludedDirs: string[] = []
 ): AsyncGenerator<FileSnapshot> {
   if (depth > 6) return;
   let entries;
@@ -114,9 +115,28 @@ export async function* walkCode(
   const dirs: string[] = [];
   const files: string[] = [];
 
+  // Check if current directory is excluded
+  const relDir = relative(root, dir);
+  if (
+    excludedDirs.includes(relDir) ||
+    (relDir !== "." && excludedDirs.some((ex) => relDir.startsWith(ex + "/")))
+  ) {
+    return;
+  }
+
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) dirs.push(join(dir, entry.name));
+      if (!SKIP_DIRS.has(entry.name)) {
+        const childPath = join(dir, entry.name);
+        const childRel = relative(root, childPath);
+        // Skip if child is excluded
+        if (
+          !excludedDirs.includes(childRel) &&
+          !excludedDirs.some((ex) => childRel.startsWith(ex + "/"))
+        ) {
+          dirs.push(childPath);
+        }
+      }
     } else if (entry.isFile()) {
       const ext = extname(entry.name).toLowerCase();
       if (CODE_EXTENSIONS.has(ext)) files.push(join(dir, entry.name));
@@ -131,6 +151,6 @@ export async function* walkCode(
   }
 
   for (const d of dirs) {
-    yield* walkCode(d, root, depth + 1);
+    yield* walkCode(d, root, depth + 1, excludedDirs);
   }
 }

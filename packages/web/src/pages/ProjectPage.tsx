@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useCollections, useUpdateCollection } from "@/hooks/useCollections";
-import { PromptList } from "@/components/features/prompts/PromptList";
-import { PromptHistory } from "@/components/features/prompts/PromptHistory";
-import { ExecutivePromptModal } from "@/components/features/prompts/ExecutivePromptModal";
+import { AgentKeysPanel } from "@/components/features/collections/AgentKeysPanel";
 import { DirPicker } from "@/components/features/collections/DirPicker";
 import { DocsPanel } from "@/components/features/collections/DocsPanel";
-import { AgentKeysPanel } from "@/components/features/collections/AgentKeysPanel";
+import { ExecutivePromptModal } from "@/components/features/prompts/ExecutivePromptModal";
+import { PromptHistory } from "@/components/features/prompts/PromptHistory";
+import { PromptList } from "@/components/features/prompts/PromptList";
+import { useCollections, useUpdateCollection } from "@/hooks/useCollections";
 import "@/pages/ProjectPage.css";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export function ProjectPage() {
   const { id } = useParams<{ id: string }>();

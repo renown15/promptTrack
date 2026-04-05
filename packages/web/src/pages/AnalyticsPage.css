@@ -1,0 +1,11 @@
+.analytics-page {
+  @apply p-4;
+}
+
+.analytics-page__header {
+  @apply mb-6;
+}
+
+.analytics-page__title {
+  @apply text-2xl font-semibold m-0 text-foreground;
+}

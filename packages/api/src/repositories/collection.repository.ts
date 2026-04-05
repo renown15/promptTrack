@@ -5,6 +5,7 @@ export type CollectionRecord = {
   name: string;
   description: string | null;
   directory: string | null;
+  in_scope_directories: string[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -19,6 +20,7 @@ type UpdateCollectionData = {
   name?: string;
   description?: string | null;
   directory?: string | null;
+  in_scope_directories?: string[];
 };
 
 export const collectionRepository = {
