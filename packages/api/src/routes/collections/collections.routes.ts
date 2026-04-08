@@ -1,3 +1,4 @@
+import { registerAnalyticsRoutes } from "@/routes/collections/collections-analytics.routes.js";
 import {
   ApiKeyParamSchema,
   CollectionChainParamSchema,
@@ -7,12 +8,14 @@ import {
   CreateCollectionSchema,
   UpdateCollectionSchema,
 } from "@/routes/collections/collections.schemas.js";
-import { analyticsService } from "@/services/analytics.service.js";
 import { apiKeyService } from "@/services/api-key.service.js";
 import { collectionService } from "@/services/collection.service.js";
 import { docsService } from "@/services/docs.service.js";
+import { fileStatusOverrideRepository } from "@/repositories/file-status-override.repository.js";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
+
+const STALE_DAYS = 30;
 
 export async function collectionRoutes(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.authenticate);
@@ -80,7 +83,43 @@ export async function collectionRoutes(fastify: FastifyInstance) {
     if (!collection.directory)
       return reply.code(400).send({ error: "No directory set" });
     const files = await docsService.list(collection.directory);
-    return files;
+    const overrides = await fileStatusOverrideRepository.listForCollection(id);
+    const overrideMap = new Map(
+      overrides
+        .filter((o) => o.metric === "doc_freshness")
+        .map((o) => [o.relativePath, o])
+    );
+    // Auto-supersede overrides where the file has been updated since the override was created
+    const toSupersede = files
+      .filter((f) => {
+        const ov = overrideMap.get(f.relativePath);
+        return ov && new Date(f.updatedAt) > ov.createdAt;
+      })
+      .map((f) => f.relativePath);
+    if (toSupersede.length > 0) {
+      await fileStatusOverrideRepository.supersedeDueToFileChange(
+        id,
+        toSupersede
+      );
+      toSupersede.forEach((p) => overrideMap.delete(p));
+    }
+    const staleMs = STALE_DAYS * 24 * 60 * 60 * 1000;
+    return files.map((f) => {
+      const ov = overrideMap.get(f.relativePath) ?? null;
+      const ageMs = Date.now() - new Date(f.updatedAt).getTime();
+      return {
+        ...f,
+        isStale: ageMs > staleMs && ov === null,
+        ageMs,
+        freshnessOverride: ov
+          ? {
+              comment: ov.comment,
+              source: ov.source,
+              createdAt: ov.createdAt.toISOString(),
+            }
+          : null,
+      };
+    });
   });
 
   fastify.get("/:id/api-keys", async (request) => {
@@ -130,49 +169,7 @@ export async function collectionRoutes(fastify: FastifyInstance) {
   });
 
   // Analytics endpoints
-  const AnalyticsQuerySchema = z.object({
-    days: z.coerce.number().int().min(1).max(365).default(30),
-  });
-
-  fastify.get("/:id/analytics", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const { days } = AnalyticsQuerySchema.parse(request.query);
-    return analyticsService.getFullAnalytics(id, days);
-  });
-
-  fastify.get("/:id/analytics/volume", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const { days } = AnalyticsQuerySchema.parse(request.query);
-    const data = await analyticsService.getVolumeAnalytics(id, days);
-    return { data, rangeInDays: days };
-  });
-
-  fastify.get("/:id/analytics/coverage", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const { days } = AnalyticsQuerySchema.parse(request.query);
-    const data = await analyticsService.getCoverageAnalytics(id, days);
-    return { data, rangeInDays: days };
-  });
-
-  fastify.get("/:id/analytics/file-count", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const { days } = AnalyticsQuerySchema.parse(request.query);
-    const data = await analyticsService.getFileCountAnalytics(id, days);
-    return { data, rangeInDays: days };
-  });
-
-  fastify.get("/:id/analytics/makeup", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const data = await analyticsService.getCodeMakeupAnalytics(id);
-    return { data };
-  });
-
-  fastify.get("/:id/analytics/growth", async (request) => {
-    const { id } = CollectionIdParamSchema.parse(request.params);
-    const { days } = AnalyticsQuerySchema.parse(request.query);
-    const data = await analyticsService.getGrowthAnalytics(id, days);
-    return { data, rangeInDays: days };
-  });
+  registerAnalyticsRoutes(fastify);
 
   // Directory scope management
   fastify.get("/:id/directory-structure", async (request) => {

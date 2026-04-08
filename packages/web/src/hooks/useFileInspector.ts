@@ -5,6 +5,8 @@ export type {
   FileContentDTO,
   FileSummaryDTO,
   FileRefactorDTO,
+  ConversationMessage,
+  FileDiscussionDTO,
 } from "@/api/endpoints/file-inspector";
 
 export function useFileContent(
@@ -30,5 +32,20 @@ export function useGenerateRefactorIdeas(collectionId: string) {
   return useMutation({
     mutationFn: (relativePath: string) =>
       fileInspectorApi.generateRefactorIdeas(collectionId, relativePath),
+  });
+}
+
+export function useFileDiscussion(collectionId: string) {
+  return useMutation({
+    mutationFn: ({
+      relativePath,
+      message,
+      history,
+    }: {
+      relativePath: string;
+      message: string;
+      history?: Parameters<typeof fileInspectorApi.discuss>[3];
+    }) =>
+      fileInspectorApi.discuss(collectionId, relativePath, message, history),
   });
 }

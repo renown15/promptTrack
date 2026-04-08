@@ -66,6 +66,7 @@ export function fileMatchesFilter(
     gitStatus?: string | null;
     coverage?: number | null;
     lintErrors?: number | null;
+    lineCount?: number;
     metrics: Record<string, unknown>;
   },
   filter: InsightFilter
@@ -74,6 +75,8 @@ export function fileMatchesFilter(
   if (filter.type === "coverage")
     return file.coverage !== null && file.coverage !== undefined;
   if (filter.type === "lint") return (file.lintErrors ?? 0) > 0;
+  if (filter.type === "near-blank")
+    return file.lineCount !== undefined && file.lineCount <= 1;
   if (filter.type === "security-refs") {
     const sec = file.metrics["security"];
     if (!sec || typeof sec !== "object" || "error" in sec) return false;

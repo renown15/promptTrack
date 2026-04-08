@@ -1,9 +1,25 @@
 import { prisma } from "@/config/prisma.js";
 
+function toLocalDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function shouldExcludePath(path: string, excludedDirs: string[]): boolean {
+  if (!excludedDirs || excludedDirs.length === 0) return false;
+  const firstSegment = path.split("/")[0];
+  return excludedDirs.some(
+    (dir) => dir === firstSegment || path.startsWith(dir + "/")
+  );
+}
+
 export const analyticsFileCountRepository = {
   async getFileCountTimeseries(
     collectionId: string,
-    days: number = 30
+    days: number = 30,
+    excludedDirs: string[] = []
   ): Promise<
     Array<{
       date: string;
@@ -27,7 +43,12 @@ export const analyticsFileCountRepository = {
       orderBy: { scannedAt: "asc" },
     });
 
-    if (allRecords.length === 0) {
+    // Filter by excluded directories
+    const filteredRecords = allRecords.filter(
+      (r) => !shouldExcludePath(r.relativePath, excludedDirs)
+    );
+
+    if (filteredRecords.length === 0) {
       return [];
     }
 
@@ -37,12 +58,10 @@ export const analyticsFileCountRepository = {
       { date: string; fileType: string }
     >();
 
-    allRecords.forEach((record) => {
+    filteredRecords.forEach((record) => {
       const fileKey = `${record.relativePath}:${record.fileType}`;
       if (!fileFirstAppearance.has(fileKey)) {
-        const dateKey = new Date(record.scannedAt)
-          .toISOString()
-          .substring(0, 10);
+        const dateKey = toLocalDateString(new Date(record.scannedAt));
         fileFirstAppearance.set(fileKey, {
           date: dateKey,
           fileType: record.fileType,
@@ -66,12 +85,12 @@ export const analyticsFileCountRepository = {
     const endDate = new Date(displayEndDate);
 
     while (currentDate <= endDate) {
-      allDatesArray.push(currentDate.toISOString().substring(0, 10));
+      allDatesArray.push(toLocalDateString(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
     // For each date, count cumulative files (created by that date)
-    const displayStartStr = displayStartDate.toISOString().substring(0, 10);
+    const displayStartStr = toLocalDateString(displayStartDate);
     const result: Array<{
       date: string;
       byFileType: Array<{ fileType: string; fileCount: number }>;

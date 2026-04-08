@@ -1,12 +1,10 @@
 import type { InsightFilter } from "@/api/endpoints/insights";
-import { fileMatchesFilter } from "@/components/features/insights/InsightSummaryPanel.utils";
 import "@/components/features/insights/InsightTreeTable.css";
-import type {
-  FileRow,
-  FolderRow,
-} from "@/components/features/insights/InsightTreeTable.utils";
+import type { FolderRow } from "@/components/features/insights/InsightTreeTable.utils";
 import { MetricCountCell } from "@/components/features/insights/InsightTreeTable.utils";
-import { MetricBadge } from "@/components/features/insights/MetricBadge";
+
+export { FileTableRow } from "@/components/features/insights/InsightTreeTable.file-row";
+export type { InsightFilter };
 
 type FolderRowProps = {
   row: FolderRow;
@@ -53,7 +51,9 @@ export function FolderTableRow({
           {row.stats.fileCount}f
         </span>
         <button
-          className="insight-tree-table__exclude-btn"
+          className={`insight-tree-table__exclude-btn ${
+            isExcluded ? "insight-tree-table__exclude-btn--active" : ""
+          }`}
           onClick={(e) => {
             e.stopPropagation();
             onExclude(row.node.path);
@@ -61,7 +61,7 @@ export function FolderTableRow({
           title={isExcluded ? "Include in analysis" : "Exclude from analysis"}
           aria-label={isExcluded ? "Include" : "Exclude"}
         >
-          🚫
+          {isExcluded ? "Include" : "Exclude"}
         </button>
       </div>
       <div className="insight-tree-table__col insight-tree-table__col--lines">
@@ -90,100 +90,3 @@ export function FolderTableRow({
     </div>
   );
 }
-
-type FileRowProps = {
-  row: FileRow;
-  flashPath: string | null;
-  selectedPath: string | null;
-  activeFilter: InsightFilter | null;
-  metricEntries: [string, string][];
-  onSelect: (path: string) => void;
-  onInspect: (path: string) => void;
-};
-
-export function FileTableRow({
-  row,
-  flashPath,
-  selectedPath,
-  activeFilter,
-  metricEntries,
-  onSelect,
-  onInspect,
-}: FileRowProps) {
-  const isFlashing = row.file.relativePath === flashPath;
-  const isSelected = row.file.relativePath === selectedPath;
-  const isHighlighted =
-    activeFilter !== null && fileMatchesFilter(row.file, activeFilter);
-  const rowClass = [
-    "insight-tree-table__file-row",
-    isFlashing ? "insight-tree-table__file-row--flash" : "",
-    isSelected ? "insight-tree-table__file-row--selected" : "",
-    isHighlighted ? "insight-tree-table__file-row--highlighted" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  return (
-    <div
-      key={row.file.relativePath}
-      className={rowClass}
-      onClick={() => onSelect(row.file.relativePath)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onSelect(row.file.relativePath)}
-    >
-      <div
-        className="insight-tree-table__col insight-tree-table__col--name"
-        style={{ "--indent": `${row.depth}rem` } as React.CSSProperties}
-      >
-        <span
-          className={`insight-tree-table__file-name${row.file.gitStatus && row.file.gitStatus !== "clean" ? ` insight-tree-table__file-name--${row.file.gitStatus}` : ""}`}
-        >
-          {row.file.name}
-        </span>
-        {row.file.gitStatus === "modified" && (
-          <span className="insight-tree-table__git-badge insight-tree-table__git-badge--modified">
-            M
-          </span>
-        )}
-        {row.file.gitStatus === "untracked" && (
-          <span className="insight-tree-table__git-badge insight-tree-table__git-badge--untracked">
-            U
-          </span>
-        )}
-        <button
-          className="insight-tree-table__inspect-btn"
-          title="Inspect file"
-          onClick={(e) => {
-            e.stopPropagation();
-            onInspect(row.file.relativePath);
-          }}
-        >
-          👓
-        </button>
-      </div>
-      <div className="insight-tree-table__col insight-tree-table__col--lines">
-        {row.file.lineCount}
-      </div>
-      <div className="insight-tree-table__col insight-tree-table__col--score">
-        {row.file.problemScore > 0 && (
-          <span
-            className={`insight-tree-table__score insight-tree-table__score--${row.file.problemScore >= 10 ? "high" : row.file.problemScore >= 5 ? "mid" : "low"}`}
-          >
-            {row.file.problemScore}
-          </span>
-        )}
-      </div>
-      {metricEntries.map(([name, label]) => (
-        <div
-          key={name}
-          className="insight-tree-table__col insight-tree-table__col--metric"
-        >
-          <MetricBadge label={label} value={row.file.metrics[name]} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export type { InsightFilter };

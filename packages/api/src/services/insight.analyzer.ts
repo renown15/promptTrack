@@ -9,6 +9,8 @@ import {
 import { insightEmitter } from "@/services/insight.emitter.js";
 import { ollamaService } from "@/services/ollama.service.js";
 import { fileSnapshotRepository } from "@/repositories/file-snapshot.repository.js";
+import { llmCallLogRepository } from "@/repositories/llm-call-log.repository.js";
+import { enqueueOllamaCall, queueDepth } from "@/services/ollama.queue.js";
 
 function isIgnoredByPatterns(ref: string, patterns: string[]): boolean {
   const filename = ref.includes("/") ? (ref.split("/").pop() ?? ref) : ref;
@@ -115,39 +117,68 @@ export async function runAnalysis(
   }
 
   for (const metric of metricsToRun) {
-    state.activeLlmCall = {
-      file: snap.relativePath,
-      metric: metric.name,
-      model: cfg.model,
-      startedAt: new Date().toISOString(),
-    };
-    insightEmitter.emit(`llm_call_start:${collectionId}`, state.activeLlmCall);
+    await enqueueOllamaCall(collectionId, async () => {
+      const callStartedAt = new Date();
+      state.activeLlmCall = {
+        file: snap.relativePath,
+        metric: metric.name,
+        model: cfg.model,
+        startedAt: callStartedAt.toISOString(),
+      };
+      insightEmitter.emit(`llm_call_start:${collectionId}`, {
+        ...state.activeLlmCall,
+        queueDepth: queueDepth(),
+      });
 
-    const result = await ollamaService.analyzeMetric({
-      endpoint: cfg.endpoint,
-      model: cfg.model,
-      timeoutMs: cfg.timeoutMs ?? 60_000,
-      metric,
-      relativePath: snap.relativePath,
-      lineCount: snap.lineCount,
-      fileType: snap.fileType,
-      content,
-    });
+      const { result, meta, promptChars } = await ollamaService.analyzeMetric({
+        endpoint: cfg.endpoint,
+        model: cfg.model,
+        timeoutMs: cfg.timeoutMs ?? 60_000,
+        metric,
+        relativePath: snap.relativePath,
+        lineCount: snap.lineCount,
+        fileType: snap.fileType,
+        content,
+      });
 
-    state.activeLlmCall = null;
-    insightEmitter.emit(`llm_call_end:${collectionId}`, {
-      file: snap.relativePath,
-      metric: metric.name,
-    });
+      const durationMs = Date.now() - callStartedAt.getTime();
+      const status =
+        "error" in result ? "error" : (result as MetricResult).status;
+      const errorReason =
+        "error" in result ? (result as MetricError).error : null;
 
-    const current = state.files.get(snap.relativePath);
-    if (current) {
-      current.metrics[metric.name] = result;
-      emitFileUpdated(collectionId, current);
-      if (metric.name === "security" && !("error" in result)) {
-        recomputeGitignoreWarnings(collectionId, directory).catch(() => {});
+      llmCallLogRepository
+        .insert({
+          collectionId,
+          relativePath: snap.relativePath,
+          metric: metric.name,
+          model: cfg.model,
+          startedAt: callStartedAt,
+          durationMs,
+          promptChars,
+          promptTokens: meta.promptTokens,
+          responseTokens: meta.responseTokens,
+          status,
+          errorReason,
+        })
+        .catch(() => {});
+
+      state.activeLlmCall = null;
+      insightEmitter.emit(`llm_call_end:${collectionId}`, {
+        file: snap.relativePath,
+        metric: metric.name,
+        queueDepth: queueDepth(),
+      });
+
+      const current = state.files.get(snap.relativePath);
+      if (current) {
+        current.metrics[metric.name] = result;
+        emitFileUpdated(collectionId, current);
+        if (metric.name === "security" && !("error" in result)) {
+          recomputeGitignoreWarnings(collectionId, directory).catch(() => {});
+        }
       }
-    }
+    });
   }
 
   const current = state.files.get(snap.relativePath);

@@ -1,8 +1,6 @@
-import type {
-  ActiveLlmCallDTO,
-  FileSnapshotDTO,
-} from "@/api/endpoints/insights";
+import type { FileSnapshotDTO } from "@/api/endpoints/insights";
 import { insightsApi } from "@/api/endpoints/insights";
+import { attachInsightSSEHandlers } from "@/hooks/useInsights.sse";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef } from "react";
@@ -10,6 +8,9 @@ import { useCallback, useEffect, useRef } from "react";
 export type {
   ActiveLlmCallDTO,
   AggregateStatsDTO,
+  FileStatusOverrideDTO,
+  LlmCallLogEntryDTO,
+  MetricOverrideDTO,
   CIJobDTO,
   CIStatusDTO,
   CIStepDTO,
@@ -26,12 +27,17 @@ export type {
 
 export {
   useCIStatus,
+  useClearLlmLog,
+  useDeleteOverride,
   useFileDetail,
   useGenerateRepoSummary,
   useInsightAggregate,
   useInsightFilesCache,
+  useLlmLog,
+  useOverrideHistory,
   useRetryInsightFile,
   useScanInsights,
+  useUpsertOverride,
 } from "@/hooks/useInsights.auxiliary";
 
 export function useInsights(collectionId: string, onScanComplete?: () => void) {
@@ -86,92 +92,8 @@ export function useInsights(collectionId: string, onScanComplete?: () => void) {
     const url = insightsApi.streamUrl(collectionId, token);
     const es = new EventSource(url);
 
-    es.addEventListener("state", (e) => {
-      const data = JSON.parse(e.data);
-      queryClient.setQueryData(["insights", collectionId], data);
-    });
-
-    es.addEventListener("file_updated", (e) => {
-      mergeFile(JSON.parse(e.data) as FileSnapshotDTO);
-    });
-
-    es.addEventListener("file_removed", (e) => {
-      const { relativePath } = JSON.parse(e.data) as { relativePath: string };
-      queryClient.setQueryData(
-        ["insights", collectionId],
-        (
-          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
-            ? T
-            : never
-        ) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            files: prev.files.filter((f) => f.relativePath !== relativePath),
-          };
-        }
-      );
-    });
-
-    es.addEventListener("scan_complete", (e) => {
-      const data = JSON.parse(e.data) as { timestamp: string };
-      queryClient.setQueryData(
-        ["insights", collectionId],
-        (
-          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
-            ? T
-            : never
-        ) => {
-          if (!prev) return prev;
-          return { ...prev, scanning: false, lastScan: data.timestamp };
-        }
-      );
+    attachInsightSSEHandlers(es, collectionId, queryClient, mergeFile, () => {
       onScanCompleteRef.current?.();
-    });
-
-    es.addEventListener("gitignore_updated", (e) => {
-      const data = JSON.parse(e.data) as { warnings: string[] };
-      queryClient.setQueryData(
-        ["insights", collectionId],
-        (
-          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
-            ? T
-            : never
-        ) => {
-          if (!prev) return prev;
-          return { ...prev, gitignoreWarnings: data.warnings };
-        }
-      );
-    });
-
-    es.addEventListener("llm_call_start", (e) => {
-      const data = JSON.parse(e.data) as ActiveLlmCallDTO;
-      queryClient.setQueryData(
-        ["insights", collectionId],
-        (
-          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
-            ? T
-            : never
-        ) => {
-          if (!prev) return prev;
-          return { ...prev, activeLlmCall: data };
-        }
-      );
-    });
-
-    es.addEventListener("llm_call_end", (e) => {
-      void e;
-      queryClient.setQueryData(
-        ["insights", collectionId],
-        (
-          prev: ReturnType<typeof insightsApi.getState> extends Promise<infer T>
-            ? T
-            : never
-        ) => {
-          if (!prev) return prev;
-          return { ...prev, activeLlmCall: null };
-        }
-      );
     });
 
     return () => es.close();

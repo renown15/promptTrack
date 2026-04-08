@@ -18,7 +18,9 @@
       "Bash(psql postgresql://postgres:postgres@localhost:5451/prompttrack -c \"SELECT pid, query FROM pg_stat_activity WHERE query LIKE '%advisory%' OR query LIKE '%pg_advisory%';\")",
       "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pg_advisory_unlock_all\\(\\);\")",
       "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pid, locktype, mode, granted FROM pg_locks WHERE locktype = 'advisory';\")",
-      "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pg_terminate_backend\\(pid\\) FROM pg_locks WHERE locktype = 'advisory';\")"
+      "Bash(psql \"postgresql://prompttrack:prompttrack_dev@localhost:5451/prompttrack\" -c \"SELECT pg_terminate_backend\\(pid\\) FROM pg_locks WHERE locktype = 'advisory';\")",
+      "Bash(NAME=add_llm_call_log make migrate-dev)",
+      "Bash(grep -n \"max-lines\" packages/web/.eslintrc* packages/web/eslint.config* .eslintrc* eslint.config*)"
     ]
   }
 }

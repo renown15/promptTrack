@@ -1,5 +1,6 @@
 import type { FileCountSnapshot } from "@/api/endpoints/collections";
 import "@/components/features/analytics/Analytics.css";
+import { AnalyticsTooltip } from "@/components/features/analytics/AnalyticsTooltip";
 import {
   Bar,
   BarChart,
@@ -42,6 +43,7 @@ function transformData(snapshots: FileCountSnapshot[]) {
     });
   });
 
+  let prevDataPoint: Record<string, unknown> | null = null;
   return snapshots.map((s) => {
     const dataPoint: Record<string, unknown> = {
       date: formatDate(s.date),
@@ -49,6 +51,15 @@ function transformData(snapshots: FileCountSnapshot[]) {
     s.byFileType.forEach((item) => {
       dataPoint[item.fileType] = item.fileCount;
     });
+
+    // Add previous values for change calculation
+    if (prevDataPoint) {
+      Array.from(allFileTypes).forEach((ft) => {
+        dataPoint[`_prev_${ft}`] = prevDataPoint![ft] || 0;
+      });
+    }
+
+    prevDataPoint = dataPoint;
     return dataPoint;
   });
 }
@@ -80,18 +91,7 @@ export function FileCountTrendsSection({ fileCountSnapshots }: Props) {
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="date" />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-              }}
-              formatter={(value) => {
-                if (typeof value === "number") {
-                  return value;
-                }
-                return value;
-              }}
-            />
+            <Tooltip content={<AnalyticsTooltip />} />
             <Legend />
             {fileTypeList.map((ft) => (
               <Bar

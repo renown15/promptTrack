@@ -3,6 +3,7 @@ import type {
   VolumeSnapshot,
 } from "@/api/endpoints/collections";
 import "@/components/features/analytics/Analytics.css";
+import { AnalyticsTooltip } from "@/components/features/analytics/AnalyticsTooltip";
 import {
   Bar,
   BarChart,
@@ -48,6 +49,7 @@ function transformVolumeData(snapshots: VolumeSnapshot[]) {
     });
   });
 
+  let prevDataPoint: Record<string, unknown> | null = null;
   return snapshots.map((s) => {
     const dataPoint: Record<string, unknown> = {
       date: formatDate(s.date),
@@ -56,15 +58,33 @@ function transformVolumeData(snapshots: VolumeSnapshot[]) {
     s.byFileType.forEach((item) => {
       dataPoint[item.fileType] = item.lineCount;
     });
+
+    // Add previous values for change calculation
+    if (prevDataPoint) {
+      dataPoint._prev_total = prevDataPoint.total;
+      Array.from(allFileTypes).forEach((ft) => {
+        dataPoint[`_prev_${ft}`] = prevDataPoint![ft] || 0;
+      });
+    }
+
+    prevDataPoint = dataPoint;
     return dataPoint;
   });
 }
 
 function transformCoverageData(snapshots: CoverageSnapshot[]) {
-  return snapshots.map((s) => ({
-    date: formatDate(s.date),
-    coverage: s.avgCoverage,
-  }));
+  let prevCoverage: number | null = null;
+  return snapshots.map((s) => {
+    const dataPoint: Record<string, unknown> = {
+      date: formatDate(s.date),
+      coverage: s.avgCoverage,
+    };
+    if (prevCoverage !== null) {
+      dataPoint._prev_coverage = prevCoverage;
+    }
+    prevCoverage = s.avgCoverage;
+    return dataPoint;
+  });
 }
 
 export function TrendsSection({ volumeSnapshots, coverageSnapshots }: Props) {
@@ -97,18 +117,7 @@ export function TrendsSection({ volumeSnapshots, coverageSnapshots }: Props) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                  }}
-                  formatter={(value) => {
-                    if (typeof value === "number") {
-                      return value.toLocaleString();
-                    }
-                    return value;
-                  }}
-                />
+                <Tooltip content={<AnalyticsTooltip />} />
                 <Legend />
                 {fileTypeList.map((ft) => (
                   <Bar
@@ -138,15 +147,12 @@ export function TrendsSection({ volumeSnapshots, coverageSnapshots }: Props) {
                 <XAxis dataKey="date" />
                 <YAxis domain={[0, 100]} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                  }}
-                  formatter={(value) => {
+                  content={<AnalyticsTooltip />}
+                  formatter={(value): string => {
                     if (typeof value === "number") {
                       return value.toFixed(1) + "%";
                     }
-                    return value;
+                    return String(value);
                   }}
                 />
                 <Legend />

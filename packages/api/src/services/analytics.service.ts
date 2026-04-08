@@ -3,36 +3,75 @@ import { analyticsRepositoryGrowth } from "@/repositories/analytics-growth.repos
 import { analyticsRepository } from "@/repositories/analytics.repository.js";
 
 export const analyticsService = {
-  async getVolumeAnalytics(collectionId: string, days: number = 30) {
-    return analyticsRepository.getVolumeTimeseries(collectionId, days);
-  },
-
-  async getCoverageAnalytics(collectionId: string, days: number = 30) {
-    return analyticsRepository.getCoverageTimeseries(collectionId, days);
-  },
-
-  async getFileCountAnalytics(collectionId: string, days: number = 30) {
-    return analyticsFileCountRepository.getFileCountTimeseries(
+  async getVolumeAnalytics(
+    collectionId: string,
+    days: number = 30,
+    excludedDirs: string[] = []
+  ) {
+    return analyticsRepository.getVolumeTimeseries(
       collectionId,
-      days
+      days,
+      excludedDirs
     );
   },
 
-  async getCodeMakeupAnalytics(collectionId: string) {
-    return analyticsRepositoryGrowth.getCurrentCodeMakeup(collectionId);
+  async getCoverageAnalytics(
+    collectionId: string,
+    days: number = 30,
+    excludedDirs: string[] = []
+  ) {
+    return analyticsRepository.getCoverageTimeseries(
+      collectionId,
+      days,
+      excludedDirs
+    );
   },
 
-  async getGrowthAnalytics(collectionId: string, days: number = 30) {
-    return analyticsRepositoryGrowth.getGrowthMetrics(collectionId, days);
+  async getFileCountAnalytics(
+    collectionId: string,
+    days: number = 30,
+    excludedDirs: string[] = []
+  ) {
+    return analyticsFileCountRepository.getFileCountTimeseries(
+      collectionId,
+      days,
+      excludedDirs
+    );
   },
 
-  async getFullAnalytics(collectionId: string, days: number = 30) {
+  async getCodeMakeupAnalytics(
+    collectionId: string,
+    excludedDirs: string[] = []
+  ) {
+    return analyticsRepositoryGrowth.getCurrentCodeMakeup(
+      collectionId,
+      excludedDirs
+    );
+  },
+
+  async getGrowthAnalytics(
+    collectionId: string,
+    days: number = 30,
+    excludedDirs: string[] = []
+  ) {
+    return analyticsRepositoryGrowth.getGrowthMetrics(
+      collectionId,
+      days,
+      excludedDirs
+    );
+  },
+
+  async getFullAnalytics(
+    collectionId: string,
+    days: number = 30,
+    excludedDirs: string[] = []
+  ) {
     const [volume, coverage, fileCount, makeup, growth] = await Promise.all([
-      this.getVolumeAnalytics(collectionId, days),
-      this.getCoverageAnalytics(collectionId, days),
-      this.getFileCountAnalytics(collectionId, days),
-      this.getCodeMakeupAnalytics(collectionId),
-      this.getGrowthAnalytics(collectionId, days),
+      this.getVolumeAnalytics(collectionId, days, excludedDirs),
+      this.getCoverageAnalytics(collectionId, days, excludedDirs),
+      this.getFileCountAnalytics(collectionId, days, excludedDirs),
+      this.getCodeMakeupAnalytics(collectionId, excludedDirs),
+      this.getGrowthAnalytics(collectionId, days, excludedDirs),
     ]);
 
     return {

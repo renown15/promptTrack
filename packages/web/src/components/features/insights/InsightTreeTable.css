@@ -10,6 +10,10 @@
   @apply text-[11px] text-muted-foreground hover:text-foreground transition-colors;
 }
 
+.insight-tree-table__toolbar-btn-count {
+  @apply ml-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive;
+}
+
 .insight-tree-table__toolbar-btn--active {
   @apply text-foreground font-medium;
 }
@@ -192,19 +196,49 @@
   @apply opacity-100;
 }
 
+.insight-tree-table__discuss-btn {
+  @apply opacity-0 text-sm leading-none px-1 rounded transition-opacity;
+}
+.insight-tree-table__file-row:hover .insight-tree-table__discuss-btn {
+  @apply opacity-60;
+}
+.insight-tree-table__discuss-btn:hover {
+  @apply opacity-100;
+}
+
+/* Metric cell with override button */
+.insight-tree-table__metric-cell {
+  @apply relative flex items-center gap-0.5;
+}
+
+.insight-tree-table__override-btn {
+  @apply opacity-0 text-[10px] leading-none px-0.5 text-muted-foreground
+    hover:text-foreground transition-opacity shrink-0;
+}
+
+.insight-tree-table__file-row:hover .insight-tree-table__override-btn {
+  @apply opacity-50;
+}
+
+.insight-tree-table__override-btn:hover {
+  @apply opacity-100;
+}
+
 /* Exclusion controls */
 .insight-tree-table__folder-row--excluded {
   @apply opacity-50 text-foreground/40;
 }
 
 .insight-tree-table__exclude-btn {
-  @apply opacity-0 text-base leading-none p-0 rounded transition-opacity hover:opacity-100;
-  width: 1.25rem;
-  height: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @apply opacity-0 text-xs font-semibold px-2 py-1 rounded transition-all hover:opacity-100
+    text-muted-foreground hover:text-foreground hover:bg-red-100/80 cursor-pointer;
+}
+.insight-tree-table__exclude-btn--active {
+  @apply text-red-600;
 }
 .insight-tree-table__folder-row:hover .insight-tree-table__exclude-btn {
   @apply opacity-60;
+}
+.insight-tree-table__folder-row:hover .insight-tree-table__exclude-btn--active {
+  @apply opacity-100;
 }

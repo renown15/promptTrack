@@ -6,6 +6,7 @@ function filterLabel(filter: InsightFilter): string {
     return filter.status === "modified" ? "Modified files" : "Untracked files";
   if (filter.type === "coverage") return "Files with coverage";
   if (filter.type === "lint") return "Files with lint errors";
+  if (filter.type === "near-blank") return "Near-blank files (≤1 line)";
   if (filter.type === "security-refs")
     return `Referencing unignored: ${filter.paths.join(", ")}`;
   const statusLabels: Record<string, string> = {
@@ -18,10 +19,11 @@ function filterLabel(filter: InsightFilter): string {
 }
 
 type Props = {
-  viewMode: "tree" | "type" | "score";
-  onViewMode: (mode: "tree" | "type" | "score") => void;
+  viewMode: "tree" | "type" | "score" | "excluded";
+  onViewMode: (mode: "tree" | "type" | "score" | "excluded") => void;
   activeFilter: InsightFilter | null;
   fileCount: number;
+  excludedCount: number;
   onExpandAll: () => void;
   onCollapseAll: () => void;
   onClearFilter: () => void;
@@ -32,17 +34,25 @@ export function InsightTreeTableToolbar({
   onViewMode,
   activeFilter,
   fileCount,
+  excludedCount,
   onExpandAll,
   onCollapseAll,
   onClearFilter,
 }: Props) {
-  function btn(mode: "tree" | "type" | "score", label: string) {
+  function btn(
+    mode: "tree" | "type" | "score" | "excluded",
+    label: string,
+    count?: number
+  ) {
     return (
       <button
         className={`insight-tree-table__toolbar-btn${viewMode === mode ? " insight-tree-table__toolbar-btn--active" : ""}`}
         onClick={() => onViewMode(mode)}
       >
         {label}
+        {count !== undefined && count > 0 && (
+          <span className="insight-tree-table__toolbar-btn-count">{count}</span>
+        )}
       </button>
     );
   }
@@ -52,6 +62,7 @@ export function InsightTreeTableToolbar({
       {btn("tree", "Tree")}
       {btn("type", "By type")}
       {btn("score", "By score")}
+      {btn("excluded", "Excluded", excludedCount)}
       <span className="insight-tree-table__toolbar-sep" />
       <button
         className="insight-tree-table__toolbar-btn"

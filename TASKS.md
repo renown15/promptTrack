@@ -2,7 +2,43 @@
 
 _Updated by Claude. Visible in Agent Insight._
 
-## Status: completed
+## Status: idle
+
+## Recent: Analytics Tooltips with Period-over-Period Deltas
+
+- [x] Created `createAnalyticsTooltip()` factory function for data access
+- [x] Implemented delta calculations: `_prev_${fieldName}` tracking in data transforms
+- [x] Updated TrendsSection to use factory tooltips for volume & coverage data
+- [x] Updated FileCountTrendsSection to use factory tooltips
+- [x] Delta display shows: "Δ +100 (+5.2%)" format in tooltips
+- [x] All builds passing: lint ✅ typecheck ✅ vite build ✅
+
+Summary of changes:
+
+1. Core issue: Recharts tooltips only receive filtered payload, missing full data context needed for delta calculations
+2. Solution: Factory function `createAnalyticsTooltip(data)` closes over full data array for previous value lookup
+3. Each chart component creates tooltip with its own data closure (VolumeTooltip, CoverageTooltip, FileCountTooltip)
+4. Data transforms include `_prev_${fieldName}` for all numeric values across periods
+5. Tooltip displays change with percentage: handles undefined previous values gracefully
+
+## Fixed: April 5th Analytics Data Missing
+
+- [x] Identified root cause: UTC date conversion in analytics repositories
+- [x] Verified database has April 5th data (8 new files)
+- [x] Added `toLocalDateString()` helper to analytics.repository.ts (volume & coverage)
+- [x] Applied fix to analytics-file-count.repository.ts
+- [x] Extracted analytics routes to reduce collections.routes.ts size
+- [x] Extracted modal logic into InsightPageModals component
+- [x] All builds passing: lint ✅ typecheck ✅ vite build ✅
+
+Summary of changes:
+
+1. Date calculation bug: `toISOString().substring(0,10)` returns UTC dates, causing files scanned early on April 5 UK time (e.g. 00:30) to show as April 4 UTC
+2. Fixed by using local date components instead: `getFullYear()`, `getMonth()`, `getDate()`
+3. Applied to all analytics repositories that track dates
+4. Code cleanup: extracted 70+ lines of analytics route handlers and 60 lines of modals JSX into separate files
+
+## Previous Status: completed
 
 ### In-Scope Directory Selection Feature — REPLACED WITH EXCLUSION ON-HOVER
 

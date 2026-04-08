@@ -1,87 +1,16 @@
 import { ollamaRepository } from "@/repositories/ollama.repository.js";
 import type { MetricResult, MetricError } from "@/services/insight.cache.js";
+import { buildPrompt, parseMetricResponse } from "@/services/ollama.prompt.js";
+export type { MetricDefinition } from "@/services/ollama.metrics.js";
+export { DEFAULT_METRICS } from "@/services/ollama.metrics.js";
+import {
+  DEFAULT_METRICS,
+  type MetricDefinition,
+} from "@/services/ollama.metrics.js";
 
-export interface MetricDefinition {
-  name: string;
-  label: string;
-  description: string;
-  trackSensitiveRefs?: boolean;
-}
-
-export const DEFAULT_METRICS: MetricDefinition[] = [
-  {
-    name: "architecture",
-    label: "Arch",
-    description:
-      "Does this file respect layering and separation of concerns? Are there any boundary violations?",
-  },
-  {
-    name: "complexity",
-    label: "Cmplx",
-    description:
-      "Is this file overly complex, deeply nested, or hard to follow at a glance?",
-  },
-  {
-    name: "naming",
-    label: "Names",
-    description:
-      "Are identifiers (variables, functions, types) named clearly and consistently with the codebase conventions?",
-  },
-  {
-    name: "security",
-    label: "Sec",
-    description:
-      "Does this file contain security vulnerabilities or risky patterns? Look for injection risks, hardcoded secrets, insecure defaults, improper input validation, unsafe deserialization, or exposure of sensitive data. Also identify any file paths or filename patterns referenced, loaded, or written by this code that contain sensitive data (e.g. .env files, credential files, private keys, secrets config) and list them in sensitiveRefs.",
-    trackSensitiveRefs: true,
-  },
-  {
-    name: "eng_quality",
-    label: "EngQ",
-    description:
-      "Does this file adhere to industry-standard engineering practices that support DevSecOps? Consider: error handling, observability (logging/tracing), testability, immutability, principle of least privilege, secrets management, and absence of technical debt that would impede secure delivery.",
-  },
-  {
-    name: "dry",
-    label: "DRY",
-    description:
-      "Does this file repeat patterns that should be abstracted? Look for: copy-pasted blocks of near-identical code, boilerplate that could be a helper or factory, multiple functions with the same shape differing only in a parameter, and any logic duplicated from nearby files. Green = minimal repetition. Amber = some duplication worth noting. Red = significant repetition that should be refactored.",
-  },
-];
-
-const MAX_CONTENT_CHARS = 6000;
-
-function buildPrompt(
-  metric: MetricDefinition,
-  relativePath: string,
-  lineCount: number,
-  fileType: string,
-  content: string
-): string {
-  const body =
-    content.length > MAX_CONTENT_CHARS
-      ? content.slice(0, MAX_CONTENT_CHARS) + "\n... (truncated)"
-      : content;
-
-  const responseFormat = metric.trackSensitiveRefs
-    ? `{"status":"green","summary":"one sentence","sensitiveRefs":["path/to/file","*.ext"]}`
-    : `{"status":"green","summary":"one sentence"}`;
-
-  const extraInstruction = metric.trackSensitiveRefs
-    ? `\nsensitiveRefs must be an array of file paths or glob patterns referenced in this code that should be excluded from version control (e.g. ".env", ".env.local", "secrets.json", "*.pem"). Use [] if none found.`
-    : "";
-
-  return `Review this file for: ${metric.description}
-
-File: ${relativePath} (${lineCount} lines, type: .${fileType})
-
-\`\`\`
-${body}
-\`\`\`
-
-Respond with ONLY this JSON, no other text:
-${responseFormat}
-
-status must be "green" (good), "amber" (minor concerns), or "red" (significant issues).${extraInstruction}`;
+export interface OllamaCallMeta {
+  promptTokens: number | null;
+  responseTokens: number | null;
 }
 
 async function callOllama(
@@ -89,7 +18,7 @@ async function callOllama(
   model: string,
   prompt: string,
   timeoutMs: number
-): Promise<string> {
+): Promise<{ response: string; meta: OllamaCallMeta }> {
   const res = await fetch(`${endpoint}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -97,36 +26,18 @@ async function callOllama(
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`Ollama HTTP ${res.status}`);
-  const data = (await res.json()) as { response: string };
-  return data.response;
-}
-
-function parseMetricResponse(raw: string): MetricResult {
-  const trimmed = raw.trim();
-  let obj: unknown;
-  try {
-    obj = JSON.parse(trimmed);
-  } catch {
-    const match = trimmed.match(/\{[\s\S]*\}/);
-    if (!match)
-      throw new Error(`No JSON in response: ${trimmed.slice(0, 120)}`);
-    obj = JSON.parse(match[0]);
-  }
-  const parsed = obj as {
-    status?: string;
-    summary?: string;
-    sensitiveRefs?: unknown;
+  const data = (await res.json()) as {
+    response: string;
+    prompt_eval_count?: number;
+    eval_count?: number;
   };
-  const status = parsed.status as "green" | "amber" | "red";
-  if (!["green", "amber", "red"].includes(status))
-    throw new Error(`Unexpected status value: ${JSON.stringify(status)}`);
-  const result: MetricResult = { status, summary: parsed.summary ?? "" };
-  if (Array.isArray(parsed.sensitiveRefs)) {
-    result.sensitiveRefs = parsed.sensitiveRefs.filter(
-      (r): r is string => typeof r === "string" && r.length > 0
-    );
-  }
-  return result;
+  return {
+    response: data.response,
+    meta: {
+      promptTokens: data.prompt_eval_count ?? null,
+      responseTokens: data.eval_count ?? null,
+    },
+  };
 }
 
 export const ollamaService = {
@@ -189,29 +100,38 @@ export const ollamaService = {
     lineCount: number;
     fileType: string;
     content: string;
-  }): Promise<MetricResult | MetricError> {
+  }): Promise<{
+    result: MetricResult | MetricError;
+    meta: OllamaCallMeta;
+    promptChars: number;
+  }> {
+    const prompt = buildPrompt(
+      opts.metric,
+      opts.relativePath,
+      opts.lineCount,
+      opts.fileType,
+      opts.content
+    );
+    const promptChars = prompt.length;
     try {
-      const prompt = buildPrompt(
-        opts.metric,
-        opts.relativePath,
-        opts.lineCount,
-        opts.fileType,
-        opts.content
-      );
-      const raw = await callOllama(
+      const { response, meta } = await callOllama(
         opts.endpoint,
         opts.model,
         prompt,
         opts.timeoutMs
       );
-      return parseMetricResponse(raw);
+      return { result: parseMetricResponse(response), meta, promptChars };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error(
         `[ollama] ${opts.metric.name} failed for ${opts.relativePath}:`,
         msg
       );
-      return { error: msg };
+      return {
+        result: { error: msg },
+        meta: { promptTokens: null, responseTokens: null },
+        promptChars,
+      };
     }
   },
 };

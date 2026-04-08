@@ -33,3 +33,19 @@
 .metric-badge__label {
   @apply leading-none;
 }
+
+.metric-badge--overridden .metric-badge__label {
+  @apply italic;
+}
+
+.metric-badge__dot--accepted {
+  @apply bg-sky-400;
+}
+
+.metric-badge__dot--rejected {
+  @apply bg-muted-foreground/50;
+}
+
+.metric-badge__dot--override {
+  @apply bg-violet-400;
+}

@@ -6,6 +6,7 @@
   "words": [
     "cuid",
     "modelcontextprotocol",
+    "nowrap",
     "ollama",
     "prompttrack",
     "pytest",

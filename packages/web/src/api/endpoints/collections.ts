@@ -6,11 +6,20 @@ import type {
   UpdateCollectionInput,
 } from "@prompttrack/shared";
 
+export interface DocFreshnessOverride {
+  comment: string;
+  source: string;
+  createdAt: string;
+}
+
 export interface DocFile {
   name: string;
   relativePath: string;
   lineCount: number;
   updatedAt: string;
+  ageMs: number;
+  isStale: boolean;
+  freshnessOverride: DocFreshnessOverride | null;
 }
 
 export interface ApiKeyRecord {
@@ -57,6 +66,7 @@ export interface CodeMakeup {
   fileCount: number;
   lineCount: number;
   avgCoverage: number | null;
+  nearBlankCount: number;
 }
 
 export const collectionsApi = {

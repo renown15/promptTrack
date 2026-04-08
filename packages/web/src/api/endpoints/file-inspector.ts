@@ -13,6 +13,15 @@ export interface FileRefactorDTO {
   ideas: string;
 }
 
+export interface ConversationMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface FileDiscussionDTO {
+  response: string;
+}
+
 export const fileInspectorApi = {
   getContent: async (
     collectionId: string,
@@ -40,6 +49,19 @@ export const fileInspectorApi = {
   ): Promise<FileRefactorDTO> => {
     const r = await apiClient.post<FileRefactorDTO>(
       `/collections/${collectionId}/insights/file-refactor?path=${encodeURIComponent(relativePath)}`
+    );
+    return r.data;
+  },
+
+  discuss: async (
+    collectionId: string,
+    relativePath: string,
+    message: string,
+    history?: ConversationMessage[]
+  ): Promise<FileDiscussionDTO> => {
+    const r = await apiClient.post<FileDiscussionDTO>(
+      `/collections/${collectionId}/insights/file-discuss?path=${encodeURIComponent(relativePath)}`,
+      { path: relativePath, message, history }
     );
     return r.data;
   },

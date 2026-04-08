@@ -33,6 +33,13 @@ export const fileSnapshotRepository = {
     });
   },
 
+  async getLatestForFile(collectionId: string, relativePath: string) {
+    return prisma.fileSnapshotRecord.findFirst({
+      where: { collectionId, relativePath },
+      orderBy: { scannedAt: "desc" },
+    });
+  },
+
   async getHistory(collectionId: string, relativePath: string) {
     return prisma.fileSnapshotRecord.findMany({
       where: { collectionId, relativePath },

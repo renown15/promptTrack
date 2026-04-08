@@ -14,6 +14,13 @@ export type MetricValue = MetricResult | MetricError | "pending" | null;
 
 export type GitFileStatus = "untracked" | "modified" | "clean";
 
+export interface MetricOverride {
+  status: string;
+  comment: string;
+  source: "human" | "agent";
+  updatedAt: string; // ISO
+}
+
 export interface FileSnapshot {
   relativePath: string;
   name: string;
@@ -25,6 +32,7 @@ export interface FileSnapshot {
   lintErrors: number | null;
   gitStatus: GitFileStatus | null;
   metrics: Record<string, MetricValue>;
+  overrides: Record<string, MetricOverride>;
 }
 
 export interface ActiveLlmCall {
@@ -38,6 +46,7 @@ export interface CollectionInsightState {
   files: Map<string, FileSnapshot>;
   lastScan: Date | null;
   scanning: boolean;
+  analysing: boolean; // true while runAnalysisQueue is in progress
   gitignoreWarnings: string[];
   activeLlmCall: ActiveLlmCall | null;
 }
@@ -50,6 +59,7 @@ export function getOrCreateState(collectionId: string): CollectionInsightState {
       files: new Map(),
       lastScan: null,
       scanning: false,
+      analysing: false,
       gitignoreWarnings: [],
       activeLlmCall: null,
     });
@@ -100,6 +110,7 @@ export function serializeState(state: CollectionInsightState) {
     })),
     lastScan: state.lastScan?.toISOString() ?? null,
     scanning: state.scanning,
+    analysing: state.analysing,
     gitignoreWarnings: state.gitignoreWarnings,
     activeLlmCall: state.activeLlmCall,
   };

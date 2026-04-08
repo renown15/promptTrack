@@ -1,15 +1,17 @@
 import { collectionsApi } from "@/api/endpoints/collections";
+import { overridesApi } from "@/api/endpoints/insights.overrides";
 import { useMutate } from "@/hooks/useMutate";
 import type {
   CreateCollectionInput,
   UpdateCollectionInput,
 } from "@prompttrack/shared";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export type {
   ApiKeyRecord,
   CodeMakeup,
   CoverageSnapshot,
   DocFile,
+  DocFreshnessOverride,
   FileCountSnapshot,
   VolumeSnapshot,
 } from "@/api/endpoints/collections";
@@ -43,6 +45,45 @@ export function useDocContent(id: string, file: string | null) {
     queryKey: ["collections", id, "docs", file],
     queryFn: () => collectionsApi.getDocContent(id, file!),
     enabled: file !== null,
+  });
+}
+
+export function useMarkDocFresh(collectionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      relativePath,
+      comment,
+    }: {
+      relativePath: string;
+      comment: string;
+    }) =>
+      overridesApi.upsert(
+        collectionId,
+        relativePath,
+        "doc_freshness",
+        "accepted",
+        comment,
+        "human"
+      ),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["collections", collectionId, "docs"],
+      });
+    },
+  });
+}
+
+export function useRemoveDocFreshOverride(collectionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (relativePath: string) =>
+      overridesApi.delete(collectionId, relativePath, "doc_freshness"),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["collections", collectionId, "docs"],
+      });
+    },
   });
 }
 

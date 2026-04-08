@@ -6,11 +6,14 @@ type Props = {
   collectionDir: string | undefined;
   lastScan: string | undefined;
   scanning: boolean;
+  analysing: boolean;
+  pendingFileCount: number;
   activeLlmCall: ActiveLlmCallDTO | null;
   modelLabel: string | null;
   filteredCount: number | null;
   onScan: () => void;
   onConfig: () => void;
+  onLlmLog: () => void;
 };
 
 export function InsightTitleBar({
@@ -18,11 +21,14 @@ export function InsightTitleBar({
   collectionDir,
   lastScan,
   scanning,
+  analysing,
+  pendingFileCount,
   activeLlmCall,
   modelLabel,
   filteredCount,
   onScan,
   onConfig,
+  onLlmLog,
 }: Props) {
   return (
     <div className="agent-insight-page__title-bar">
@@ -50,9 +56,20 @@ export function InsightTitleBar({
             title={`${activeLlmCall.model} · ${activeLlmCall.file}`}
           >
             ◉ {activeLlmCall.metric} · {activeLlmCall.file.split("/").pop()}
+            {pendingFileCount > 1 && (
+              <span className="agent-insight-page__llm-queue">
+                {" "}
+                ({pendingFileCount} remaining)
+              </span>
+            )}
           </span>
         )}
-        {scanning && !activeLlmCall && (
+        {analysing && !activeLlmCall && pendingFileCount > 0 && (
+          <span className="agent-insight-page__llm-call">
+            ◌ {pendingFileCount} queued…
+          </span>
+        )}
+        {scanning && !activeLlmCall && !analysing && (
           <span className="agent-insight-page__scanning">Scanning…</span>
         )}
         <button
@@ -61,6 +78,13 @@ export function InsightTitleBar({
           disabled={scanning}
         >
           ↻ Scan
+        </button>
+        <button
+          className="agent-insight-page__log-btn"
+          onClick={onLlmLog}
+          title="View LLM call log"
+        >
+          LLM Log
         </button>
         <button
           className="agent-insight-page__config-btn"

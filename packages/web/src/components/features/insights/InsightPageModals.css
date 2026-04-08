@@ -1,0 +1,3 @@
+.insight-page-modals__panel {
+  height: var(--panel-h, 240px);
+}

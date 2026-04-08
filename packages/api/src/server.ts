@@ -11,7 +11,9 @@ import { promptRoutes } from "@/routes/prompts/prompts.routes.js";
 import { chainRoutes } from "@/routes/chains/chains.routes.js";
 import { collectionRoutes } from "@/routes/collections/collections.routes.js";
 import { fsRoutes } from "@/routes/fs/fs.routes.js";
+import { fileOverrideRoutes } from "@/routes/insights/file-override.routes.js";
 import { insightRoutes } from "@/routes/insights/insights.routes.js";
+import { llmLogRoutes } from "@/routes/insights/llm-log.routes.js";
 import { ciRoutes } from "@/routes/insights/ci.routes.js";
 import { repoSummaryRoutes } from "@/routes/insights/repo-summary.routes.js";
 import { fileInspectorRoutes } from "@/routes/insights/file-inspector.routes.js";
@@ -71,6 +73,8 @@ async function buildApp() {
   await fastify.register(collectionRoutes, { prefix: "/api/collections" });
   await fastify.register(fsRoutes, { prefix: "/api/fs" });
   await fastify.register(insightRoutes, { prefix: "/api/collections" });
+  await fastify.register(llmLogRoutes, { prefix: "/api/collections" });
+  await fastify.register(fileOverrideRoutes, { prefix: "/api/collections" });
   await fastify.register(ciRoutes, { prefix: "/api/collections" });
   await fastify.register(repoSummaryRoutes, { prefix: "/api/collections" });
   await fastify.register(fileInspectorRoutes, { prefix: "/api/collections" });

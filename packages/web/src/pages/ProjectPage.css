@@ -1,5 +1,9 @@
+.project-page {
+  @apply flex flex-col gap-5;
+}
+
 .project-page__header {
-  @apply flex flex-col gap-1 mb-5;
+  @apply flex flex-col gap-1;
 }
 
 .project-page__title {

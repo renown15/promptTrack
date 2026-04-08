@@ -56,6 +56,14 @@ export function CodeMakeupSection({ makeup, totalLines }: Props) {
                 <span title="percentage of total">
                   {((item.lineCount / totalLines) * 100).toFixed(1)}%
                 </span>
+                {item.nearBlankCount > 0 && (
+                  <span
+                    title="files with 1 line or less"
+                    style={{ color: "#ef4444", fontWeight: "600" }}
+                  >
+                    {item.nearBlankCount}⊘
+                  </span>
+                )}
                 {item.avgCoverage !== null && (
                   <span
                     className="analytics__composition-coverage"

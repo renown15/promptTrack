@@ -19,6 +19,7 @@ export function attachInsightSSE(
   const onGitignoreUpdated = (data: unknown) => send("gitignore_updated", data);
   const onLlmCallStart = (data: unknown) => send("llm_call_start", data);
   const onLlmCallEnd = (data: unknown) => send("llm_call_end", data);
+  const onAnalysisComplete = (data: unknown) => send("analysis_complete", data);
 
   insightEmitter.on(`file_updated:${id}`, onFileUpdated);
   insightEmitter.on(`file_removed:${id}`, onFileRemoved);
@@ -26,6 +27,7 @@ export function attachInsightSSE(
   insightEmitter.on(`gitignore_updated:${id}`, onGitignoreUpdated);
   insightEmitter.on(`llm_call_start:${id}`, onLlmCallStart);
   insightEmitter.on(`llm_call_end:${id}`, onLlmCallEnd);
+  insightEmitter.on(`analysis_complete:${id}`, onAnalysisComplete);
 
   res.on("close", () => {
     insightEmitter.off(`file_updated:${id}`, onFileUpdated);
@@ -34,6 +36,7 @@ export function attachInsightSSE(
     insightEmitter.off(`gitignore_updated:${id}`, onGitignoreUpdated);
     insightEmitter.off(`llm_call_start:${id}`, onLlmCallStart);
     insightEmitter.off(`llm_call_end:${id}`, onLlmCallEnd);
+    insightEmitter.off(`analysis_complete:${id}`, onAnalysisComplete);
     res.end();
     onClose();
   });

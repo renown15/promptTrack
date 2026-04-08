@@ -92,6 +92,7 @@ export async function readSnapshot(
       lintErrors: null,
       gitStatus: null,
       metrics: {},
+      overrides: {},
     };
   } catch {
     return null;

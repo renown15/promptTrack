@@ -1,18 +1,10 @@
-import { CIDetailPanel } from "@/components/features/insights/CIDetailPanel";
-import { FileInspectorModal } from "@/components/features/insights/FileInspectorModal";
 import { InsightActivityStack } from "@/components/features/insights/InsightActivityStack";
-import { InsightDetailPanel } from "@/components/features/insights/InsightDetailPanel";
-import { InsightRepoSummaryPanel } from "@/components/features/insights/InsightRepoSummaryPanel";
+import { InsightPageModals } from "@/components/features/insights/InsightPageModals";
 import { InsightSummaryPanel } from "@/components/features/insights/InsightSummaryPanel";
-import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 import { InsightTitleBar } from "@/components/features/insights/InsightTitleBar";
 import { InsightTreeTable } from "@/components/features/insights/InsightTreeTable";
-import { OllamaConfigModal } from "@/components/features/insights/OllamaConfigModal";
-import {
-  useCollections,
-  useUpdateInScopeDirectories,
-} from "@/hooks/useCollections";
-import type { InsightFilter } from "@/hooks/useInsights";
+import { useCollections } from "@/hooks/useCollections";
+import { useInsightPageHandlers } from "@/hooks/useInsightPageHandlers";
 import {
   useCIStatus,
   useFileDetail,
@@ -39,8 +31,20 @@ export function AgentInsightPage() {
   const collection = collections?.find((c) => c.id === id);
 
   const [showSummary, setShowSummary] = useState(false);
-  const [excludedPaths, setExcludedPaths] = useState<Set<string>>(new Set());
-  const updateExclusions = useUpdateInScopeDirectories(id ?? "");
+  const {
+    excludedPaths,
+    setExcludedPaths,
+    activeFilter,
+    setActiveFilter,
+    handleFilterToggle,
+    handleExcludePath,
+  } = useInsightPageHandlers(id ?? "");
+  const [showConfig, setShowConfig] = useState(false);
+  const [inspectedFile, setInspectedFile] = useState<string | null>(null);
+  const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [showCIDetail, setShowCIDetail] = useState(false);
+  const [showLlmLog, setShowLlmLog] = useState(false);
   const summary = useGenerateRepoSummary(id ?? "");
   const { data: state, isLoading } = useInsights(id ?? "", () => {
     setShowSummary(true);
@@ -50,14 +54,6 @@ export function AgentInsightPage() {
   const { data: ollamaCfg } = useOllamaConfig();
   const { data: aggregate } = useInsightAggregate(id ?? "");
   const { data: ciStatus } = useCIStatus(id ?? "");
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [showConfig, setShowConfig] = useState(false);
-  const [inspectedFile, setInspectedFile] = useState<string | null>(null);
-  const [highlightedPath, setHighlightedPath] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [showCIDetail, setShowCIDetail] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<InsightFilter | null>(null);
   const detail = useResizeHandle(
     "insight-detail-height",
     240,
@@ -74,6 +70,7 @@ export function AgentInsightPage() {
     "x",
     true
   );
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const file = searchParams.get("file");
@@ -95,22 +92,14 @@ export function AgentInsightPage() {
     : null;
   const allFiles = state?.files ?? [];
   const files = filterByExcludedPaths(allFiles, excludedPaths);
+  const pendingFileCount = allFiles.filter((f) =>
+    Object.values(f.metrics).some((v) => v === "pending")
+  ).length;
   const filteredFiles = applyFilter(files, activeFilter);
   const { data: fileDetail, isLoading: detailLoading } = useFileDetail(
     id ?? "",
     selectedFile
   );
-  const handleFilterToggle = (filter: InsightFilter) =>
-    setActiveFilter((prev) =>
-      prev && filterMatches(prev, filter) ? null : filter
-    );
-  const handleExcludePath = (path: string) => {
-    const newExcluded = new Set(excludedPaths);
-    if (newExcluded.has(path)) newExcluded.delete(path);
-    else newExcluded.add(path);
-    setExcludedPaths(newExcluded);
-    updateExclusions.mutate(Array.from(newExcluded));
-  };
   const handleCIClick = () => {
     setShowSummary(false);
     setShowCIDetail((prev) => !prev);
@@ -129,11 +118,14 @@ export function AgentInsightPage() {
         collectionDir={collection?.directory ?? undefined}
         lastScan={state?.lastScan ?? undefined}
         scanning={state?.scanning ?? false}
+        analysing={state?.analysing ?? false}
+        pendingFileCount={pendingFileCount}
         activeLlmCall={state?.activeLlmCall ?? null}
         modelLabel={modelLabel}
         filteredCount={activeFilter !== null ? filteredFiles.length : null}
         onScan={() => scan.mutate()}
         onConfig={() => setShowConfig(true)}
+        onLlmLog={() => setShowLlmLog((v) => !v)}
       />
 
       <InsightSummaryPanel
@@ -164,7 +156,8 @@ export function AgentInsightPage() {
             <>
               <div className="agent-insight-page__table-col">
                 <InsightTreeTable
-                  files={filteredFiles}
+                  collectionId={id ?? ""}
+                  files={allFiles}
                   metricLabels={metricLabels}
                   highlightedPath={highlightedPath}
                   selectedPath={selectedFile}
@@ -210,38 +203,31 @@ export function AgentInsightPage() {
           className="agent-insight-page__detail-panel"
           style={{ height: detail.size }}
         >
-          {showCIDetail && ciStatus ? (
-            <CIDetailPanel
+          {id && (
+            <InsightPageModals
+              showConfig={showConfig}
+              onConfigClose={() => setShowConfig(false)}
+              inspectedFile={inspectedFile}
+              onInspectedFileClose={() => setInspectedFile(null)}
+              collectionId={id}
+              showCIDetail={showCIDetail}
               ciStatus={ciStatus}
-              onClose={() => setShowCIDetail(false)}
-            />
-          ) : showSummary ? (
-            <InsightRepoSummaryPanel
-              summary={summary.data}
-              isLoading={summary.isPending}
-              onClose={() => setShowSummary(false)}
-            />
-          ) : (
-            <InsightDetailPanel
-              relativePath={selectedFile}
-              detail={selectedFile ? fileDetail : undefined}
-              isLoading={selectedFile ? detailLoading : false}
+              onCIDetailClose={() => setShowCIDetail(false)}
+              showSummary={showSummary}
+              summary={summary}
+              onSummaryClose={() => setShowSummary(false)}
+              showLlmLog={showLlmLog}
+              onLlmLogClose={() => setShowLlmLog(false)}
+              selectedFile={selectedFile}
+              fileDetail={fileDetail}
+              detailLoading={detailLoading}
               metricLabels={metricLabels}
-              onClose={() => setSelectedFile(null)}
+              onDetailClose={() => setSelectedFile(null)}
+              detail={detail}
             />
           )}
         </div>
       </div>
-
-      {showConfig && <OllamaConfigModal onClose={() => setShowConfig(false)} />}
-      {inspectedFile && id && (
-        <FileInspectorModal
-          collectionId={id}
-          relativePath={inspectedFile}
-          metricLabels={metricLabels}
-          onClose={() => setInspectedFile(null)}
-        />
-      )}
     </div>
   );
 }

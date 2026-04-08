@@ -9,12 +9,16 @@ import {
   buildTypeTree,
   collectAllFolderPaths,
   flattenVisible,
-  rowId,
 } from "@/components/features/insights/InsightTreeTable.utils";
+import { filterTreeTableFiles } from "@/components/features/insights/InsightTreeTable.filter";
 import { InsightTreeTableToolbar } from "@/components/features/insights/InsightTreeTableToolbar";
-import { useEffect, useMemo, useState } from "react";
+import { FileDiscussionMenu } from "@/components/features/insights/FileDiscussionMenu";
+import { useHighlightPath } from "@/components/features/insights/InsightTreeTable.hooks";
+import { useOverrideDialog } from "@/components/features/insights/InsightTreeTable.override";
+import { useMemo, useState, useEffect } from "react";
 
 type Props = {
+  collectionId: string;
   files: FileSnapshotDTO[];
   metricLabels: Record<string, string>;
   highlightedPath: string | null;
@@ -28,6 +32,7 @@ type Props = {
 };
 
 export function InsightTreeTable({
+  collectionId,
   files,
   metricLabels,
   highlightedPath,
@@ -41,7 +46,16 @@ export function InsightTreeTable({
 }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [flashPath, setFlashPath] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"tree" | "type" | "score">("tree");
+  const [viewMode, setViewMode] = useState<
+    "tree" | "type" | "score" | "excluded"
+  >("tree");
+  const [discussionFile, setDiscussionFile] = useState<string | null>(null);
+  const [discussionRect, setDiscussionRect] = useState<DOMRect | null>(null);
+  const { openOverride, dialog: overrideDialog } = useOverrideDialog(
+    collectionId,
+    files,
+    metricLabels
+  );
 
   const metricNames = useMemo(() => Object.keys(metricLabels), [metricLabels]);
   const metricEntries = useMemo(
@@ -49,10 +63,18 @@ export function InsightTreeTable({
     [metricLabels]
   );
 
-  const tree = useMemo(() => buildTree(files), [files]);
-  const typeTree = useMemo(() => buildTypeTree(files), [files]);
+  // Filter files based on view mode, exclusions, and active filter
+  const filteredFiles = useMemo(
+    () => filterTreeTableFiles(files, viewMode, excludedPaths, activeFilter),
+    [files, viewMode, excludedPaths, activeFilter]
+  );
+
+  const tree = useMemo(() => buildTree(filteredFiles), [filteredFiles]);
+  const typeTree = useMemo(() => buildTypeTree(filteredFiles), [filteredFiles]);
   const activeTree =
-    viewMode === "tree" || viewMode === "score" ? tree : typeTree;
+    viewMode === "tree" || viewMode === "score" || viewMode === "excluded"
+      ? tree
+      : typeTree;
   const allFolderPaths = useMemo(
     () => new Set(collectAllFolderPaths(activeTree)),
     [activeTree]
@@ -61,57 +83,29 @@ export function InsightTreeTable({
 
   const scoreRows = useMemo(
     () =>
-      [...files]
+      [...filteredFiles]
         .filter((f) => f.problemScore > 0)
         .sort((a, b) => b.problemScore - a.problemScore)
         .map((f) => ({ kind: "file" as const, file: f, depth: 0 })),
-    [files]
+    [filteredFiles]
   );
 
-  const rows = useMemo(
-    () =>
-      viewMode === "score"
-        ? scoreRows
-        : flattenVisible(activeTree, 0, effectiveExpanded, metricNames, true),
-    [viewMode, scoreRows, activeTree, effectiveExpanded, metricNames]
-  );
+  const rows = useMemo(() => {
+    if (viewMode === "score") return scoreRows;
+    return flattenVisible(activeTree, 0, effectiveExpanded, metricNames, true);
+  }, [viewMode, scoreRows, activeTree, effectiveExpanded, metricNames]);
 
   useEffect(() => {
     setExpanded(new Set());
   }, [viewMode]);
 
-  useEffect(() => {
-    if (!highlightedPath) return;
-    if (viewMode === "type") {
-      const file = files.find((f) => f.relativePath === highlightedPath);
-      if (file) {
-        setExpanded((prev) => {
-          const next = new Set(prev);
-          next.add(`__type__${file.fileType}`);
-          return next;
-        });
-      }
-    } else {
-      const parts = highlightedPath.split("/");
-      const ancestors = parts
-        .slice(0, -1)
-        .map((_, i) => parts.slice(0, i + 1).join("/"))
-        .filter(Boolean);
-      setExpanded((prev) => {
-        const next = new Set(prev);
-        ancestors.forEach((p) => next.add(p));
-        return next;
-      });
-    }
-    setFlashPath(highlightedPath);
-    setTimeout(() => {
-      document
-        .getElementById(rowId(highlightedPath))
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 50);
-    const timer = setTimeout(() => setFlashPath(null), 1800);
-    return () => clearTimeout(timer);
-  }, [highlightedPath]);
+  useHighlightPath({
+    highlightedPath,
+    viewMode,
+    files,
+    onSetFlash: setFlashPath,
+    onSetExpanded: setExpanded,
+  });
 
   function toggleFolder(path: string) {
     setExpanded((prev) => {
@@ -129,6 +123,7 @@ export function InsightTreeTable({
         onViewMode={setViewMode}
         activeFilter={activeFilter}
         fileCount={files.length}
+        excludedCount={excludedPaths.size}
         onExpandAll={() =>
           setExpanded(new Set(collectAllFolderPaths(activeTree)))
         }
@@ -180,10 +175,33 @@ export function InsightTreeTable({
               metricEntries={metricEntries}
               onSelect={onFileSelect}
               onInspect={onInspect}
+              onDiscuss={(e) => {
+                setDiscussionFile(row.file.relativePath);
+                setDiscussionRect(
+                  (e.currentTarget as HTMLButtonElement).getBoundingClientRect()
+                );
+              }}
+              onOverride={(metric) =>
+                openOverride(row.file.relativePath, metric)
+              }
             />
           );
         })}
       </div>
+
+      {discussionFile && discussionRect && (
+        <FileDiscussionMenu
+          collectionId={collectionId}
+          relativePath={discussionFile}
+          triggerRect={discussionRect}
+          onClose={() => {
+            setDiscussionFile(null);
+            setDiscussionRect(null);
+          }}
+        />
+      )}
+
+      {overrideDialog}
     </div>
   );
 }

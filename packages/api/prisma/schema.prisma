@@ -83,10 +83,12 @@ model Collection {
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 
-  prompts       PromptCollection[]
-  chains        ChainCollection[]
-  fileSnapshots FileSnapshotRecord[]
-  apiKeys       ApiKey[]
+  prompts            PromptCollection[]
+  chains             ChainCollection[]
+  fileSnapshots      FileSnapshotRecord[]
+  apiKeys            ApiKey[]
+  llmCallLogs        LlmCallLog[]
+  fileStatusOverrides FileStatusOverride[]
 
   @@map("collections")
 }
@@ -295,6 +297,26 @@ model ChainEdge {
   @@map("chain_edges")
 }
 
+model LlmCallLog {
+  id           String   @id @default(cuid())
+  collectionId String   @map("collection_id")
+  relativePath String   @map("relative_path")
+  metric       String
+  model        String
+  startedAt    DateTime @map("started_at")
+  durationMs   Int      @map("duration_ms")
+  promptChars  Int      @map("prompt_chars")
+  promptTokens Int?     @map("prompt_tokens")
+  responseTokens Int?   @map("response_tokens")
+  status       String   // green | amber | red | error
+  errorReason  String?  @map("error_reason")
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId, startedAt])
+  @@map("llm_call_logs")
+}
+
 model OllamaConfig {
   id        String   @id @default(cuid())
   endpoint  String   @default("http://localhost:11434")
@@ -325,4 +347,23 @@ model AuditLog {
   @@index([promptId])
   @@index([chainId])
   @@map("audit_logs")
+}
+
+model FileStatusOverride {
+  id            String    @id @default(cuid())
+  collectionId  String    @map("collection_id")
+  relativePath  String    @map("relative_path")
+  metric        String
+  status        String    // green | amber | red | accepted | rejected
+  comment       String
+  source        String    @default("human") // human | agent
+  supersededAt  DateTime? @map("superseded_at") // null = active; set = historical
+  supersededBy  String?   @map("superseded_by")  // "file_changed" | "user_update" | "user_delete"
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId, relativePath, metric])
+  @@index([collectionId, relativePath])
+  @@map("file_status_overrides")
 }

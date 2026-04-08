@@ -1,0 +1,105 @@
+.file-override-dialog__overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6;
+}
+
+.file-override-dialog {
+  @apply bg-card border border-border rounded-xl shadow-xl flex flex-col;
+  width: min(480px, 100%);
+}
+
+.file-override-dialog__header {
+  @apply flex items-center justify-between px-5 py-3 border-b border-border shrink-0;
+}
+
+.file-override-dialog__title {
+  @apply text-sm font-semibold text-foreground;
+}
+
+.file-override-dialog__subtitle {
+  @apply text-xs text-muted-foreground font-mono mt-0.5;
+}
+
+.file-override-dialog__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors text-sm;
+}
+
+.file-override-dialog__body {
+  @apply flex flex-col gap-4 px-5 py-4;
+}
+
+.file-override-dialog__field {
+  @apply flex flex-col gap-1.5;
+}
+
+.file-override-dialog__label {
+  @apply text-xs font-semibold text-foreground;
+}
+
+.file-override-dialog__status-row {
+  @apply flex gap-2;
+}
+
+.file-override-dialog__status-btn {
+  @apply flex-1 py-1.5 rounded border border-border text-xs font-medium
+    transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50;
+}
+
+.file-override-dialog__status-btn--green {
+  @apply border-green-500/40 text-green-600 hover:bg-green-500/10;
+}
+
+.file-override-dialog__status-btn--amber {
+  @apply border-amber-500/40 text-amber-600 hover:bg-amber-500/10;
+}
+
+.file-override-dialog__status-btn--red {
+  @apply border-red-500/40 text-red-600 hover:bg-red-500/10;
+}
+
+.file-override-dialog__status-btn--accepted {
+  @apply border-sky-500/40 text-sky-600 hover:bg-sky-500/10;
+}
+
+.file-override-dialog__status-btn--rejected {
+  @apply border-muted-foreground/40 text-muted-foreground hover:bg-muted/50;
+}
+
+.file-override-dialog__status-btn--active {
+  @apply ring-1 ring-inset bg-muted/40;
+}
+
+.file-override-dialog__textarea {
+  @apply w-full rounded border border-border bg-background px-3 py-2
+    text-xs text-foreground placeholder:text-muted-foreground
+    focus:outline-none focus:ring-1 focus:ring-primary resize-none;
+}
+
+.file-override-dialog__existing {
+  @apply text-xs text-muted-foreground bg-muted/30 rounded p-2;
+}
+
+.file-override-dialog__existing-label {
+  @apply font-semibold text-foreground mr-1;
+}
+
+.file-override-dialog__footer {
+  @apply flex items-center justify-between gap-2 px-5 py-3 border-t border-border;
+}
+
+.file-override-dialog__remove-btn {
+  @apply text-xs text-red-500 hover:text-red-600 transition-colors;
+}
+
+.file-override-dialog__actions {
+  @apply flex gap-2 ml-auto;
+}
+
+.file-override-dialog__cancel-btn {
+  @apply text-xs px-3 py-1.5 rounded border border-border
+    text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors;
+}
+
+.file-override-dialog__save-btn {
+  @apply text-xs px-3 py-1.5 rounded bg-primary text-primary-foreground
+    hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}

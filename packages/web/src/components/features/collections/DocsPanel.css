@@ -1,30 +1,46 @@
 .docs-panel {
-  @apply flex flex-col rounded-xl border border-border bg-card overflow-hidden;
-  grid-column: 1 / -1;
+  @apply flex flex-col rounded-xl border border-border bg-card;
 }
 
 .docs-panel__header {
-  @apply flex items-center px-4 py-3 border-b border-border bg-muted/30 shrink-0;
+  @apply flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30 shrink-0 rounded-t-xl;
 }
 
 .docs-panel__title {
   @apply text-sm font-semibold text-foreground;
 }
 
+.docs-panel__stale-legend {
+  @apply text-xs text-muted-foreground;
+}
+
 .docs-panel__file-list {
-  @apply flex flex-wrap gap-2 p-4;
+  @apply grid gap-2 p-4;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
 
 .docs-panel__loading,
 .docs-panel__empty {
   @apply text-xs text-muted-foreground;
+  grid-column: 1 / -1;
 }
 
 .docs-panel__file {
-  @apply flex flex-col items-start gap-1 px-3 py-2.5 rounded-lg border border-border
-    hover:bg-muted/50 hover:border-border/80 transition-colors text-left;
-  width: 180px;
-  height: 80px;
+  @apply flex flex-col items-start rounded-lg border border-border transition-colors overflow-hidden;
+}
+
+.docs-panel__file--stale {
+  @apply border-amber-500/50 bg-amber-500/5;
+}
+
+.docs-panel__file--reviewed {
+  @apply border-sky-500/40 bg-sky-500/5;
+}
+
+/* The clickable inner button that opens the modal */
+.docs-panel__file-content {
+  @apply flex flex-col items-start gap-1 px-3 py-2.5 w-full text-left
+    hover:bg-muted/50 transition-colors;
 }
 
 .docs-panel__file-name {
@@ -43,11 +59,61 @@
 }
 
 .docs-panel__file-meta {
-  @apply flex items-center gap-2 text-xs text-muted-foreground mt-auto;
+  @apply flex items-center gap-2 text-xs text-muted-foreground mt-1;
 }
 
 .docs-panel__file-meta span {
   @apply shrink-0;
+}
+
+.docs-panel__age--stale {
+  @apply text-amber-500 font-medium;
+}
+
+.docs-panel__stale-badge {
+  @apply px-1.5 py-0.5 rounded text-xs font-medium bg-amber-500/15 text-amber-600;
+}
+
+.docs-panel__reviewed-badge {
+  @apply px-1.5 py-0.5 rounded text-xs font-medium bg-sky-500/15 text-sky-600 cursor-help;
+}
+
+/* Override comment row */
+.docs-panel__override-row {
+  @apply flex items-center gap-1 px-3 pb-2 w-full;
+}
+
+.docs-panel__override-comment {
+  @apply text-xs text-muted-foreground flex-1 truncate italic;
+}
+
+.docs-panel__override-remove {
+  @apply text-xs text-muted-foreground hover:text-destructive transition-colors shrink-0 px-1;
+}
+
+/* Mark as reviewed button */
+.docs-panel__mark-reviewed {
+  @apply w-full text-xs text-muted-foreground hover:text-foreground px-3 pb-2 pt-0 text-left
+    transition-colors;
+}
+
+/* Inline review form */
+.docs-panel__review-form {
+  @apply flex items-center gap-1 px-2 pb-2;
+}
+
+.docs-panel__review-input {
+  @apply flex-1 text-xs bg-background border border-border rounded px-2 py-1
+    placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-ring;
+}
+
+.docs-panel__review-save {
+  @apply text-xs px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90
+    transition-colors disabled:opacity-50;
+}
+
+.docs-panel__review-cancel {
+  @apply text-xs text-muted-foreground hover:text-foreground transition-colors px-1;
 }
 
 /* Modal */

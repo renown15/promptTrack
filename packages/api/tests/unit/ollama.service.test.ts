@@ -163,11 +163,15 @@ describe("ollamaService.analyzeMetric", () => {
       ok: true,
       json: async () => ({
         response: '{"status":"green","summary":"Looks good"}',
+        prompt_eval_count: 120,
+        eval_count: 30,
       }),
     } as Response);
 
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result, meta } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toEqual({ status: "green", summary: "Looks good" });
+    expect(meta.promptTokens).toBe(120);
+    expect(meta.responseTokens).toBe(30);
   });
 
   it("returns amber and red statuses", async () => {
@@ -178,8 +182,18 @@ describe("ollamaService.analyzeMetric", () => {
       }),
     } as Response);
 
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toEqual({ status: "red", summary: "Has issues" });
+  });
+
+  it("handles missing token counts gracefully", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ response: '{"status":"green","summary":"ok"}' }),
+    } as Response);
+    const { meta } = await ollamaService.analyzeMetric(baseOpts);
+    expect(meta.promptTokens).toBeNull();
+    expect(meta.responseTokens).toBeNull();
   });
 
   it("extracts JSON embedded in prose response", async () => {
@@ -191,34 +205,34 @@ describe("ollamaService.analyzeMetric", () => {
       }),
     } as Response);
 
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toEqual({ status: "amber", summary: "Minor concerns" });
   });
 
-  it("returns error when Ollama HTTP fails", async () => {
+  it("returns error result when Ollama HTTP fails", async () => {
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: false,
       status: 500,
     } as Response);
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toHaveProperty("error");
   });
 
-  it("returns error when response JSON is malformed", async () => {
+  it("returns error result when response JSON is malformed", async () => {
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ response: "not json at all" }),
     } as Response);
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toHaveProperty("error");
   });
 
-  it("returns error when status value is invalid", async () => {
+  it("returns error result when status value is invalid", async () => {
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ response: '{"status":"yellow","summary":"hm"}' }),
     } as Response);
-    const result = await ollamaService.analyzeMetric(baseOpts);
+    const { result } = await ollamaService.analyzeMetric(baseOpts);
     expect(result).toHaveProperty("error");
   });
 
@@ -230,6 +244,15 @@ describe("ollamaService.analyzeMetric", () => {
     await ollamaService.analyzeMetric({ ...baseOpts, timeoutMs: 15_000 });
     const init = vi.mocked(fetch).mock.calls[0]![1] as RequestInit;
     expect(init.signal).toBeDefined();
+  });
+
+  it("returns promptChars matching the built prompt length", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ response: '{"status":"green","summary":"ok"}' }),
+    } as Response);
+    const { promptChars } = await ollamaService.analyzeMetric(baseOpts);
+    expect(promptChars).toBeGreaterThan(0);
   });
 
   it("truncates content exceeding 6000 chars", async () => {

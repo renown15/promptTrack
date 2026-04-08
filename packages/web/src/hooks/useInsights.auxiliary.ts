@@ -106,3 +106,86 @@ export function useCIStatus(collectionId: string) {
     refetchInterval: 120_000,
   });
 }
+
+export function useLlmLog(collectionId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["llm-log", collectionId],
+    queryFn: () => insightsApi.getLlmLog(collectionId),
+    enabled: !!collectionId && enabled,
+    staleTime: 0,
+  });
+}
+
+export function useClearLlmLog(collectionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => insightsApi.clearLlmLog(collectionId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["llm-log", collectionId],
+      });
+    },
+  });
+}
+
+export function useUpsertOverride(collectionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      relativePath,
+      metric,
+      status,
+      comment,
+      source,
+    }: {
+      relativePath: string;
+      metric: string;
+      status: string;
+      comment: string;
+      source: "human" | "agent";
+    }) =>
+      insightsApi.upsertOverride(
+        collectionId,
+        relativePath,
+        metric,
+        status,
+        comment,
+        source
+      ),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["insights", collectionId],
+      });
+    },
+  });
+}
+
+export function useDeleteOverride(collectionId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      relativePath,
+      metric,
+    }: {
+      relativePath: string;
+      metric: string;
+    }) => insightsApi.deleteOverride(collectionId, relativePath, metric),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["insights", collectionId],
+      });
+    },
+  });
+}
+
+export function useOverrideHistory(
+  collectionId: string,
+  relativePath: string | null
+) {
+  return useQuery({
+    queryKey: ["override-history", collectionId, relativePath],
+    queryFn: () => insightsApi.overrideHistory(collectionId, relativePath!),
+    enabled: !!collectionId && !!relativePath,
+    staleTime: 0,
+  });
+}

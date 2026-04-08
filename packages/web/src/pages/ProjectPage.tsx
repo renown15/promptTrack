@@ -70,10 +70,10 @@ export function ProjectPage() {
             />
           )}
         </section>
-
-        {id && collection?.directory && <DocsPanel collectionId={id} />}
-        {id && <AgentKeysPanel collectionId={id} />}
       </div>
+
+      {id && collection?.directory && <DocsPanel collectionId={id} />}
+      {id && <AgentKeysPanel collectionId={id} />}
 
       {executiveIds && id && (
         <ExecutivePromptModal

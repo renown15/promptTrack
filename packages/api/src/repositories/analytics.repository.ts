@@ -1,5 +1,20 @@
 import { prisma } from "@/config/prisma.js";
 
+function toLocalDateString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function shouldExcludePath(path: string, excludedDirs: string[]): boolean {
+  if (!excludedDirs || excludedDirs.length === 0) return false;
+  const firstSegment = path.split("/")[0];
+  return excludedDirs.some(
+    (dir) => dir === firstSegment || path.startsWith(dir + "/")
+  );
+}
+
 export interface VolumeSnapshot {
   date: string;
   totalFiles: number;
@@ -21,7 +36,8 @@ export interface CoverageSnapshot {
 export const analyticsRepository = {
   async getVolumeTimeseries(
     collectionId: string,
-    days: number = 30
+    days: number = 30,
+    excludedDirs: string[] = []
   ): Promise<VolumeSnapshot[]> {
     const displayEndDate = new Date();
     const displayStartDate = new Date();
@@ -41,7 +57,12 @@ export const analyticsRepository = {
       orderBy: { scannedAt: "asc" },
     });
 
-    if (allRecords.length === 0) {
+    // Filter by excluded directories
+    const filteredRecords = allRecords.filter(
+      (r) => !shouldExcludePath(r.relativePath, excludedDirs)
+    );
+
+    if (filteredRecords.length === 0) {
       return [];
     }
 
@@ -51,12 +72,10 @@ export const analyticsRepository = {
       { date: string; lineCount: number; fileType: string }
     >();
 
-    allRecords.forEach((record) => {
+    filteredRecords.forEach((record) => {
       const fileKey = `${record.relativePath}:${record.fileType}`;
       if (!fileFirstAppearance.has(fileKey)) {
-        const dateKey = new Date(record.scannedAt)
-          .toISOString()
-          .substring(0, 10);
+        const dateKey = toLocalDateString(new Date(record.scannedAt));
         fileFirstAppearance.set(fileKey, {
           date: dateKey,
           lineCount: record.lineCount,
@@ -81,12 +100,12 @@ export const analyticsRepository = {
     const endDate = new Date(displayEndDate);
 
     while (currentDate <= endDate) {
-      allDatesArray.push(currentDate.toISOString().substring(0, 10));
+      allDatesArray.push(toLocalDateString(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
     // For each date, calculate cumulative lines and files
-    const displayStartStr = displayStartDate.toISOString().substring(0, 10);
+    const displayStartStr = toLocalDateString(displayStartDate);
     const result: VolumeSnapshot[] = [];
 
     allDatesArray.forEach((date) => {
@@ -134,7 +153,8 @@ export const analyticsRepository = {
 
   async getCoverageTimeseries(
     collectionId: string,
-    days: number = 30
+    days: number = 30,
+    excludedDirs: string[] = []
   ): Promise<CoverageSnapshot[]> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -148,14 +168,20 @@ export const analyticsRepository = {
       select: {
         scannedAt: true,
         coverage: true,
+        relativePath: true,
       },
       orderBy: { scannedAt: "asc" },
     });
 
-    type Record = (typeof records)[0];
+    // Filter by excluded directories
+    const filteredRecords = records.filter(
+      (r) => !shouldExcludePath(r.relativePath, excludedDirs)
+    );
+
+    type Record = (typeof filteredRecords)[0];
     const byDate = new Map<string, Record[]>();
-    records.forEach((record) => {
-      const dateKey = new Date(record.scannedAt).toISOString().substring(0, 10);
+    filteredRecords.forEach((record) => {
+      const dateKey = toLocalDateString(new Date(record.scannedAt));
       if (!byDate.has(dateKey)) {
         byDate.set(dateKey, []);
       }
