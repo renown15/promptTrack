@@ -1,6 +1,7 @@
 import { collectionRepository } from "@/repositories/collection.repository.js";
 import { fileSnapshotRepository } from "@/repositories/file-snapshot.repository.js";
 import { fileStatusOverrideRepository } from "@/repositories/file-status-override.repository.js";
+import { docsAnalyzerService } from "@/services/docs.analyzer.js";
 import { getPerFileMaps } from "@/services/discovery.per-file.js";
 import {
   emitFileUpdated,
@@ -134,7 +135,10 @@ export const insightService = {
           insightEmitter.emit(`analysis_complete:${collectionId}`, {
             timestamp: new Date().toISOString(),
           });
+          docsAnalyzerService.analyze(collectionId, directory).catch(() => {});
         });
+    } else {
+      docsAnalyzerService.analyze(collectionId, directory).catch(() => {});
     }
   },
 

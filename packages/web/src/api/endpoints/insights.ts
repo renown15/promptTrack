@@ -19,8 +19,8 @@ export interface FileMetricError {
 }
 
 export type {
-  MetricOverrideDTO,
   FileStatusOverrideDTO,
+  MetricOverrideDTO,
 } from "@/api/endpoints/insights.overrides";
 
 export interface FileSnapshotDTO {

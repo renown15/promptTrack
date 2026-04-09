@@ -1,9 +1,9 @@
 import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
-import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 import {
   Badge,
   StatRow,
 } from "@/components/features/insights/InsightSummaryPanel.helpers";
+import { filterMatches } from "@/components/features/insights/InsightSummaryPanel.utils";
 
 type Props = {
   files: FileSnapshotDTO[];

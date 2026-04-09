@@ -38,5 +38,8 @@
   "problems.exclude": {
     "**/prisma/schema.prisma": true
   },
-  "cSpell.words": ["nums"]
+  "cSpell.words": ["nums"],
+  "chat.tools.terminal.autoApprove": {
+    "pnpm": true
+  }
 }

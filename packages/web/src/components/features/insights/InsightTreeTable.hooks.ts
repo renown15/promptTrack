@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import type { FileSnapshotDTO } from "@/api/endpoints/insights";
 import { rowId } from "@/components/features/insights/InsightTreeTable.utils";
+import { useEffect } from "react";
 
 type UseHighlightPathProps = {
   highlightedPath: string | null;

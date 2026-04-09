@@ -1,4 +1,5 @@
 import { apiClient } from "@/api/client";
+import { collectionsAnalyticsApi } from "@/api/endpoints/collections.analytics";
 import type {
   CollectionDTO,
   CreateCollectionInput,
@@ -10,6 +11,13 @@ export interface DocFreshnessOverride {
   comment: string;
   source: string;
   createdAt: string;
+}
+
+export interface DocAnalysisResult {
+  status: "adequate" | "needs_work" | "sparse";
+  summary: string;
+  suggestions: string[];
+  analyzedAt: string;
 }
 
 export interface DocFile {
@@ -129,6 +137,14 @@ export const collectionsApi = {
     return response.data.content;
   },
 
+  getDocAnalysis: async (id: string): Promise<DocAnalysisResult | null> => {
+    const response = await apiClient.get<DocAnalysisResult>(
+      `/collections/${id}/docs/analysis`,
+      { validateStatus: (s) => s === 200 || s === 204 }
+    );
+    return response.status === 204 ? null : response.data;
+  },
+
   listApiKeys: async (id: string): Promise<ApiKeyRecord[]> => {
     const response = await apiClient.get<ApiKeyRecord[]>(
       `/collections/${id}/api-keys`
@@ -158,53 +174,7 @@ export const collectionsApi = {
     return response.data;
   },
 
-  getAnalytics: async (id: string, days: number = 30) => {
-    const response = await apiClient.get(`/collections/${id}/analytics`, {
-      params: { days },
-    });
-    return response.data;
-  },
-
-  getVolumeAnalytics: async (id: string, days: number = 30) => {
-    const response = await apiClient.get(
-      `/collections/${id}/analytics/volume`,
-      {
-        params: { days },
-      }
-    );
-    return response.data;
-  },
-
-  getCoverageAnalytics: async (id: string, days: number = 30) => {
-    const response = await apiClient.get(
-      `/collections/${id}/analytics/coverage`,
-      { params: { days } }
-    );
-    return response.data;
-  },
-
-  getFileCountAnalytics: async (id: string, days: number = 30) => {
-    const response = await apiClient.get(
-      `/collections/${id}/analytics/file-count`,
-      { params: { days } }
-    );
-    return response.data;
-  },
-
-  getCodeMakeupAnalytics: async (id: string) => {
-    const response = await apiClient.get(`/collections/${id}/analytics/makeup`);
-    return response.data;
-  },
-
-  getGrowthAnalytics: async (id: string, days: number = 30) => {
-    const response = await apiClient.get(
-      `/collections/${id}/analytics/growth`,
-      {
-        params: { days },
-      }
-    );
-    return response.data;
-  },
+  ...collectionsAnalyticsApi,
 
   getDirectoryStructure: async (id: string) => {
     const response = await apiClient.get(

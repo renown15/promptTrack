@@ -130,3 +130,7 @@
 .analytics__error {
   @apply bg-destructive/10 text-destructive p-4 rounded-lg;
 }
+
+.analytics__near-blank {
+  @apply text-red-500 font-semibold;
+}

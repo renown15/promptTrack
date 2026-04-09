@@ -1,5 +1,9 @@
 import type { FileSnapshotDTO, InsightFilter } from "@/api/endpoints/insights";
+import { FileDiscussionMenu } from "@/components/features/insights/FileDiscussionMenu";
 import "@/components/features/insights/InsightTreeTable.css";
+import { filterTreeTableFiles } from "@/components/features/insights/InsightTreeTable.filter";
+import { useHighlightPath } from "@/components/features/insights/InsightTreeTable.hooks";
+import { useOverrideDialog } from "@/components/features/insights/InsightTreeTable.override";
 import {
   FileTableRow,
   FolderTableRow,
@@ -10,12 +14,8 @@ import {
   collectAllFolderPaths,
   flattenVisible,
 } from "@/components/features/insights/InsightTreeTable.utils";
-import { filterTreeTableFiles } from "@/components/features/insights/InsightTreeTable.filter";
 import { InsightTreeTableToolbar } from "@/components/features/insights/InsightTreeTableToolbar";
-import { FileDiscussionMenu } from "@/components/features/insights/FileDiscussionMenu";
-import { useHighlightPath } from "@/components/features/insights/InsightTreeTable.hooks";
-import { useOverrideDialog } from "@/components/features/insights/InsightTreeTable.override";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Props = {
   collectionId: string;

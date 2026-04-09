@@ -14,6 +14,30 @@
   @apply text-xs text-muted-foreground;
 }
 
+.docs-panel__analysis {
+  @apply flex flex-col gap-1.5 px-4 py-3 border-b border-border text-sm;
+}
+
+.docs-panel__analysis--adequate {
+  @apply bg-green-500/5 border-b-green-500/20;
+}
+
+.docs-panel__analysis--needs_work {
+  @apply bg-amber-500/5 border-b-amber-500/20;
+}
+
+.docs-panel__analysis--sparse {
+  @apply bg-red-500/5 border-b-red-500/20;
+}
+
+.docs-panel__analysis-summary {
+  @apply text-sm text-foreground;
+}
+
+.docs-panel__analysis-suggestions {
+  @apply flex flex-col gap-0.5 pl-4 list-disc text-xs text-muted-foreground;
+}
+
 .docs-panel__file-list {
   @apply grid gap-2 p-4;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

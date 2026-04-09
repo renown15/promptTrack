@@ -59,7 +59,7 @@ export function CodeMakeupSection({ makeup, totalLines }: Props) {
                 {item.nearBlankCount > 0 && (
                   <span
                     title="files with 1 line or less"
-                    style={{ color: "#ef4444", fontWeight: "600" }}
+                    className="analytics__near-blank"
                   >
                     {item.nearBlankCount}⊘
                   </span>

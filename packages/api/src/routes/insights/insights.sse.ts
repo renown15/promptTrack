@@ -20,6 +20,7 @@ export function attachInsightSSE(
   const onLlmCallStart = (data: unknown) => send("llm_call_start", data);
   const onLlmCallEnd = (data: unknown) => send("llm_call_end", data);
   const onAnalysisComplete = (data: unknown) => send("analysis_complete", data);
+  const onDocAnalysis = (data: unknown) => send("doc_analysis", data);
 
   insightEmitter.on(`file_updated:${id}`, onFileUpdated);
   insightEmitter.on(`file_removed:${id}`, onFileRemoved);
@@ -28,6 +29,7 @@ export function attachInsightSSE(
   insightEmitter.on(`llm_call_start:${id}`, onLlmCallStart);
   insightEmitter.on(`llm_call_end:${id}`, onLlmCallEnd);
   insightEmitter.on(`analysis_complete:${id}`, onAnalysisComplete);
+  insightEmitter.on(`doc_analysis:${id}`, onDocAnalysis);
 
   res.on("close", () => {
     insightEmitter.off(`file_updated:${id}`, onFileUpdated);
@@ -37,6 +39,7 @@ export function attachInsightSSE(
     insightEmitter.off(`llm_call_start:${id}`, onLlmCallStart);
     insightEmitter.off(`llm_call_end:${id}`, onLlmCallEnd);
     insightEmitter.off(`analysis_complete:${id}`, onAnalysisComplete);
+    insightEmitter.off(`doc_analysis:${id}`, onDocAnalysis);
     res.end();
     onClose();
   });

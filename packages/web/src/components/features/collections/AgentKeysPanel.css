@@ -99,6 +99,10 @@
   @apply text-sm text-muted-foreground;
 }
 
+.agent-keys-modal__warning--error {
+  @apply text-amber-600;
+}
+
 .agent-keys-modal__snippet {
   @apply rounded-lg bg-muted px-4 py-3 text-xs font-mono text-foreground
     whitespace-pre overflow-x-auto;
@@ -107,4 +111,21 @@
 .agent-keys-modal__copy-btn {
   @apply self-start rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm
     font-medium hover:opacity-90 transition-opacity;
+}
+
+.agent-keys-modal__prompt-section {
+  @apply flex flex-col gap-3 border-t border-border pt-4 mt-1;
+}
+
+.agent-keys-modal__prompt-toggle {
+  @apply self-start text-sm text-muted-foreground hover:text-foreground transition-colors
+    underline underline-offset-2;
+}
+
+.agent-keys-modal__prompt-body {
+  @apply flex flex-col gap-3;
+}
+
+.agent-keys-modal__snippet--prompt {
+  @apply whitespace-pre-wrap max-h-64 overflow-y-auto;
 }

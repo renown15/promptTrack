@@ -89,12 +89,12 @@ export function FileDiscussionMenu({
     <div
       ref={menuRef}
       className="file-discuss-menu"
-      style={{
-        position: "fixed",
-        left: `${X}px`,
-        top: `${Y}px`,
-        zIndex: 9999,
-      }}
+      style={
+        {
+          "--menu-left": `${X}px`,
+          "--menu-top": `${Y}px`,
+        } as React.CSSProperties
+      }
     >
       <div className="file-discuss-menu__header">
         <span className="file-discuss-menu__title">

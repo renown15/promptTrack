@@ -1,3 +1,4 @@
+import type { DocAnalysisResult } from "@/api/endpoints/collections";
 import type {
   ActiveLlmCallDTO,
   FileSnapshotDTO,
@@ -103,5 +104,12 @@ export function attachInsightSSEHandlers(
       activeLlmCall: null,
     }));
     void queryClient.invalidateQueries({ queryKey: ["llm-log", collectionId] });
+  });
+
+  es.addEventListener("doc_analysis", (e) => {
+    queryClient.setQueryData(
+      ["collections", collectionId, "docs", "analysis"],
+      JSON.parse(e.data) as DocAnalysisResult
+    );
   });
 }

@@ -1,5 +1,6 @@
 import chokidar, { type FSWatcher } from "chokidar";
 import { extname } from "path";
+import { docsAnalyzerService } from "@/services/docs.analyzer.js";
 import { insightService } from "@/services/insight.service.js";
 import { CODE_EXTENSIONS } from "@/services/insight.scanner.js";
 
@@ -56,7 +57,21 @@ export const watcherService = {
     });
 
     watcher.on("change", (filePath) => {
-      if (!CODE_EXTENSIONS.has(extname(filePath).toLowerCase())) return;
+      const ext = extname(filePath).toLowerCase();
+      if (ext === ".md") {
+        debounce(
+          debounceTimers,
+          `docs:${filePath}`,
+          () => {
+            docsAnalyzerService
+              .analyze(collectionId, directory)
+              .catch(() => {});
+          },
+          3000
+        );
+        return;
+      }
+      if (!CODE_EXTENSIONS.has(ext)) return;
       debounce(
         debounceTimers,
         filePath,
@@ -70,7 +85,21 @@ export const watcherService = {
     });
 
     watcher.on("add", (filePath) => {
-      if (!CODE_EXTENSIONS.has(extname(filePath).toLowerCase())) return;
+      const ext = extname(filePath).toLowerCase();
+      if (ext === ".md") {
+        debounce(
+          debounceTimers,
+          `docs:${filePath}`,
+          () => {
+            docsAnalyzerService
+              .analyze(collectionId, directory)
+              .catch(() => {});
+          },
+          3000
+        );
+        return;
+      }
+      if (!CODE_EXTENSIONS.has(ext)) return;
       debounce(
         debounceTimers,
         filePath,

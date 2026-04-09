@@ -10,6 +10,7 @@ export type {
   ApiKeyRecord,
   CodeMakeup,
   CoverageSnapshot,
+  DocAnalysisResult,
   DocFile,
   DocFreshnessOverride,
   FileCountSnapshot,
@@ -45,6 +46,13 @@ export function useDocContent(id: string, file: string | null) {
     queryKey: ["collections", id, "docs", file],
     queryFn: () => collectionsApi.getDocContent(id, file!),
     enabled: file !== null,
+  });
+}
+
+export function useDocAnalysis(id: string) {
+  return useQuery({
+    queryKey: ["collections", id, "docs", "analysis"],
+    queryFn: () => collectionsApi.getDocAnalysis(id),
   });
 }
 
@@ -165,48 +173,14 @@ export function useGetFullApiKey(collectionId: string, keyId: string) {
   });
 }
 
-// Analytics hooks
-export function useAnalytics(collectionId: string, days: number = 30) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", days],
-    queryFn: () => collectionsApi.getAnalytics(collectionId, days),
-  });
-}
-
-export function useVolumeAnalytics(collectionId: string, days: number = 30) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", "volume", days],
-    queryFn: () => collectionsApi.getVolumeAnalytics(collectionId, days),
-  });
-}
-
-export function useCoverageAnalytics(collectionId: string, days: number = 30) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", "coverage", days],
-    queryFn: () => collectionsApi.getCoverageAnalytics(collectionId, days),
-  });
-}
-
-export function useFileCountAnalytics(collectionId: string, days: number = 30) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", "file-count", days],
-    queryFn: () => collectionsApi.getFileCountAnalytics(collectionId, days),
-  });
-}
-
-export function useCodeMakeupAnalytics(collectionId: string) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", "makeup"],
-    queryFn: () => collectionsApi.getCodeMakeupAnalytics(collectionId),
-  });
-}
-
-export function useGrowthAnalytics(collectionId: string, days: number = 30) {
-  return useQuery({
-    queryKey: ["collections", collectionId, "analytics", "growth", days],
-    queryFn: () => collectionsApi.getGrowthAnalytics(collectionId, days),
-  });
-}
+export {
+  useAnalytics,
+  useCodeMakeupAnalytics,
+  useCoverageAnalytics,
+  useFileCountAnalytics,
+  useGrowthAnalytics,
+  useVolumeAnalytics,
+} from "@/hooks/useAnalytics";
 
 export function useDirectoryStructure(collectionId: string, enabled: boolean) {
   return useQuery({

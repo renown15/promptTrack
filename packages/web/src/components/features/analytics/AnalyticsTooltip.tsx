@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import "@/components/features/analytics/AnalyticsTooltip.css";
 
 type TooltipPayload = {
   name: string;
@@ -34,58 +34,10 @@ export function AnalyticsTooltip({
     return null;
   }
 
-  const tooltipStyle: CSSProperties = {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    border: "1px solid #e5e7eb",
-    borderRadius: "0.75rem",
-    padding: "0.875rem 1.25rem",
-    boxShadow: "0 10px 35px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08)",
-    color: "#1f2937",
-    fontSize: "0.875rem",
-    zIndex: 1000,
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    backdropFilter: "blur(8px)",
-  };
-
-  const labelStyle: CSSProperties = {
-    fontWeight: 700,
-    marginBottom: "0.75rem",
-    color: "#111827",
-    fontSize: "0.9375rem",
-    borderBottom: "1px solid #f3f4f6",
-    paddingBottom: "0.5rem",
-  };
-
-  const itemStyle: CSSProperties = {
-    color: "#1f2937",
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "1rem",
-    marginBottom: "0.5rem",
-    alignItems: "center",
-  };
-
-  const labelPartStyle: CSSProperties = {
-    fontWeight: 500,
-  };
-
-  const valuePartStyle: CSSProperties = {
-    textAlign: "right" as const,
-    fontWeight: 600,
-  };
-
-  const deltaContainerStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    fontSize: "0.8125rem",
-    marginTop: "0.375rem",
-  };
-
   return (
-    <div style={tooltipStyle}>
+    <div className="analytics-tooltip">
       {label && (
-        <div style={labelStyle}>
+        <div className="analytics-tooltip__label">
           {labelFormatter ? labelFormatter(label) : label}
         </div>
       )}
@@ -96,11 +48,9 @@ export function AnalyticsTooltip({
             ? entry.value.toLocaleString()
             : entry.value;
 
-        // Get previous value from the entry's payload (full data point from chart)
         const fullDataPoint = entry.payload;
         let prevValue: number | undefined;
         if (fullDataPoint && typeof fullDataPoint === "object") {
-          // Strip leading dot from field name if present (e.g., ".ts" → "ts")
           const fieldName = name.startsWith(".") ? name.slice(1) : name;
           prevValue = fullDataPoint[`_prev_${fieldName}`] as number | undefined;
         }
@@ -112,37 +62,44 @@ export function AnalyticsTooltip({
 
         const deltaColor =
           change && change.value > 0
-            ? "#059669" // green for increase
+            ? "#059669"
             : change && change.value < 0
-              ? "#dc2626" // red for decrease
-              : "#6b7280"; // gray for no change
+              ? "#dc2626"
+              : "#6b7280";
 
         return (
           <div key={`${name}-${index}`}>
-            <div style={itemStyle}>
+            <div className="analytics-tooltip__item">
               <span
-                style={{
-                  ...labelPartStyle,
-                  color: entry.color || "#6b7280",
-                }}
+                className="analytics-tooltip__item-label"
+                style={
+                  {
+                    "--entry-color": entry.color || "#6b7280",
+                  } as React.CSSProperties
+                }
               >
                 {name}
               </span>
               <span
-                style={{
-                  ...valuePartStyle,
-                  color: entry.color || "#1f2937",
-                }}
+                className="analytics-tooltip__item-value"
+                style={
+                  {
+                    "--entry-color": entry.color || "#1f2937",
+                  } as React.CSSProperties
+                }
               >
                 {value}
               </span>
             </div>
             {change && (
-              <div style={deltaContainerStyle}>
-                <span style={{ color: deltaColor, fontSize: "0.75rem" }}>
+              <div
+                className="analytics-tooltip__delta"
+                style={{ "--delta-color": deltaColor } as React.CSSProperties}
+              >
+                <span className="analytics-tooltip__delta-arrow">
                   {change.value > 0 ? "↑" : change.value < 0 ? "↓" : "→"}
                 </span>
-                <span style={{ color: deltaColor, fontWeight: 500 }}>
+                <span className="analytics-tooltip__delta-value">
                   {Math.abs(change.value).toLocaleString()} (
                   {change.value > 0 ? "+" : ""}
                   {change.percent.toFixed(1)}%)

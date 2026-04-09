@@ -1,6 +1,10 @@
 .file-discuss-menu {
   @apply flex flex-col bg-card border border-border rounded-lg shadow-lg w-96 max-h-[600px];
   font-family: inherit;
+  position: fixed;
+  left: var(--menu-left);
+  top: var(--menu-top);
+  z-index: 9999;
 }
 
 .file-discuss-menu__header {
