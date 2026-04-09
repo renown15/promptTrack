@@ -1,5 +1,5 @@
-import { InsightPageModals } from "@/components/features/insights/InsightPageModals";
 import type { CIStatusDTO } from "@/api/endpoints/insights";
+import { InsightPageModals } from "@/components/features/insights/InsightPageModals";
 
 interface InsightDetailPanelProps {
   id: string | undefined;
@@ -45,7 +45,7 @@ export function InsightDetailPanel({
   return (
     <div
       className="agent-insight-page__detail-panel"
-      style={{ height: detail.size }}
+      style={{ "--detail-size": `${detail.size}px` } as React.CSSProperties}
     >
       {id && (
         <InsightPageModals

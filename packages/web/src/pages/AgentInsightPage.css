@@ -103,7 +103,7 @@
 /* detail panel: absolutely pinned to bottom */
 .agent-insight-page__detail-panel {
   @apply absolute inset-x-0 bottom-0 flex flex-col overflow-hidden border-t border-border;
-  /* height set via inline style */
+  height: var(--detail-size);
 }
 
 .agent-insight-page__loading,
