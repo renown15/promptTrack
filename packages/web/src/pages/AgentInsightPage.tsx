@@ -1,5 +1,4 @@
 import { InsightActivityStack } from "@/components/features/insights/InsightActivityStack";
-import { InsightPageModals } from "@/components/features/insights/InsightPageModals";
 import { InsightSummaryPanel } from "@/components/features/insights/InsightSummaryPanel";
 import { InsightTitleBar } from "@/components/features/insights/InsightTitleBar";
 import { InsightTreeTable } from "@/components/features/insights/InsightTreeTable";
@@ -15,6 +14,7 @@ import {
 } from "@/hooks/useInsights";
 import { useOllamaConfig } from "@/hooks/useOllamaConfig";
 import { useResizeHandle } from "@/hooks/useResizeHandle";
+import { InsightDetailPanel } from "@/pages/AgentInsightDetailPanel";
 import "@/pages/AgentInsightPage.css";
 import {
   applyFilter,
@@ -199,34 +199,26 @@ export function AgentInsightPage() {
           onMouseDown={detail.onMouseDown}
         />
 
-        <div
-          className="agent-insight-page__detail-panel"
-          style={{ height: detail.size }}
-        >
-          {id && (
-            <InsightPageModals
-              showConfig={showConfig}
-              onConfigClose={() => setShowConfig(false)}
-              inspectedFile={inspectedFile}
-              onInspectedFileClose={() => setInspectedFile(null)}
-              collectionId={id}
-              showCIDetail={showCIDetail}
-              ciStatus={ciStatus}
-              onCIDetailClose={() => setShowCIDetail(false)}
-              showSummary={showSummary}
-              summary={summary}
-              onSummaryClose={() => setShowSummary(false)}
-              showLlmLog={showLlmLog}
-              onLlmLogClose={() => setShowLlmLog(false)}
-              selectedFile={selectedFile}
-              fileDetail={fileDetail}
-              detailLoading={detailLoading}
-              metricLabels={metricLabels}
-              onDetailClose={() => setSelectedFile(null)}
-              detail={detail}
-            />
-          )}
-        </div>
+        <InsightDetailPanel
+          id={id}
+          showConfig={showConfig}
+          onConfigClose={() => setShowConfig(false)}
+          inspectedFile={inspectedFile}
+          onInspectedFileClose={() => setInspectedFile(null)}
+          showCIDetail={showCIDetail}
+          ciStatus={ciStatus}
+          onCIDetailClose={() => setShowCIDetail(false)}
+          showSummary={showSummary}
+          summary={summary}
+          onSummaryClose={() => setShowSummary(false)}
+          showLlmLog={showLlmLog}
+          onLlmLogClose={() => setShowLlmLog(false)}
+          selectedFile={selectedFile}
+          fileDetail={fileDetail}
+          detailLoading={detailLoading}
+          metricLabels={metricLabels}
+          detail={detail}
+        />
       </div>
     </div>
   );
