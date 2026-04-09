@@ -105,11 +105,6 @@ export function AgentInsightPage() {
     setShowCIDetail((prev) => !prev);
     setSelectedFile(null);
   };
-  const handleFileSelect = (path: string) => {
-    setShowSummary(false);
-    setShowCIDetail(false);
-    setSelectedFile((prev) => (prev === path ? null : path));
-  };
 
   return (
     <div className="agent-insight-page">
@@ -161,7 +156,11 @@ export function AgentInsightPage() {
                   metricLabels={metricLabels}
                   highlightedPath={highlightedPath}
                   selectedPath={selectedFile}
-                  onFileSelect={handleFileSelect}
+                  onFileSelect={(path) => {
+                    setShowSummary(false);
+                    setShowCIDetail(false);
+                    setSelectedFile((prev) => (prev === path ? null : path));
+                  }}
                   onInspect={setInspectedFile}
                   activeFilter={activeFilter}
                   onClearFilter={() => setActiveFilter(null)}
@@ -185,14 +184,15 @@ export function AgentInsightPage() {
                   onFileClick={(p) => {
                     setHighlightedPath(null);
                     setTimeout(() => setHighlightedPath(p), 0);
-                    handleFileSelect(p);
+                    setShowSummary(false);
+                    setShowCIDetail(false);
+                    setSelectedFile((prev) => (prev === p ? null : p));
                   }}
                 />
               </div>
             </>
           )}
         </div>
-
         <div
           className="agent-insight-page__row-handle"
           style={{ bottom: detail.size, height: HANDLE_H }}
