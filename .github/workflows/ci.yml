@@ -80,6 +80,10 @@ jobs:
         run: |
           # Verify 80% coverage threshold
           pnpm test:coverage -- --coverage.thresholds.lines=80 --coverage.thresholds.functions=80 --coverage.thresholds.branches=80 --coverage.thresholds.statements=80
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
+          NODE_ENV: test
 
   build:
     name: Build
