@@ -121,11 +121,11 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: prompttrack_test
+          POSTGRES_USER: prompttrack
           POSTGRES_PASSWORD: prompttrack_test
           POSTGRES_DB: prompttrack_test
         ports:
-          - 5432:5432
+          - 5453:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -155,13 +155,13 @@ jobs:
       - name: Run database migrations
         run: pnpm db:migrate
         env:
-          DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          DATABASE_URL: postgresql://prompttrack:prompttrack_test@localhost:5453/prompttrack_test
           JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
       - name: Run integration tests
         run: pnpm test:integration
         env:
-          DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          DATABASE_URL: postgresql://prompttrack:prompttrack_test@localhost:5453/prompttrack_test
           JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
   e2e-tests:
@@ -172,11 +172,11 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg16
         env:
-          POSTGRES_USER: prompttrack_test
+          POSTGRES_USER: prompttrack
           POSTGRES_PASSWORD: prompttrack_test
           POSTGRES_DB: prompttrack_test
         ports:
-          - 5432:5432
+          - 5453:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -209,7 +209,7 @@ jobs:
       - name: Run database migrations
         run: pnpm db:migrate
         env:
-          DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          DATABASE_URL: postgresql://prompttrack:prompttrack_test@localhost:5453/prompttrack_test
           JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
       - name: Build packages
@@ -218,7 +218,7 @@ jobs:
       - name: Run E2E tests
         run: pnpm test:e2e
         env:
-          DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          DATABASE_URL: postgresql://prompttrack:prompttrack_test@localhost:5453/prompttrack_test
           JWT_SECRET: test-secret-not-used-outside-ci-0123456789
           VITE_API_URL: http://localhost:3051
 
