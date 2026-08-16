@@ -16,7 +16,17 @@ vi.mock("@/repositories/collection.repository.js", () => ({
   },
 }));
 
+vi.mock("@/repositories/prompt.repository.js", () => ({
+  promptRepository: { findById: vi.fn() },
+}));
+
+vi.mock("@/repositories/chain.repository.js", () => ({
+  chainRepository: { findById: vi.fn() },
+}));
+
 import { collectionRepository } from "@/repositories/collection.repository.js";
+import { promptRepository } from "@/repositories/prompt.repository.js";
+import { chainRepository } from "@/repositories/chain.repository.js";
 import { collectionService } from "@/services/collection.service.js";
 
 const baseCollection = {
@@ -161,6 +171,9 @@ describe("collectionService", () => {
       vi.mocked(collectionRepository.findById).mockResolvedValue(
         baseCollection
       );
+      vi.mocked(promptRepository.findById).mockResolvedValue({
+        id: "p1",
+      } as never);
       vi.mocked(collectionRepository.addPrompt).mockResolvedValue(undefined);
 
       await collectionService.addPrompt("col1", "p1");
@@ -192,6 +205,9 @@ describe("collectionService", () => {
       vi.mocked(collectionRepository.findById).mockResolvedValue(
         baseCollection
       );
+      vi.mocked(chainRepository.findById).mockResolvedValue({
+        id: "c1",
+      } as never);
       vi.mocked(collectionRepository.addChain).mockResolvedValue(undefined);
 
       await collectionService.addChain("col1", "c1");

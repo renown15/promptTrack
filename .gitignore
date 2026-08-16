@@ -63,3 +63,6 @@ playwright/.cache/
 
 # Generated lint reports (contain absolute paths)
 *.eslint-report.json
+
+# Test env: local placeholders only, required by CI integration tests
+!packages/api/.env.test
