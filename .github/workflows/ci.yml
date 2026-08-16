@@ -71,6 +71,10 @@ jobs:
 
       - name: Run unit tests with coverage
         run: pnpm test:coverage
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
+          NODE_ENV: test
 
       - name: Check coverage threshold
         run: |
@@ -148,11 +152,13 @@ jobs:
         run: pnpm db:migrate
         env:
           DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
       - name: Run integration tests
         run: pnpm test:integration
         env:
           DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
   e2e-tests:
     name: E2E Tests
@@ -200,6 +206,7 @@ jobs:
         run: pnpm db:migrate
         env:
           DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
 
       - name: Build packages
         run: pnpm build
@@ -208,6 +215,7 @@ jobs:
         run: pnpm test:e2e
         env:
           DATABASE_URL: postgresql://prompttrack_test:prompttrack_test@localhost:5432/prompttrack_test
+          JWT_SECRET: test-secret-not-used-outside-ci-0123456789
           VITE_API_URL: http://localhost:3051
 
       - name: Upload Playwright report
