@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter @prompttrack/api db:generate
+
       - name: Run ESLint
         run: pnpm lint
 
@@ -63,6 +66,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter @prompttrack/api db:generate
+
       - name: Run unit tests with coverage
         run: pnpm test:coverage
 
@@ -92,6 +98,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @prompttrack/api db:generate
 
       - name: Build all packages
         run: pnpm build
@@ -131,6 +140,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @prompttrack/api db:generate
 
       - name: Run database migrations
         run: pnpm db:migrate
@@ -177,6 +189,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @prompttrack/api db:generate
 
       - name: Install Playwright browsers
         run: pnpm --filter @prompttrack/web exec playwright install --with-deps
