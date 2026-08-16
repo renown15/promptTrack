@@ -1,0 +1,11 @@
+.prompt-list {
+  @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.prompt-list__empty {
+  @apply col-span-full text-center py-16 text-muted-foreground text-sm;
+}
+
+.prompt-list__error {
+  @apply col-span-full text-center py-16 text-destructive text-sm;
+}

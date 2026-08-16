@@ -1,0 +1,129 @@
+.insight-summary-panel {
+  @apply px-4 py-3 border-b border-border bg-card shrink-0;
+}
+
+.insight-summary-panel__grid {
+  @apply flex flex-wrap gap-2 items-stretch;
+}
+
+/* ── Card shell ─────────────────────────────────────────── */
+.insight-summary-panel__tile {
+  @apply flex flex-col gap-1.5 px-3 py-2.5 rounded-lg
+    border border-border bg-card
+    shadow-sm flex-1 min-w-[110px];
+}
+
+.insight-summary-panel__tile-label {
+  @apply text-[10px] font-semibold uppercase tracking-widest
+    text-muted-foreground whitespace-nowrap mb-0.5;
+}
+
+/* ── Clean state ────────────────────────────────────────── */
+.insight-summary-panel__tile-clean {
+  @apply text-sm font-semibold text-green-600 leading-none;
+}
+
+/* ── Codebase stat rows ──────────────────────────────────── */
+.insight-summary-panel__stat-row {
+  @apply flex items-baseline gap-2;
+}
+
+.insight-summary-panel__stat-value {
+  @apply text-base font-bold text-foreground tabular-nums leading-none w-14 text-right shrink-0;
+}
+
+.insight-summary-panel__stat-label {
+  @apply text-[11px] text-muted-foreground whitespace-nowrap;
+}
+
+/* ── Pipeline rows (cov / lint / CI) ─────────────────────── */
+.insight-summary-panel__pipeline-row {
+  @apply flex items-center gap-1.5;
+}
+
+.insight-summary-panel__pipeline-label {
+  @apply text-[11px] text-muted-foreground w-6 shrink-0;
+}
+
+.insight-summary-panel__pipeline-badge {
+  @apply flex items-center gap-1 flex-1;
+}
+
+.insight-summary-panel__pipeline-age {
+  @apply text-[10px] text-muted-foreground/50 whitespace-nowrap ml-auto;
+}
+
+/* ── Git badges ──────────────────────────────────────────── */
+.insight-summary-panel__tile-badges {
+  @apply flex items-center gap-1.5 flex-wrap;
+}
+
+/* ── Status badge ────────────────────────────────────────── */
+.insight-summary-panel__badge {
+  @apply text-xs font-semibold px-2 py-0.5 rounded-md border-0
+    whitespace-nowrap leading-snug;
+}
+
+.insight-summary-panel__badge--clickable {
+  @apply cursor-pointer hover:opacity-75 transition-opacity;
+}
+
+.insight-summary-panel__badge--active {
+  @apply ring-2 ring-current ring-offset-1;
+}
+
+.insight-summary-panel__badge--green {
+  @apply text-green-700 bg-green-500/15;
+}
+.insight-summary-panel__badge--amber {
+  @apply text-yellow-700 bg-yellow-400/20;
+}
+.insight-summary-panel__badge--red {
+  @apply text-red-700 bg-red-500/15;
+}
+.insight-summary-panel__badge--muted {
+  @apply text-muted-foreground bg-muted;
+}
+
+/* ── AI metric chips ─────────────────────────────────────── */
+.insight-summary-panel__chips {
+  @apply flex flex-col gap-1.5 py-0.5;
+}
+
+.insight-summary-panel__chip {
+  @apply flex items-center gap-1.5 text-[11px] px-1.5 py-0.5 rounded
+    border border-transparent w-full text-left whitespace-nowrap
+    cursor-pointer hover:opacity-75 transition-opacity;
+}
+
+.insight-summary-panel__chip--active {
+  @apply border-current;
+}
+
+.insight-summary-panel__chip--red {
+  @apply text-red-700 bg-red-500/15;
+}
+.insight-summary-panel__chip--amber {
+  @apply text-yellow-700 bg-yellow-400/15;
+}
+.insight-summary-panel__chip--green {
+  @apply text-green-700 bg-green-500/15;
+}
+.insight-summary-panel__chip--error {
+  @apply text-foreground/50 bg-muted;
+}
+.insight-summary-panel__chip--pending {
+  @apply text-muted-foreground/50 cursor-default;
+}
+
+.insight-summary-panel__chips-footer {
+  @apply flex items-center gap-1 mt-0.5 pt-0.5 border-t border-border/50;
+}
+
+.insight-summary-panel__chip-count {
+  @apply font-bold tabular-nums w-5 text-right shrink-0;
+}
+
+.insight-summary-panel__chip-label {
+  @apply font-normal;
+}

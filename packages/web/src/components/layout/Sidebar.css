@@ -1,0 +1,92 @@
+.sidebar {
+  @apply flex flex-col w-56 min-h-screen border-r border-border bg-card px-3 py-4 shrink-0 overflow-y-auto;
+}
+
+.sidebar__brand {
+  @apply text-base font-semibold text-foreground px-2 mb-4;
+}
+
+.sidebar__section-header {
+  @apply flex items-center justify-between px-2 mb-1;
+}
+
+.sidebar__section-label {
+  @apply text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70;
+}
+
+.sidebar__add-btn {
+  @apply text-base leading-none text-muted-foreground hover:text-foreground transition-colors cursor-pointer;
+}
+
+.sidebar__new-project {
+  @apply flex items-center gap-1 px-2 mb-2;
+}
+
+.sidebar__new-project-input {
+  @apply flex-1 min-w-0 text-xs rounded border border-border bg-background px-2 py-1
+    focus:outline-none focus:ring-1 focus:ring-ring;
+}
+
+.sidebar__new-project-submit {
+  @apply text-xs rounded border border-border px-2 py-1 hover:bg-accent
+    transition-colors cursor-pointer shrink-0;
+}
+
+.sidebar__new-project-cancel {
+  @apply text-xs text-muted-foreground hover:text-foreground transition-colors
+    cursor-pointer leading-none shrink-0 px-0.5;
+}
+
+.sidebar__nav {
+  @apply flex flex-col flex-1 overflow-y-auto;
+}
+
+.sidebar__divider {
+  @apply my-3 border-t border-border;
+}
+
+.sidebar__bottom-nav {
+  @apply flex flex-col gap-1 mb-2;
+}
+
+.sidebar__link {
+  @apply flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground
+    hover:bg-accent hover:text-accent-foreground transition-colors;
+}
+
+.sidebar__link--active {
+  @apply bg-accent text-accent-foreground font-medium;
+}
+
+.sidebar__footer {
+  @apply pt-3 border-t border-border flex flex-col gap-0.5;
+}
+
+.sidebar__llm-toggle {
+  @apply flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors w-full text-left cursor-pointer;
+}
+
+.sidebar__llm-toggle--on {
+  @apply text-muted-foreground hover:bg-accent hover:text-accent-foreground;
+}
+
+.sidebar__llm-toggle--off {
+  @apply text-amber-600 hover:bg-amber-500/10;
+}
+
+.sidebar__llm-toggle-dot {
+  @apply inline-block w-2 h-2 rounded-full shrink-0;
+}
+
+.sidebar__llm-toggle--on .sidebar__llm-toggle-dot {
+  @apply bg-green-500;
+}
+
+.sidebar__llm-toggle--off .sidebar__llm-toggle-dot {
+  @apply bg-amber-500;
+}
+
+.sidebar__logout {
+  @apply flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground
+    hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left cursor-pointer;
+}

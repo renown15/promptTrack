@@ -1,0 +1,102 @@
+.llm-log {
+  @apply flex flex-col h-full overflow-hidden;
+}
+
+.llm-log__header {
+  @apply flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 bg-muted/20;
+}
+
+.llm-log__title {
+  @apply text-xs font-semibold text-foreground;
+}
+
+.llm-log__count {
+  @apply text-xs text-muted-foreground;
+}
+
+.llm-log__actions {
+  @apply flex items-center gap-2 ml-auto;
+}
+
+.llm-log__clear-btn {
+  @apply text-xs px-2 py-0.5 rounded border border-border text-muted-foreground
+    hover:text-foreground hover:border-foreground/30 transition-colors;
+}
+
+.llm-log__close-btn {
+  @apply text-xs text-muted-foreground hover:text-foreground transition-colors;
+}
+
+.llm-log__loading,
+.llm-log__empty {
+  @apply text-xs text-muted-foreground p-4;
+}
+
+.llm-log__table-wrap {
+  @apply flex-1 overflow-auto;
+}
+
+.llm-log__table {
+  @apply w-full text-xs border-collapse;
+}
+
+.llm-log__table thead th {
+  @apply text-left text-[10px] font-semibold text-muted-foreground px-3 py-1.5
+    border-b border-border bg-muted/30 sticky top-0;
+}
+
+.llm-log__table tbody tr {
+  @apply border-b border-border/40 hover:bg-muted/20;
+}
+
+.llm-log__table tbody td {
+  @apply px-3 py-1.5 text-xs text-foreground align-top;
+}
+
+.llm-log__row--error {
+  @apply bg-red-500/5;
+}
+
+.llm-log__cell--path {
+  @apply font-mono max-w-48 truncate;
+}
+
+.llm-log__cell--num {
+  @apply font-mono tabular-nums text-right;
+}
+
+.llm-log__cell--model {
+  @apply font-mono text-muted-foreground text-[10px];
+}
+
+.llm-log__cell--time {
+  @apply text-muted-foreground text-[10px] tabular-nums;
+}
+
+.llm-log__status {
+  @apply text-[10px] font-semibold px-1.5 py-0.5 rounded;
+}
+
+.llm-log__status--green {
+  @apply bg-green-500/10 text-green-600;
+}
+
+.llm-log__status--amber {
+  @apply bg-amber-500/10 text-amber-600;
+}
+
+.llm-log__status--red {
+  @apply bg-red-500/10 text-red-600;
+}
+
+.llm-log__status--error {
+  @apply bg-red-500/15 text-red-700;
+}
+
+.llm-log__status--running {
+  @apply bg-primary/10 text-primary animate-pulse;
+}
+
+.llm-log__error {
+  @apply text-red-500 cursor-help;
+}

@@ -1,0 +1,9 @@
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Husky sets core.hooksPath, which overrides the global privacy guard.
+# Invoke it explicitly so this repo gets the same protection as the others.
+if [ -x "$HOME/.config/git/hooks/pre-commit" ]; then
+  "$HOME/.config/git/hooks/pre-commit" || exit 1
+fi
+
+pnpm lint-staged

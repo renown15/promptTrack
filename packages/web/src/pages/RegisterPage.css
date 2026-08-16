@@ -1,0 +1,23 @@
+.register-page {
+  @apply min-h-screen flex items-center justify-center bg-background px-4;
+}
+
+.register-page__card {
+  @apply w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm;
+}
+
+.register-page__title {
+  @apply text-2xl font-semibold text-card-foreground mb-2;
+}
+
+.register-page__subtitle {
+  @apply text-sm text-muted-foreground mb-6;
+}
+
+.register-page__footer {
+  @apply text-sm text-muted-foreground text-center mt-6;
+}
+
+.register-page__link {
+  @apply text-primary hover:underline;
+}

@@ -1,0 +1,71 @@
+.directory-selector-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+}
+
+.directory-selector {
+  @apply bg-card border border-border rounded-lg shadow-lg max-w-2xl max-h-[80vh] flex flex-col;
+}
+
+.directory-selector__header {
+  @apply flex justify-between items-center px-6 py-4 border-b border-border;
+}
+
+.directory-selector__title {
+  @apply text-lg font-semibold text-foreground;
+}
+
+.directory-selector__close {
+  @apply text-muted-foreground hover:text-foreground cursor-pointer text-2xl leading-none transition-colors;
+}
+
+.directory-selector__body {
+  @apply flex-1 overflow-auto px-6 py-4;
+}
+
+.directory-selector__controls {
+  @apply mb-4 pb-4 border-b border-border;
+}
+
+.directory-selector__select-all {
+  @apply px-3 py-1.5 text-sm font-medium bg-muted text-foreground rounded hover:bg-muted/80 transition-colors;
+}
+
+.directory-selector__tree {
+  @apply space-y-1;
+}
+
+.directory-tree {
+  @apply text-sm;
+}
+
+.directory-tree__item {
+  @apply py-1;
+}
+
+.directory-tree__label {
+  @apply flex items-center gap-2 cursor-pointer text-foreground hover:text-primary transition-colors;
+}
+
+.directory-tree__checkbox {
+  @apply w-4 h-4 cursor-pointer;
+}
+
+.directory-tree__name {
+  @apply font-medium;
+}
+
+.directory-tree__children {
+  @apply ml-6 border-l border-border pl-0;
+}
+
+.directory-selector__footer {
+  @apply flex justify-end gap-2 px-6 py-4 border-t border-border;
+}
+
+.directory-selector__cancel {
+  @apply px-4 py-2 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded transition-colors;
+}
+
+.directory-selector__save {
+  @apply px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded transition-colors;
+}

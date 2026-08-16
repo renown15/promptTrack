@@ -1,0 +1,201 @@
+.exec-modal__overlay {
+  @apply fixed inset-0 bg-black/60 flex items-center justify-center p-4;
+  z-index: var(--z-modal);
+}
+
+.exec-modal {
+  @apply bg-background border border-border rounded-xl shadow-2xl flex flex-col;
+  width: 92vw;
+  height: 90vh;
+  max-width: 1400px;
+}
+
+/* Header */
+.exec-modal__header {
+  @apply flex items-center justify-between px-6 py-4 border-b border-border shrink-0;
+}
+
+.exec-modal__title {
+  @apply text-xl font-semibold text-foreground;
+}
+
+.exec-modal__close {
+  @apply text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded
+    hover:bg-accent text-sm leading-none;
+}
+
+.exec-modal__loading {
+  @apply text-sm text-muted-foreground px-6 py-10 flex-1;
+}
+
+/* Body: two-column */
+.exec-modal__body {
+  @apply flex flex-1 min-h-0 divide-x divide-border;
+}
+
+.exec-modal__panel-label {
+  @apply text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 shrink-0;
+}
+
+/* Left: context panel */
+.exec-modal__context-panel {
+  @apply flex flex-col p-6 min-h-0;
+  width: 38%;
+  flex-shrink: 0;
+}
+
+.exec-modal__context-list {
+  @apply flex flex-col gap-4 overflow-y-auto flex-1 pr-1;
+}
+
+.exec-modal__context-block {
+  @apply border border-border rounded-lg overflow-hidden shrink-0;
+}
+
+.exec-modal__context-header {
+  @apply flex items-center gap-2 px-3 py-2 bg-muted/60 border-b border-border;
+}
+
+.exec-modal__context-icon {
+  @apply text-muted-foreground;
+}
+
+.exec-modal__context-name {
+  @apply text-sm font-medium text-foreground flex-1;
+}
+
+.exec-modal__context-remove {
+  @apply text-muted-foreground hover:text-destructive transition-colors text-xs leading-none cursor-pointer;
+}
+
+.exec-modal__context-content {
+  @apply px-3 py-3 text-xs text-muted-foreground font-mono whitespace-pre-wrap
+    leading-relaxed max-h-48 overflow-y-auto bg-background;
+}
+
+/* Right: form */
+.exec-modal__form {
+  @apply flex flex-col gap-4 p-6 flex-1 min-h-0 min-w-0 overflow-y-auto;
+}
+
+.exec-modal__form-error {
+  @apply rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive;
+}
+
+.exec-modal__project-badge {
+  @apply flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-xs shrink-0;
+}
+
+.exec-modal__project-badge-label {
+  @apply text-muted-foreground;
+}
+
+.exec-modal__project-badge-name {
+  @apply font-medium text-foreground;
+}
+
+.exec-modal__field {
+  @apply flex flex-col gap-1.5 shrink-0;
+}
+
+.exec-modal__field--grow {
+  @apply flex-1 min-h-0 flex flex-col;
+}
+
+.exec-modal__label {
+  @apply text-sm font-medium text-foreground;
+}
+
+.exec-modal__input {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm
+    placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
+}
+
+.exec-modal__select {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm
+    focus:outline-none focus:ring-2 focus:ring-ring;
+}
+
+.exec-modal__field-error {
+  @apply text-xs text-destructive;
+}
+
+.exec-modal__editor-wrap {
+  @apply flex-1 min-h-0 border border-input rounded-md overflow-hidden flex flex-col;
+}
+
+/* Make TipTap fill the available height inside the wrapper */
+.exec-modal__editor-wrap .wysiwyg-editor {
+  @apply flex flex-col flex-1 h-full;
+}
+
+.exec-modal__editor-wrap .wysiwyg-editor .ProseMirror {
+  @apply flex-1 overflow-y-auto;
+  min-height: 200px;
+}
+
+/* Content label row with expand button */
+.exec-modal__content-label-row {
+  @apply flex items-center justify-between;
+}
+
+.exec-modal__expand-btn {
+  @apply text-muted-foreground hover:text-foreground transition-colors
+    text-base leading-none p-1 rounded hover:bg-accent;
+}
+
+/* Expanded editor overlay — sits above the existing modal */
+.exec-modal__expand-overlay {
+  @apply fixed inset-0 bg-black/70 flex items-center justify-center p-6;
+  z-index: calc(var(--z-modal) + 10);
+}
+
+.exec-modal__expand-modal {
+  @apply bg-background border border-border rounded-xl shadow-2xl flex flex-col;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1100px;
+}
+
+.exec-modal__expand-header {
+  @apply flex items-center justify-between px-6 py-4 border-b border-border shrink-0;
+}
+
+.exec-modal__expand-title {
+  @apply text-base font-semibold text-foreground;
+}
+
+.exec-modal__expand-body {
+  @apply flex-1 min-h-0 flex flex-col p-4;
+}
+
+.exec-modal__expand-body .wysiwyg-editor {
+  @apply flex flex-col flex-1 h-full;
+}
+
+.exec-modal__expand-body .wysiwyg-editor .ProseMirror {
+  @apply flex-1 overflow-y-auto;
+}
+
+.exec-modal__expand-footer {
+  @apply flex justify-end px-6 py-4 border-t border-border shrink-0;
+}
+
+/* Footer */
+.exec-modal__footer {
+  @apply flex justify-end gap-3 px-6 py-4 border-t border-border shrink-0;
+}
+
+.exec-modal__btn-close {
+  @apply px-4 py-2 text-sm border border-border rounded-md hover:bg-accent transition-colors;
+}
+
+.exec-modal__btn-copy {
+  @apply px-4 py-2 text-sm border border-primary text-primary rounded-md
+    hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.exec-modal__btn-create {
+  @apply px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md
+    hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed;
+}

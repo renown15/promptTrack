@@ -1,0 +1,12 @@
+.wysiwyg-toolbar {
+  @apply flex flex-wrap gap-1 p-2 border-b border-input bg-muted/40;
+}
+
+.wysiwyg-toolbar__btn {
+  @apply px-2 py-1 text-xs font-mono rounded border border-transparent
+    hover:bg-accent hover:border-border transition-colors min-w-[28px] text-center;
+}
+
+.wysiwyg-toolbar__btn--active {
+  @apply bg-primary/10 border-primary/30 text-primary;
+}

@@ -1,0 +1,57 @@
+.wysiwyg-editor {
+  @apply rounded-md border border-input bg-background overflow-hidden;
+}
+
+.wysiwyg-editor:focus-within {
+  @apply ring-2 ring-ring;
+}
+
+/* TipTap content area */
+.wysiwyg-editor__content {
+  @apply px-4 py-3 min-h-[240px] outline-none text-sm leading-relaxed;
+}
+
+/* Prose styles for rendered content */
+.wysiwyg-editor__content h1 {
+  @apply text-2xl font-bold mt-4 mb-2 first:mt-0;
+}
+
+.wysiwyg-editor__content h2 {
+  @apply text-xl font-semibold mt-4 mb-2 first:mt-0;
+}
+
+.wysiwyg-editor__content h3 {
+  @apply text-lg font-semibold mt-3 mb-1 first:mt-0;
+}
+
+.wysiwyg-editor__content p {
+  @apply mb-2 last:mb-0;
+}
+
+.wysiwyg-editor__content strong {
+  @apply font-semibold;
+}
+
+.wysiwyg-editor__content em {
+  @apply italic;
+}
+
+.wysiwyg-editor__content ul {
+  @apply list-disc pl-5 mb-2 space-y-0.5;
+}
+
+.wysiwyg-editor__content ol {
+  @apply list-decimal pl-5 mb-2 space-y-0.5;
+}
+
+.wysiwyg-editor__content code {
+  @apply bg-muted px-1 py-0.5 rounded text-xs font-mono;
+}
+
+.wysiwyg-editor__content pre {
+  @apply bg-muted rounded-md p-3 mb-2 overflow-x-auto;
+}
+
+.wysiwyg-editor__content pre code {
+  @apply bg-transparent p-0 text-xs;
+}

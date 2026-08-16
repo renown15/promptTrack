@@ -1,0 +1,121 @@
+import "@/components/features/collections/ProjectPicker.css";
+import {
+  useAddChainToCollection,
+  useAddPromptToCollection,
+  useProjectTree,
+  useRemoveChainFromCollection,
+  useRemovePromptFromCollection,
+} from "@/hooks/useCollections";
+import { useQueryClient } from "@tanstack/react-query";
+
+type Props = {
+  resourceId: string;
+  resourceType: "prompt" | "chain";
+};
+
+export function ProjectPicker({ resourceId, resourceType }: Props) {
+  const queryClient = useQueryClient();
+  const { data: tree } = useProjectTree();
+
+  const addPrompt = useAddPromptToCollection();
+  const removePrompt = useRemovePromptFromCollection();
+  const addChain = useAddChainToCollection();
+  const removeChain = useRemoveChainFromCollection();
+
+  if (!tree) {
+    return <span className="project-picker__loading">Loading…</span>;
+  }
+
+  // DEBUG: Log tree collections
+  if (typeof window !== "undefined") {
+    (window as any).__debugProjectPickerTree = {
+      totalCollections: tree.collections.length,
+      collectionIds: tree.collections.map((c) => ({ id: c.id, name: c.name })),
+    };
+  }
+
+  const memberIds = new Set(
+    tree.collections
+      .filter((c) =>
+        resourceType === "prompt"
+          ? c.prompts.some((p) => p.id === resourceId)
+          : c.chains.some((ch) => ch.id === resourceId)
+      )
+      .map((c) => c.id)
+  );
+
+  const nonMembers = tree.collections.filter((c) => !memberIds.has(c.id));
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["collections", "tree"] });
+  };
+
+  const handleAdd = (collectionId: string) => {
+    if (resourceType === "prompt") {
+      addPrompt.mutate(
+        { collectionId, promptId: resourceId },
+        { onSuccess: invalidate }
+      );
+    } else {
+      addChain.mutate(
+        { collectionId, chainId: resourceId },
+        { onSuccess: invalidate }
+      );
+    }
+  };
+
+  const handleRemove = (collectionId: string) => {
+    if (resourceType === "prompt") {
+      removePrompt.mutate(
+        { collectionId, promptId: resourceId },
+        { onSuccess: invalidate }
+      );
+    } else {
+      removeChain.mutate(
+        { collectionId, chainId: resourceId },
+        { onSuccess: invalidate }
+      );
+    }
+  };
+
+  const memberCollections = tree.collections.filter((c) => memberIds.has(c.id));
+
+  if (memberCollections.length === 0 && nonMembers.length === 0) {
+    return <span className="project-picker__empty">No collections yet</span>;
+  }
+
+  return (
+    <div className="project-picker">
+      <div className="project-picker__tags">
+        {memberCollections.map((c) => (
+          <span key={c.id} className="project-picker__tag">
+            {c.name}
+            <button
+              className="project-picker__remove"
+              onClick={() => handleRemove(c.id)}
+              title="Remove from collection"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+        {nonMembers.length > 0 && (
+          <select
+            className="project-picker__select"
+            value=""
+            onChange={(e) => {
+              if (e.target.value) handleAdd(e.target.value);
+            }}
+          >
+            <option value="">+ Add to collection</option>
+            {nonMembers.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,11 @@
+.app-shell {
+  @apply flex min-h-screen bg-background;
+}
+
+.app-shell__main {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+.app-shell__content {
+  @apply flex-1 p-6 overflow-auto;
+}

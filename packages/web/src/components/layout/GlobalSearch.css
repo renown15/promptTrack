@@ -1,0 +1,97 @@
+.global-search {
+  @apply relative flex-1;
+  max-width: 480px;
+}
+
+.global-search__input-wrap {
+  @apply flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 h-9;
+}
+
+.global-search__input-wrap:focus-within {
+  @apply border-ring bg-background ring-1 ring-ring;
+}
+
+.global-search__icon {
+  @apply text-muted-foreground text-base leading-none shrink-0 select-none;
+}
+
+.global-search__input {
+  @apply flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground
+    focus:outline-none;
+}
+
+.global-search__clear {
+  @apply text-muted-foreground hover:text-foreground transition-colors text-xs leading-none
+    cursor-pointer shrink-0;
+}
+
+.global-search__dropdown {
+  @apply absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-border bg-popover
+    shadow-lg overflow-hidden z-[var(--z-dropdown)];
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+}
+
+.global-search__result {
+  @apply flex flex-col gap-1.5 w-full px-3 py-2.5 text-left rounded-lg
+    hover:bg-accent transition-colors cursor-pointer;
+}
+
+.global-search__result-header {
+  @apply flex items-center gap-2 flex-wrap;
+}
+
+.global-search__result-name {
+  @apply text-sm font-medium text-foreground;
+}
+
+.global-search__result-env {
+  @apply text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0;
+}
+
+.global-search__result-env--draft {
+  @apply bg-muted text-muted-foreground;
+}
+
+.global-search__result-env--review {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.global-search__result-env--staging {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.global-search__result-env--production {
+  @apply bg-green-100 text-green-800;
+}
+
+.global-search__result-date {
+  @apply text-[11px] text-muted-foreground ml-auto shrink-0;
+}
+
+.global-search__result-preview {
+  @apply text-xs text-muted-foreground leading-relaxed;
+}
+
+.global-search__result-chains {
+  @apply flex flex-wrap gap-1;
+}
+
+.global-search__result-chain-tag {
+  @apply text-[10px] font-medium px-2 py-0.5 rounded-full
+    bg-primary/10 text-primary;
+}
+
+.global-search__result-filetype {
+  @apply text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0;
+}
+
+.global-search__result-filepath {
+  @apply text-xs text-muted-foreground truncate;
+}
+
+.global-search__empty {
+  @apply absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-border bg-popover
+    shadow-lg px-3 py-3 text-sm text-muted-foreground z-[var(--z-dropdown)];
+}

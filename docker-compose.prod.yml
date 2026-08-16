@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: prompttrack-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: prompttrack
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prompttrack_dev}
+      POSTGRES_DB: prompttrack
+    ports:
+      - "5451:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prompttrack -d prompttrack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+      target: production
+    container_name: prompttrack-api-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://prompttrack:${POSTGRES_PASSWORD:-prompttrack_dev}@postgres:5432/prompttrack
+      PORT: 3051
+      HOST: 0.0.0.0
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_EXPIRES_IN: 7d
+      LOG_LEVEL: info
+    ports:
+      - "3051:3051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+      target: production
+      args:
+        VITE_API_BASE_URL: http://localhost:3051/api
+    container_name: prompttrack-web-prod
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_prod_data:
