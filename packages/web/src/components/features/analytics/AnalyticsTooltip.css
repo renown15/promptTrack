@@ -3,7 +3,9 @@
   border: 1px solid #e5e7eb;
   border-radius: 0.75rem;
   padding: 0.875rem 1.25rem;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.12),
+    0 0 1px rgba(0, 0, 0, 0.08);
   color: #1f2937;
   font-size: 0.875rem;
   z-index: 1000;
