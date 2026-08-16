@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prompttrack_dev}
       POSTGRES_DB: prompttrack
     ports:
-      - "5451:5432"
+      - "127.0.0.1:5451:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,7 +24,7 @@ services:
       POSTGRES_PASSWORD: prompttrack_test
       POSTGRES_DB: prompttrack_test
     ports:
-      - "5453:5432"
+      - "127.0.0.1:5453:5432"
     tmpfs:
       - /var/lib/postgresql/data
     healthcheck:
@@ -45,7 +45,7 @@ services:
       PORT: 3051
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
     ports:
-      - "3051:3051"
+      - "127.0.0.1:3051:3051"
     volumes:
       - ./packages/api/src:/app/src
       - ./packages/api/prisma:/app/prisma
